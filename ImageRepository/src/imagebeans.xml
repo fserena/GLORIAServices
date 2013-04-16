@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/jdbc/gloriaDB" />
+	</bean>
+
+	<bean id="sqlImageSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="imageMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+			value="eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService" />
+		<property name="sqlSessionFactory" ref="sqlImageSessionFactory" />
+	</bean>
+
+	<bean id="imageAdapter" class="eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter">
+		<property name="imageDBService" ref="imageMapper"></property>
+	</bean>
+
+</beans>

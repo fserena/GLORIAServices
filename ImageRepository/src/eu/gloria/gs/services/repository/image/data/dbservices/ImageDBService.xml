@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS `gloria_services`.`image`
+		(
+		`idimage` int(11) NOT NULL AUTO_INCREMENT,
+		`rt` varchar(50) NOT NULL,
+		`user` varchar(40) NOT NULL,
+		`url` varchar(200) DEFAULT NULL,
+		`date`
+		datetime NOT NULL,
+		`rid` int(11) DEFAULT NULL,
+		`local_id` varchar(50)
+		NOT NULL,
+		`ccd` varchar(40) NOT NULL,
+		PRIMARY KEY (`idimage`),
+		KEY
+		`fk_image_rt` (`rt`),
+		KEY `fk_image_user` (`user`),
+		KEY `fk_image_rid`
+		(`rid`),
+		KEY `fk_image_ccd` (`ccd`),
+		CONSTRAINT `fk_image_rid` FOREIGN
+		KEY (`rid`) REFERENCES `gloria_services`.`reservation`
+		(`idreservation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+		CONSTRAINT
+		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `gloria_services`.`rt`
+		(`name`) ON DELETE
+		CASCADE ON UPDATE CASCADE,
+		CONSTRAINT `fk_image_user`
+		FOREIGN KEY (`user`) REFERENCES `gloria_services`.`user` (`name`) ON
+		DELETE NO ACTION ON UPDATE NO ACTION
+		) ENGINE=InnoDB DEFAULT
+		CHARSET=utf8
+	</update>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		idimage=#{id_}
+	</select>
+
+	<select id="getByUser"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		user=#{user_}
+	</select>
+
+	<select id="getByUrl"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		url=#{url_}
+	</select>
+
+	<select id="getByRT"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		rt=#{rt_}
+	</select>
+
+	<select id="getByRTLocalId"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		rt=#{rt_} AND
+		local_id=#{lid_}
+	</select>
+
+	<select id="getByReservation"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		rid=#{rid_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		INSERT INTO
+		`gloria_services`.`image`
+		(rt, user, date,
+		local_id, ccd)
+		VALUE ( #{rt}, #{user}, #{date}, #{local_id}, #{ccd})
+	</insert>
+
+	<delete id="removeByUser">
+		DELETE FROM `gloria_services`.`image`
+		WHERE
+		user=#{user_}
+	</delete>
+
+	<update id="setUser">
+		UPDATE `gloria_services`.`image`
+		SET
+		user=#{user_}
+		WHERE idimage
+		=#{id_}
+	</update>
+
+	<update id="setReservation">
+		UPDATE `gloria_services`.`image`
+		SET
+		rid=#{rid_}
+		WHERE
+		idimage
+		=#{id_}
+	</update>
+
+	<update id="setUrl">
+		UPDATE `gloria_services`.`image`
+		SET
+		url=#{url_}
+		WHERE
+		idimage
+		=#{id_}
+	</update>
+
+	<update id="setUrlByRTLocalId">
+		UPDATE `gloria_services`.`image`
+		SET
+		url=#{url_}
+		WHERE
+		rt=#{rt_} AND local_id=#{lid_}
+	</update>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`image`
+		WHERE
+		idimage=#{id_}
+	</select>
+
+	<select id="containsUrl" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`image`
+		WHERE
+		url=#{url_}
+	</select>
+
+	<select id="containsRTLocalId" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`image`
+		WHERE
+		rt=#{rt_} AND local_id=#{lid_}
+	</select>
+
+	<select id="getAllWithoutUrl"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE
+		url IS NULL
+	</select>
+
+</mapper>
