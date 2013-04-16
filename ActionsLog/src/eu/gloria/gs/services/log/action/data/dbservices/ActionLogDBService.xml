@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.log.action.data.dbservices.ActionLogDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS
+		`gloria_services`.`actions_log` (
+		`idactions_log` int(11) NOT NULL
+		AUTO_INCREMENT,
+		`date` datetime NOT
+		NULL,
+		`user` varchar(40) DEFAULT
+		NULL,
+		`action` varchar(1000) DEFAULT
+		NULL,
+		PRIMARY KEY (`idactions_log`),
+		UNIQUE KEY `idactions_log_UNIQUE`
+		(`idactions_log`),
+		KEY `username`
+		(`user`),
+		KEY `user_fk` (`user`),
+		CONSTRAINT `user_fk` FOREIGN KEY
+		(`user`) REFERENCES `user` (`name`)
+		ON DELETE
+		CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`gloria_services`.`actions_log`
+		WHERE
+		user=#{user_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		INSERT INTO
+		`gloria_services`.`actions_log`
+		(user, date,
+		action)
+		VALUE ( #{user}, #{date},
+		#{action} )
+	</insert>
+
+	<delete id="removeByUser">
+		DELETE FROM `gloria_services`.`actions_log`
+		WHERE
+		user=#{user_}
+	</delete>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`actions_log`
+		WHERE
+		user=#{user_}
+	</select>
+</mapper>
