@@ -21,6 +21,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	private CCDTeleoperationInterface ccd;
 	private String username;
 	private String password;
+	private boolean thereArePending;
 
 	public void setAdapter(ImageRepositoryAdapter adapter) {
 		this.adapter = adapter;
@@ -46,7 +47,11 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	protected void doWork() {
 
 		try {
-			Thread.sleep(1000);
+			if (thereArePending) {
+				Thread.sleep(100);
+			} else {
+				Thread.sleep(1000);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -70,57 +75,44 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		} catch (ImageRepositoryAdapterException e) {
 		}
 
+		thereArePending = false;
+
 		for (ImageInformation imageInfo : notUrlCompleted) {
 
-			int retries = 0;
 			String url = null;
 
-			while (retries < 10 && url == null) {
+			try {
+				url = ccd.getImageURL(imageInfo.getRt(), imageInfo.getCcd(),
+						imageInfo.getLocalid(), ImageExtensionFormat.JPG);
 
-				try {
-					url = ccd.getImageURL(imageInfo.getRt(),
-							imageInfo.getCcd(), imageInfo.getLocalid(),
-							ImageExtensionFormat.JPG);
-
-					adapter.setUrlByRT(imageInfo.getRt(),
-							imageInfo.getLocalid(), url);
-
-				} catch (CCDTeleoperationException e) {
-					if (e.getMessage().contains("yet")) {
-						try {
-							Thread.sleep((int) (100));
-						} catch (InterruptedException s) {
-						}
-					} else {
-						try {
-							adapter.removeImage(imageInfo.getId());
-						} catch (ImageRepositoryAdapterException e1) {
-							e1.printStackTrace();
-						}
-
-						try {
-							alog.registerAction(username, new Date(),
-									"Image entry " + imageInfo.getId()
-											+ " removed");
-						} catch (ActionLogException ea) {
-							System.out.println(ea.getMessage());
-						}
+				adapter.setUrlByRT(imageInfo.getRt(), imageInfo.getLocalid(),
+						url);
+			} catch (CCDTeleoperationException e) {
+				if (e.getMessage().contains("yet")) {
+					// Ignore the image this time, it will be treated by the
+					// next
+					// iteration of the executor
+					thereArePending = true;
+				} else {
+					try {
+						adapter.removeImage(imageInfo.getId());
+					} catch (ImageRepositoryAdapterException e1) {
+						e1.printStackTrace();
 					}
 
-				} catch (ImageRepositoryAdapterException e) {
-					System.out.println(e.getMessage());
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
+					try {
+						alog.registerAction(username, new Date(),
+								"Image entry " + imageInfo.getId() + " removed");
+					} catch (ActionLogException ea) {
+						System.out.println(ea.getMessage());
+					}
 				}
 
-				retries++;
+			} catch (ImageRepositoryAdapterException e) {
+				System.out.println(e.getMessage());
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
 			}
-
-			/*try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
 		}
 	}
 }
