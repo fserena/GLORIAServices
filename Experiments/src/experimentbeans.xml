@@ -1,0 +1,1885 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath*:wsclientbeans.xml" />
+
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/jdbc/gloriaDB" />
+	</bean>
+
+	<bean id="sqlExperimentSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="onlineExperimentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+			value="eu.gloria.gs.services.experiment.online.data.dbservices.OnlineExperimentDBService" />
+		<property name="sqlSessionFactory" ref="sqlExperimentSessionFactory" />
+	</bean>
+
+	<bean id="experimentAdapter"
+		class="eu.gloria.gs.services.experiment.online.data.ExperimentDBAdapter">
+		<property name="onlineExperimentDBService" ref="onlineExperimentMapper"></property>
+		<property name="parameterFactory" ref="parameterFactory"></property>
+		<property name="operationFactory" ref="operationFactory"></property>
+	</bean>
+
+	<bean id="modelFactory"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentModelFactory"
+		scope="singleton">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="parameterFactory" ref="parameterFactory"></property>
+		<property name="operationFactory" ref="operationFactory"></property>
+		<property name="featureFactory" ref="featureFactory"></property>
+	</bean>
+
+	<bean id="modelManager"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentModelManager"
+		scope="singleton">
+		<property name="modelFactory" ref="modelFactory"></property>
+		<property name="adapter" ref="experimentAdapter"></property>
+	</bean>
+
+	<bean id="contextFactory"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentContextFactory"
+		scope="singleton">
+		<property name="adapter" ref="experimentAdapter"></property>
+	</bean>
+
+	<bean id="contextManager"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentContextManager"
+		scope="singleton">
+		<property name="contextFactory" ref="contextFactory">
+		</property>
+	</bean>
+
+	<bean id="rtBooker"
+		class="eu.gloria.gs.services.experiment.online.reservation.RTBooker">
+		<property name="RTRepository" ref="rtRepository"></property>
+	</bean>
+
+	<bean id="experimentBooker"
+		class="eu.gloria.gs.services.experiment.online.reservation.ExperimentBooker">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="RTBooker" ref="rtBooker"></property>
+	</bean>
+
+	<bean id="customModel"
+		class="eu.gloria.gs.services.experiment.online.models.CustomExperimentModel">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="parameterFactory" ref="parameterFactory"></property>
+	</bean>
+
+	<bean id="parameterFactory"
+		class="eu.gloria.gs.services.experiment.online.parameters.ExperimentParameterFactory"
+		scope="singleton">
+	</bean>
+
+	<bean id="operationFactory"
+		class="eu.gloria.gs.services.experiment.online.operations.ExperimentOperationFactory"
+		scope="singleton">
+	</bean>
+
+	<bean id="featureFactory"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeatureFactory"
+		scope="singleton">
+	</bean>
+
+	<bean id="INTEGER_VALUE"
+		class="eu.gloria.gs.services.experiment.online.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.lang.Integer"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DOUBLE_VALUE"
+		class="eu.gloria.gs.services.experiment.online.parameters.ParameterType"
+		scope="singleton">
+		<property name="operationDependent" value="false"></property>
+		<property name="valueType" value="java.lang.Double"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Double</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="STRING_VALUE"
+		class="eu.gloria.gs.services.experiment.online.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.lang.String"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="POINTER_VALUE" parent="STRING_VALUE" scope="singleton">
+		<property name="operationDependent" value="true"></property>
+	</bean>
+
+	<bean id="NAMED_INTEGER" parent="STRING_VALUE" scope="singleton">
+		<property name="valueType" value="java.lang.Integer"></property>
+	</bean>
+
+	<bean id="NAMED_DOUBLE" parent="STRING_VALUE" scope="singleton">
+		<property name="valueType" value="java.lang.Double"></property>
+	</bean>
+
+	<bean id="ORDER_STRING" parent="STRING_VALUE" scope="singleton">
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DEPENDANT_ORDER_STRING" parent="STRING_VALUE" scope="singleton">
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.String</value>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="experimentContextService"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentContextService"
+		abstract="true">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="username" value="username"></property>
+		<property name="password" value="password"></property>
+		<property name="RTRepository" ref="rtRepository"></property>
+		<property name="userRepository" ref="userRepository"></property>
+		<property name="CCDTeleoperation" ref="ccdTeleoperation"></property>
+		<property name="domeTeleoperation" ref="domeTeleoperation"></property>
+		<property name="SCamTeleoperation" ref="scamTeleoperation"></property>
+		<property name="mountTeleoperation" ref="mountTeleoperation"></property>
+		<property name="focuserTeleoperation" ref="focuserTeleoperation"></property>
+		<property name="imageRepository" ref="imageRepository"></property>
+	</bean>
+
+	<bean id="parameterContextService"
+		class="eu.gloria.gs.services.experiment.online.parameters.ParameterContextService"
+		parent="experimentContextService" scope="singleton">
+	</bean>
+
+	<bean id="operationContextService"
+		class="eu.gloria.gs.services.experiment.online.operations.OperationContextService"
+		parent="experimentContextService" scope="singleton">
+	</bean>
+
+	<bean id="INTEGER"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="INTEGER_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOUBLE"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="DOUBLE_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="STRING"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="STRING_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="URL" parent="STRING" scope="singleton">
+		<property name="name" value="URL"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>http://</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="STREAM_URL" parent="SCAM_PROPERTY" scope="singleton">
+		<property name="name" value="STREAM_URL"></property>
+	</bean>
+
+	<bean id="DYNAMIC_URL" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="DYNAMIC_URL"></property>
+	</bean>
+
+	<bean id="STATIC_URL" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="STATIC_URL"></property>
+	</bean>
+
+	<bean id="FORMAT" parent="STRING" scope="singleton">
+		<property name="name" value="FORMAT"></property>
+	</bean>
+
+	<bean id="JPG_FORMAT" parent="FORMAT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>JPG</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FITS_FORMAT" parent="FORMAT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>FITS</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MOVEMENT" parent="STRING" scope="singleton">
+		<property name="name" value="MOVEMENT"></property>
+	</bean>
+
+	<bean id="OPEN_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>OPEN</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CLOSE_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>CLOSE</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LEFT_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>LEFT</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="RIGHT_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>RIGHT</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="UP_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>UP</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOWN_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>DOWN</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="POINTER" parent="STRING" scope="singleton">
+		<property name="type" ref="POINTER_VALUE"></property>
+		<property name="operationDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="ExperimentOperation"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="RT_NAME"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="ORDER_STRING"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="loadRTName">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DEVICE_NAME"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="DEPENDANT_ORDER_STRING"></property>
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="RT_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+		<property name="initOperations">
+			<map>
+				<entry key="loadDeviceName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>deviceType</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCD_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>CCD</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SCAM_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>SURVEILLANCE_CAMERA</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MOUNT_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>MOUNT</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOME_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>DOME</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FOCUSER_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>FOCUS</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DEVICE_PROPERTY"
+		class="eu.gloria.gs.services.experiment.online.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="STRING_VALUE"></property>
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="DEVICE_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCD_PROPERTY" parent="DEVICE_PROPERTY" scope="singleton">
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="CCD_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SCAM_PROPERTY" parent="DEVICE_PROPERTY" scope="singleton">
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="SCAM_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PARAMETER_CONTEXT"
+		class="eu.gloria.gs.services.experiment.online.parameters.ParameterContext"
+		scope="prototype">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="contextService" ref="parameterContextService"></property>
+	</bean>
+
+	<bean id="CCD_BRIGHTNESS" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_CONTRAST" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_GAIN" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_EXPOSURE" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="CCD_EXPOSURE"></property>
+		<property name="type" ref="NAMED_DOUBLE"></property>
+	</bean>
+
+	<bean id="ExperimentOperation"
+		class="eu.gloria.gs.services.experiment.online.operations.BeanExperimentOperation"
+		scope="singleton">
+		<property name="type" ref="OPERATION_TYPE"></property>
+	</bean>
+
+	<bean id="OPERATION_TYPE"
+		class="eu.gloria.gs.services.experiment.online.operations.OperationType"
+		scope="singleton">
+	</bean>
+
+	<bean id="SetIntParameter" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="INTEGER"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="setParameter">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToObject" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="STRING"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="pointToObject">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetStream" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="SCAM_NAME"></ref>
+				<ref bean="STREAM_URL"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="getStream">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="TakeImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="STATIC_URL"></ref>
+				<ref bean="FORMAT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="takeImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadContinuousImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="DYNAMIC_URL"></ref>
+				<ref bean="FORMAT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="getContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Park" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="park">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence1" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="POINTER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence2" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="OPERATION_CONTEXT"
+		class="eu.gloria.gs.services.experiment.online.operations.OperationContext"
+		scope="prototype">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="contextService" ref="operationContextService"></property>
+	</bean>
+
+	<bean id="LoadCCDAttributes" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="CCD_BRIGHTNESS"></ref>
+				<ref bean="CCD_CONTRAST"></ref>
+				<ref bean="CCD_GAIN"></ref>
+				<ref bean="CCD_EXPOSURE"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadCCDAttributes">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SaveCCDAttributes" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="CCD_BRIGHTNESS"></ref>
+				<ref bean="CCD_CONTRAST"></ref>
+				<ref bean="CCD_GAIN"></ref>
+				<ref bean="CCD_EXPOSURE"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="saveCCDAttributes">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ConstrainedMountMove" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="MOUNT_NAME"></ref>
+				<ref bean="MOVEMENT"></ref>
+				<ref bean="INTEGER"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="constrainedMountMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DomeMove" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="DOME_NAME"></ref>
+				<ref bean="MOVEMENT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="domeMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ChangeFocusRelative" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="FOCUSER_NAME"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="changeFocusRelative">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DomeManagementFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="open_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="OPEN_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="close_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CLOSE_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dome_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="DOME_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="open_dome">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="DomeMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>dome_name</value>
+								<value>open_direction</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="close_dome">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="DomeMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>dome_name</value>
+								<value>close_direction</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MountConstrainedManagementFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="left_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="LEFT_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="right_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RIGHT_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="up_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="UP_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="down_direction">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="DOWN_MOVEMENT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="mount_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="MOUNT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="max_moves">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="INTEGER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg2</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="current_moves_x">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="INTEGER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>0</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="current_moves_y">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="INTEGER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>0</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="move_left">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="ConstrainedMountMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>mount_name</value>
+								<value>left_direction</value>
+								<value>max_moves</value>
+								<value>current_moves_x</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="move_right">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="ConstrainedMountMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>mount_name</value>
+								<value>right_direction</value>
+								<value>max_moves</value>
+								<value>current_moves_x</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="move_up">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="ConstrainedMountMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>mount_name</value>
+								<value>up_direction</value>
+								<value>max_moves</value>
+								<value>current_moves_y</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="move_down">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="ConstrainedMountMove"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>mount_name</value>
+								<value>down_direction</value>
+								<value>max_moves</value>
+								<value>current_moves_y</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FocusManagementFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="focus_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="FOCUSER_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="focus_steps">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="INTEGER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="move_focus">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="ChangeFocusRelative"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>focus_name</value>
+								<value>focus_steps</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCDContinuousImageFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_cont_url">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="DYNAMIC_URL"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="jpg_format">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="JPG_FORMAT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="fits_format">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="FITS_FORMAT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_continuous_image_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>load_continuous_image</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="load_continuous_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadContinuousImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
+								<value>ccd_cont_url</value>
+								<value>jpg_format</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCDInstantaneousJPGImageFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="jpg_format">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="JPG_FORMAT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_inst_jpg_url">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="STATIC_URL"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="take_jpg_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="TakeImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
+								<value>ccd_inst_jpg_url</value>
+								<value>jpg_format</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCDInstantaneousFITSImageFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="fits_format">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="FITS_FORMAT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>null</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_inst_fits_url">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="STATIC_URL"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="take_fits_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="TakeImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
+								<value>ccd_inst_url</value>
+								<value>fits_format</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SurveillanceImageFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="scam_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="SCAM_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="stream_url">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="STREAM_URL"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>scam_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="load_stream">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="GetStream"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>scam_name</value>
+								<value>stream_url</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCDAttributesManagementFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>rt_name</value>
+								<value>arg1</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_brightness">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_BRIGHTNESS"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_contrast">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_CONTRAST"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_gain">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_GAIN"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="ccd_exposure">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_EXPOSURE"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="load_ccd_attributes">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadCCDAttributes"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
+								<value>ccd_brightness</value>
+								<value>ccd_contrast</value>
+								<value>ccd_gain</value>
+								<value>ccd_exposure</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="save_ccd_attributes">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="SaveCCDAttributes"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
+								<value>ccd_brightness</value>
+								<value>ccd_contrast</value>
+								<value>ccd_gain</value>
+								<value>ccd_exposure</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToObjectFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="object">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="STRING"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="center_object">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="PointToObject"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>object</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FinishParkingFeature"
+		class="eu.gloria.gs.services.experiment.online.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="rt_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="RT_NAME"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>arg0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="park_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>park</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="park">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Park"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="end">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Sequence1"></property>
+						<property name="relations">
+							<list>
+								<value>park_ptr</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>
