@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.user.data.dbservices.UserDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS `gloria_services`.`user` (
+		`name` varchar(40) NOT NULL,
+		`password` varchar(45) DEFAULT NULL,
+		`roles` varchar(20) NOT NULL,
+		PRIMARY KEY (`name`),
+		UNIQUE KEY
+		`name_UNIQUE` (`name`)
+		) ENGINE=InnoDB
+		DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.repository.user.data.dbservices.UserEntry">
+		SELECT * FROM
+		`gloria_services`.`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.user.data.dbservices.UserEntry">
+		INSERT INTO
+		`gloria_services`.`user`
+		(name,
+		password,
+		roles)
+		VALUE ( #{name},
+		#{password}, #{roles} )
+	</insert>
+
+	<delete id="remove">
+		DELETE FROM `gloria_services`.`user`
+		WHERE
+		name=#{name_}
+	</delete>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getPassword" resultType="string">
+		SELECT password FROM
+		`gloria_services`.`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setPassword">
+		UPDATE `gloria_services`.`user`
+		SET password=
+		#{password_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getRoles" resultType="string">
+		SELECT roles FROM
+		`gloria_services`.`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setRoles">
+		UPDATE `gloria_services`.`user`
+		SET roles= #{roles_}
+		WHERE name
+		=#{name_}
+	</update>
+
+</mapper>
