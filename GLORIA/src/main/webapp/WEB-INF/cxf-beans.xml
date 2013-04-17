@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<import resource="classpath*:userbeans.xml" />
+	<import resource="classpath*:experimentbeans.xml" />
+	<import resource="classpath*:rtbeans.xml" />
+	<import resource="classpath*:actionlogbeans.xml" />
+	<import resource="classpath*:imagebeans.xml" />
+	<import resource="classpath*:wsclientbeans.xml" />
+
+	<jaxws:endpoint xmlns:tns="http://action.log.services.gs.gloria.eu/"
+		id="actionlog" endpointName="tns:ActionLogPort" serviceName="tns:ActionLogService"
+		address="/ActionLogPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.log.action.ActionLog">
+				<property name="adapter" ref="actionLogAdapter"></property>
+				<property name="username" value="user"></property>
+				<property name="password" value="password"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="actionLogPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://user.repository.services.gs.gloria.eu/"
+		id="userrepository" endpointName="tns:UserRepositoryPort" serviceName="tns:UserRepositoryService"
+		address="/UserRepositoryPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.repository.user.UserRepository">
+				<property name="adapter" ref="userAdapter"></property>
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.repository.user.UserRepositoryServerInterceptor">
+				<constructor-arg>
+					<map>
+						<entry key="action" value="UsernameToken"></entry>
+						<entry key="passwordType" value="PasswordText"></entry>
+						<entry key="passwordCallbackRef">
+							<ref bean="userRepositoryHandler"></ref>
+						</entry>
+					</map>
+				</constructor-arg>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<bean id="userRepositoryHandler"
+		class="eu.gloria.gs.services.repository.user.UserRepositoryServerPasswordHandler">
+		<property name="adapter">
+			<ref bean="userAdapter"></ref>
+		</property>
+	</bean>
+
+	<jaxws:endpoint xmlns:tns="http://rt.repository.services.gs.gloria.eu/"
+		id="rtrepository" endpointName="tns:RTRepositoryPort" serviceName="tns:RTRepositoryService"
+		address="/RTRepositoryPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.repository.rt.RTRepository">
+				<property name="adapter" ref="rtAdapter"></property>
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="rtRepositoryPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://image.repository.services.gs.gloria.eu/"
+		id="imagerepository" endpointName="tns:ImageRepositoryPort"
+		serviceName="tns:ImageRepositoryService" address="/ImageRepositoryPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.repository.image.ImageRepository">
+				<property name="adapter" ref="imageAdapter"></property>
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="rtRepositoryPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<bean id="imageURLRetrieveExecutor"
+		class="eu.gloria.gs.services.repository.image.ImageURLRetrieveExecutor"
+		scope="singleton">
+		<property name="adapter" ref="imageAdapter"></property>
+		<property name="CCDTeleoperation" ref="ccdTeleoperation"></property>
+		<property name="actionLog" ref="actionLog"></property>
+		<property name="username" value="user"></property>
+		<property name="password" value="password"></property>
+	</bean>
+
+	<jaxws:endpoint xmlns:tns="http://online.experiment.services.gs.gloria.eu/"
+		id="onlineexperiment" endpointName="tns:OnlineExperimentPort"
+		serviceName="tns:OnlineExperimentService" address="/OnlineExperimentPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.experiment.online.OnlineExperiment">
+				<property name="adapter" ref="experimentAdapter"></property>
+				<property name="booker" ref="experimentBooker"></property>
+				<property name="contextManager" ref="contextManager"></property>
+				<property name="modelManager" ref="modelManager"></property>
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="experimentPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<bean id="experimentExecutor"
+		class="eu.gloria.gs.services.experiment.online.ExperimentExecutor"
+		scope="singleton">
+		<property name="adapter" ref="experimentAdapter"></property>
+		<property name="contextManager" ref="contextManager"></property>
+		<property name="actionLog" ref="actionLog"></property>
+		<property name="username" value="password"></property>
+		<property name="password" value="user"></property>
+	</bean>
+
+	<bean id="serverResolver" class="eu.gloria.gs.services.teleoperation.rts.RTSResolver"
+		scope="singleton">
+		<property name="RTRepository" ref="rtRepository"></property>
+	</bean>
+
+	<jaxws:endpoint xmlns:tns="http://scam.teleoperation.services.gs.gloria.eu/"
+		id="scamteleoperation" endpointName="tns:SCamTeleoperationPort"
+		serviceName="tns:SCamTeleoperationService" address="/SCamTeleoperationPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://mount.teleoperation.services.gs.gloria.eu/"
+		id="mountteleoperation" endpointName="tns:MountTeleoperationPort"
+		serviceName="tns:MountTeleoperationService" address="/MountTeleoperationPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.teleoperation.mount.MountTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://dome.teleoperation.services.gs.gloria.eu/"
+		id="dometeleoperation" endpointName="tns:DomeTeleoperationPort"
+		serviceName="tns:DomeTeleoperationService" address="/DomeTeleoperationPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<bean id="userDependantPasswordHandler"
+		class="eu.gloria.gs.services.core.security.server.user.UserServerPasswordHandler">
+		<property name="userRepository" ref="userRepository"></property>
+	</bean>
+
+	<bean id="teleoperationPasswordHandler" parent="userDependantPasswordHandler">
+		<property name="username" value="user"></property>
+		<property name="password" value="password"></property>
+		<property name="grantedRoles">
+			<list value-type="eu.gloria.gs.services.repository.user.data.UserRole">
+				<value>ADMIN</value>
+				<value>WEB_SERVICE</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="experimentPasswordHandler" parent="userDependantPasswordHandler">
+		<property name="username" value="user"></property>
+		<property name="password" value="password"></property>
+	</bean>
+
+	<bean id="actionLogPasswordHandler" parent="userDependantPasswordHandler">
+		<property name="username" value="user"></property>
+		<property name="password" value="password"></property>
+		<property name="grantedRoles">
+			<list value-type="eu.gloria.gs.services.repository.user.data.UserRole">
+				<value>ADMIN</value>
+				<value>WEB_SERVICE</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="rtRepositoryPasswordHandler" parent="userDependantPasswordHandler">
+		<property name="username" value="user"></property>
+		<property name="password" value="password"></property>
+	</bean>
+
+	<jaxws:endpoint xmlns:tns="http://ccd.teleoperation.services.gs.gloria.eu/"
+		id="ccdteleoperation" endpointName="tns:CCDTeleoperationPort"
+		serviceName="tns:CCDTeleoperationService" address="/CCDTeleoperationPort">
+		<jaxws:implementor>
+			<bean class="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+				<property name="imageRepository" ref="imageRepository"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://focuser.teleoperation.services.gs.gloria.eu/"
+		id="focuserteleoperation" endpointName="tns:FocuserTeleoperationPort"
+		serviceName="tns:FocuserTeleoperationService" address="/FocuserTeleoperationPort">
+		<jaxws:implementor>
+			<bean
+				class="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+</beans>
