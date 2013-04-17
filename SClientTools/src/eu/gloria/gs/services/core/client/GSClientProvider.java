@@ -1,0 +1,123 @@
+package eu.gloria.gs.services.core.client;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import eu.gloria.gs.services.core.security.client.Credentials;
+import eu.gloria.gs.services.core.security.client.ThreadCredentialsStore;
+import eu.gloria.gs.services.experiment.online.OnlineExperimentInterface;
+import eu.gloria.gs.services.log.action.ActionLogInterface;
+import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
+import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
+import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
+import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
+
+public class GSClientProvider {
+
+	private final static String ACTIONLOG_BEAN_NAME = "actionLogClientFactory";
+	private final static String RTREPOSITORY_BEAN_NAME = "rtRepositoryClientFactory";
+	private final static String IMAGEREPOSITORY_BEAN_NAME = "imageRepositoryClientFactory";
+	private final static String USERREPOSITORY_BEAN_NAME = "userRepositoryClientFactory";
+	private final static String CCDTELEOPERATION_BEAN_NAME = "ccdTeleoperationClientFactory";
+	private final static String DOMETELEOPERATION_BEAN_NAME = "domeTeleoperationClientFactory";
+	private final static String MOUNTTELEOPERATION_BEAN_NAME = "mountTeleoperationClientFactory";
+	private final static String FOCUSERTELEOPERATION_BEAN_NAME = "focuserTeleoperationClientFactory";
+	private final static String SCAMTELEOPERATION_BEAN_NAME = "scamTeleoperationClientFactory";
+	private final static String ONLINEEXPERIMENT_BEAN_NAME = "onlineExperimentClientFactory";
+	private static String HOSTNAME = "localhost";
+	private static String PORT = "9443";
+	private static ClassPathXmlApplicationContext context;
+
+	static {
+		context = new ClassPathXmlApplicationContext("gsbeans.xml");
+	}
+
+	public static void setCredentials(String username, String password) {
+		Credentials credentials = new Credentials();
+		credentials.setUsername(username);
+		credentials.setPassword(password);
+		ThreadCredentialsStore.storeCredentials(credentials);
+	}
+
+	public static void setHost(String hostname) {
+		HOSTNAME = hostname;
+	}
+
+	public static String getHost() {
+		return HOSTNAME;
+	}
+
+	public static void setPort(String port) {
+		PORT = port;
+	}
+
+	public static String getPort() {
+		return PORT;
+	}
+
+	public static ActionLogInterface getActionLogClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(ACTIONLOG_BEAN_NAME);
+
+		return (ActionLogInterface) factory.create();
+	}
+
+	public static RTRepositoryInterface getRTRepositoryClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(RTREPOSITORY_BEAN_NAME);
+
+		return (RTRepositoryInterface) factory.create();
+	}
+
+	public static ImageRepositoryInterface getImageRepositoryClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(IMAGEREPOSITORY_BEAN_NAME);
+
+		return (ImageRepositoryInterface) factory.create();
+	}
+
+	public static UserRepositoryInterface getUserRepositoryClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(USERREPOSITORY_BEAN_NAME);
+		return (UserRepositoryInterface) factory.create();
+	}
+
+	public static CCDTeleoperationInterface getCCDTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(CCDTELEOPERATION_BEAN_NAME);
+		return (CCDTeleoperationInterface) factory.create();
+	}
+
+	public static DomeTeleoperationInterface getDomeTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(DOMETELEOPERATION_BEAN_NAME);
+		return (DomeTeleoperationInterface) factory.create();
+	}
+
+	public static MountTeleoperationInterface getMountTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(MOUNTTELEOPERATION_BEAN_NAME);
+		return (MountTeleoperationInterface) factory.create();
+	}
+
+	public static SCamTeleoperationInterface getSCamTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(SCAMTELEOPERATION_BEAN_NAME);
+		return (SCamTeleoperationInterface) factory.create();
+	}
+
+	public static OnlineExperimentInterface getOnlineExperimentClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(ONLINEEXPERIMENT_BEAN_NAME);
+		return (OnlineExperimentInterface) factory.create();
+	}
+
+	public static FocuserTeleoperationInterface getFocuserTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(FOCUSERTELEOPERATION_BEAN_NAME);
+		return (FocuserTeleoperationInterface) factory.create();
+	}
+}

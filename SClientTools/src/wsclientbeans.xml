@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="actionLog" class="eu.gloria.gs.services.log.action.ActionLogInterface"
+		factory-bean="actionLogWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="rtRepository"
+		class="eu.gloria.gs.services.repository.rt.RTRepositoryInterface"
+		factory-bean="rtRepositoryWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="userRepository"
+		class="eu.gloria.gs.services.repository.user.UserRepositoryInterface"
+		factory-bean="userRepositoryWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="ccdTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface"
+		factory-bean="ccdTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="domeTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface"
+		factory-bean="domeTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="mountTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface"
+		factory-bean="mountTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="scamTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface"
+		factory-bean="scamTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="focuserTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"
+		factory-bean="focuserTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="onlineExperiment"
+		class="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"
+		factory-bean="onlineExperimentWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="imageRepository"
+		class="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"
+		factory-bean="imageRepositoryWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
+	<bean id="WSClientFactory" class="eu.gloria.gs.services.core.client.WSClientFactory"
+		lazy-init="true" scope="singleton">
+		<property name="host" value="localhost"></property>
+		<property name="port" value="8443"></property>
+	</bean>
+
+	<bean id="ccdTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="CCDTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="rtRepositoryWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="RTRepositoryPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.repository.rt.RTRepositoryInterface"></property>
+	</bean>
+
+	<bean id="userRepositoryWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="UserRepositoryPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.repository.user.UserRepositoryInterface"></property>
+	</bean>
+
+	<bean id="actionLogWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="ActionLogPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.log.action.ActionLogInterface"></property>
+	</bean>
+
+	<bean id="domeTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="DomeTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="mountTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="MountTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="scamTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="SCamTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="focuserTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="FocuserTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="onlineExperimentWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="OnlineExperimentPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"></property>
+	</bean>
+
+	<bean id="imageRepositoryWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="ImageRepositoryPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"></property>
+	</bean>
+
+</beans>
