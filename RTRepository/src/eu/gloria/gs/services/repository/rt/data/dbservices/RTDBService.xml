@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.RTDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS `gloria_services`.`rt` (
+		`name` varchar(50) NOT NULL,
+		`description` varchar(100) DEFAULT NULL,
+		`url` varchar(100) NOT NULL,
+		`public_key` blob,
+		`owner` varchar(50) NOT
+		NULL,
+		`oid` int(11) DEFAULT NULL,
+		`longitude` double DEFAULT NULL,
+		`latitude` double DEFAULT NULL,
+		`starting_avl` datetime DEFAULT NULL,
+		`ending_avl` datetime DEFAULT NULL,
+		PRIMARY KEY (`name`),
+		KEY `oid`
+		(`oid`),
+		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES
+		`gloria_services`.`observatory` (`oid`) ON DELETE
+		CASCADE ON UPDATE
+		CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED
+	</update>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTEntry">
+		SELECT * FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.RTEntry">
+		INSERT INTO
+		`gloria_services`.`rt`
+		(name,
+		owner, url)
+		VALUE
+		( #{name}, #{owner},
+		#{url} )
+	</insert>
+
+	<delete id="remove">
+		DELETE FROM `gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</delete>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getOwner" resultType="string">
+		SELECT owner FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setDescription">
+		UPDATE `gloria_services`.`rt`
+		SET description=
+		#{description_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getDescription" resultType="string">
+		SELECT description FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setPublicKey">
+		UPDATE `gloria_services`.`rt`
+		SET public_key= #{pk_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getPublicKey" resultType="string">
+		SELECT public_key FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setCoordinates">
+		UPDATE `gloria_services`.`rt`
+		SET latitude= #{lat_},
+		longitude= #{long_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getLatitude" resultType="double">
+		SELECT latitude FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getAvailability"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTAvailabilityEntry">
+		SELECT
+		starting_avl,ending_avl FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setStartingAvailability">
+		UPDATE `gloria_services`.`rt`
+		SET starting_avl=
+		#{starting_}
+		WHERE name=#{name_}
+	</update>
+
+	<update id="setEndingAvailability">
+		UPDATE `gloria_services`.`rt`
+		SET ending_avl=
+		#{ending_}
+		WHERE name=#{name_}
+	</update>
+
+	<select id="getLongitude" resultType="double">
+		SELECT longitude FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getObservatory" resultType="int">
+		SELECT oid FROM
+		`gloria_services`.`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setObservatory">
+		UPDATE `gloria_services`.`rt`
+		SET oid= #{oid_}
+		WHERE
+		name
+		=#{name_}
+	</update>
+
+	<select id="getByObservatoryId" resultType="string">
+		SELECT name FROM
+		`gloria_services`.`rt`
+		WHERE
+		oid=#{oid_}
+	</select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS
+		`gloria_services`.`observatory` (
+		`oid`
+		int(11) NOT NULL AUTO_INCREMENT,
+		`city` varchar(50) CHARACTER SET
+		utf8 NOT NULL,
+		`country` varchar(50)
+		CHARACTER SET utf8 NOT NULL,
+		`ratio` double DEFAULT '0',
+		`light_pollution` double DEFAULT '0',
+		`name` varchar(50) CHARACTER SET
+		utf8 NOT NULL,
+		PRIMARY KEY (`oid`)
+		)
+		ENGINE=InnoDB DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="getByName"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
+		SELECT * FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getById"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
+		SELECT * FROM
+		`gloria_services`.`observatory`
+		WHERE
+		oid=#{oid_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
+		INSERT INTO `gloria_services`.`observatory`
+		(name,
+		city,
+		country)
+		VALUE ( #{name}, #{city}, #{country} )
+	</insert>
+
+	<delete id="remove" parameterType="string">
+		DELETE FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</delete>
+
+	<select id="getCity" resultType="string">
+		SELECT city FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getCountry" resultType="string">
+		SELECT country FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getVisibilityRatio" resultType="double">
+		SELECT ratio FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getLightPollution" resultType="double">
+		SELECT light_pollution
+		FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setCity">
+		UPDATE `gloria_services`.`observatory`
+		SET city=
+		#{city_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<update id="setCountry">
+		UPDATE `gloria_services`.`observatory`
+		SET country=
+		#{country_}
+		WHERE
+		name
+		=#{name_}
+	</update>
+
+	<update id="setVisibilityRatio">
+		UPDATE `gloria_services`.`observatory`
+		SET ratio=
+		#{ratio_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<update id="setLightPollution">
+		UPDATE `gloria_services`.`observatory`
+		SET
+		light_pollution= #{light_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`observatory`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getAllNames" resultType="string">
+		SELECT name
+		FROM
+		`gloria_services`.`observatory`
+	</select>
+
+</mapper>

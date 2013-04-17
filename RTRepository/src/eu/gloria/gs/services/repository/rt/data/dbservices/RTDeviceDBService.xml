@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.RTDeviceDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS
+		`gloria_services`.`rt_device` (
+		`rt` varchar(50) CHARACTER SET utf8 NOT
+		NULL,
+		`did` int(11) NOT NULL,
+		`name` varchar(40) NOT NULL,
+		PRIMARY KEY
+		(`rt`,`did`,`name`) USING BTREE,
+		KEY `device` (`did`),
+		CONSTRAINT
+		`device` FOREIGN KEY (`did`) REFERENCES `gloria_services`.`device`
+		(`did`) ON DELETE
+		CASCADE ON UPDATE CASCADE,
+		CONSTRAINT `rt` FOREIGN KEY
+		(`rt`) REFERENCES `gloria_services`.`rt` (`name`) ON DELETE CASCADE
+		ON
+		UPDATE CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="getByRT"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTDevEntry">
+		SELECT * FROM `gloria_services`.`rt_device`
+		WHERE
+		rt=#{rt_}
+	</select>
+
+	<select id="getByDevice"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTDevEntry">
+		SELECT * FROM `gloria_services`.`rt_device`
+		WHERE
+		did=#{did_}
+	</select>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTDevEntry">
+		SELECT * FROM `gloria_services`.`rt_device`
+		WHERE
+		rt=#{rt_}
+		AND name=#{name_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.RTDevEntry">
+		INSERT INTO `gloria_services`.`rt_device`
+		(rt,
+		did,
+		name)
+		VALUE ( #{rt}, #{did}, #{name} )
+	</insert>
+
+	<delete id="remove">
+		DELETE FROM `gloria_services`.`rt_device
+		WHERE
+		rt=#{rt_} AND did=#{did_}
+		AND name=#{name_}
+	</delete>
+
+</mapper>

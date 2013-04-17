@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceDBService">
+
+	<update id="create">
+		CREATE TABLE IF NOT EXISTS `gloria_services`.`device`
+		(
+		`did` int(11)
+		NOT NULL AUTO_INCREMENT,
+		`type` varchar(100) NOT NULL,
+		`model`
+		varchar(100) NOT NULL,
+		`description` varchar(100) DEFAULT NULL,
+		PRIMARY
+		KEY (`did`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+	</update>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
+		INSERT INTO `gloria_services`.`device`
+		(type,
+		model)
+		VALUE
+		( #{type}, #{model} )
+	</insert>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
+		SELECT * FROM `gloria_services`.`device`
+		WHERE
+		type=#{type_}
+		AND model=#{model_}
+	</select>
+
+	<select id="getById"
+		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
+		SELECT * FROM `gloria_services`.`device`
+		WHERE
+		did=#{did_}
+	</select>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`gloria_services`.`device`
+		WHERE
+		type=#{type_} AND model=#{model_}
+	</select>
+
+	<delete id="remove">
+		DELETE FROM `gloria_services`.`device`
+		WHERE
+		type=#{type_} AND
+		model=#{model_}
+	</delete>
+
+	<select id="getModels" resultType="string">
+		SELECT model FROM
+		`gloria_services`.`device`
+		WHERE
+		type=#{type_}
+	</select>
+
+	<select id="getTypes" resultType="string">
+		SELECT type FROM
+		`gloria_services`.`device`
+	</select>
+
+	<select id="getDescription" resultType="string">
+		SELECT description FROM
+		`gloria_services`.`device`
+		WHERE
+		type=#{type_} AND model=#{model_}
+	</select>
+
+	<update id="setDescription">
+		UPDATE `gloria_services`.`device`
+		SET description=
+		#{desc_}
+		WHERE
+		type
+		=#{type_} AND model=#{model_}
+	</update>
+
+</mapper>
