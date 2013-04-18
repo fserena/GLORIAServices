@@ -553,7 +553,7 @@ public class OperationContextService extends ExperimentContextService {
 				url = imageInfo.getUrl();
 
 				try {
-					Thread.sleep(200);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 				}
 
