@@ -154,7 +154,7 @@
 		class="eu.gloria.gs.services.experiment.online.models.ExperimentContextService"
 		abstract="true">
 		<property name="adapter" ref="experimentAdapter"></property>
-		<property name="username" value="username"></property>
+		<property name="username" value="user"></property>
 		<property name="password" value="password"></property>
 		<property name="RTRepository" ref="rtRepository"></property>
 		<property name="userRepository" ref="userRepository"></property>
@@ -1318,6 +1318,24 @@
 						<property name="parameterArguments">
 							<list>
 								<value>load_continuous_image</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="stop_continuous_image_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>stop_continuous_image</value>
 							</list>
 						</property>
 						<property name="nameSuffix">
