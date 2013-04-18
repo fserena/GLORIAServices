@@ -54,6 +54,8 @@ public class OperationContextService extends ExperimentContextService {
 			this.executeSequence(operationContext, operationArguments);
 		} else if (operation.equals("changeFocusRelative")) {
 			this.changeFocusRelative(operationContext, operationArguments);
+		} else if (operation.equals("stopContinuousImage")) {
+			this.stopContinuousImage(operationContext, operationArguments);
 		}
 	}
 
@@ -324,6 +326,36 @@ public class OperationContextService extends ExperimentContextService {
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException
 				| UndefinedExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+
+	// TODO: 
+	private void stopContinuousImage(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		try {
+			String rtNameParameter = (String) operationArguments[0];
+			String rtName = (String) operationContext.getExperimentContext()
+					.getParameterValue(rtNameParameter);
+
+			String camNameParameter = (String) operationArguments[1];
+			String camName = (String) operationContext.getExperimentContext()
+					.getParameterValue(camNameParameter);
+			
+			GSClientProvider.setCredentials(this.getUsername(),
+					this.getPassword());
+
+
+			try {
+				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
+			} catch (CCDTeleoperationException e) {
+				if (!e.getMessage().contains("stop")) {
+					throw new ExperimentOperationException(
+							"Cannot stop the continuous mode of the camera");
+				}
+			}
+		} catch (ExperimentParameterException | NoSuchExperimentException
+				| ExperimentNotInstantiatedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
 	}

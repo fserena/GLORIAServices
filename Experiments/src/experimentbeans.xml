@@ -623,6 +623,25 @@
 		</property>
 	</bean>
 
+	<bean id="StopContinuousImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="stopContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 	<bean id="Park" parent="ExperimentOperation">
 		<property name="type" ref="OPERATION_TYPE"></property>
 		<property name="parameterTypes">
@@ -1324,6 +1343,25 @@
 								<value>ccd_name</value>
 								<value>ccd_cont_url</value>
 								<value>jpg_format</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="stop_continuous_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="StopContinuousImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt_name</value>
+								<value>ccd_name</value>
 							</list>
 						</property>
 						<property name="nameSuffix">
