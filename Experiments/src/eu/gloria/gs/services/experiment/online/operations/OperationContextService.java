@@ -521,9 +521,11 @@ public class OperationContextService extends ExperimentContextService {
 
 			String urlParameter = (String) operationArguments[2];
 
-			String formatParameter = (String) operationArguments[3];
-			String format = (String) operationContext.getExperimentContext()
-					.getParameterValue(formatParameter);
+			/*
+			 * String formatParameter = (String) operationArguments[3]; String
+			 * format = (String) operationContext.getExperimentContext()
+			 * .getParameterValue(formatParameter);
+			 */
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
@@ -551,34 +553,11 @@ public class OperationContextService extends ExperimentContextService {
 				url = imageInfo.getUrl();
 
 				try {
-					Thread.sleep(200);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 				}
 
 				retries++;
-			}
-
-			/*
-			 * 
-			 * int retries = 0;
-			 * 
-			 * while (retries < 10 && url == null) {
-			 * 
-			 * try { url = this.getCCDTeleoperation().getImageURL(rtName,
-			 * camName, imageId, ImageExtensionFormat.valueOf(format)); } catch
-			 * (CCDTeleoperationException e) {
-			 * 
-			 * System.out.println(e.getMessage()); if
-			 * (e.getMessage().contains("yet")) { try { Thread.sleep((int)
-			 * (exposure * 1000 + 100)); } catch (InterruptedException s) { } }
-			 * else throw new ExperimentOperationException(e.getMessage()); }
-			 * 
-			 * retries++; }
-			 */
-
-			if (url == null) {
-				throw new ExperimentOperationException(
-						"Cannot recover the instantaneous image url from the camera");
 			}
 
 			int rid = operationContext.getExperimentContext().getReservation();
@@ -589,6 +568,11 @@ public class OperationContextService extends ExperimentContextService {
 					.getReservationInformation(rid);
 
 			this.getImageRepository().setUserByUrl(url, resInfo.getUser());
+
+			if (url == null) {
+				throw new ExperimentOperationException(
+						"Cannot recover the instantaneous image url from the camera");
+			}
 
 			operationContext.getExperimentContext().setParameterValue(
 					urlParameter, url);
