@@ -1,13 +1,14 @@
 package eu.gloria.rti.client;
 
-public class RTSException extends Exception {
+public class DeviceNotAvailableException extends RTSException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3378992569190922738L;
 
-	public RTSException(String message) {
+	public DeviceNotAvailableException(String message)
+	{
 		super(message);
 	}
 }

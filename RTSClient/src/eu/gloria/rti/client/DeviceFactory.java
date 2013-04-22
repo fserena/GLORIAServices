@@ -1,5 +1,6 @@
 package eu.gloria.rti.client;
 
+import eu.gloria.rt.entity.device.DeviceType;
 import eu.gloria.rti.client.devices.CCD;
 import eu.gloria.rti.client.devices.Focuser;
 import eu.gloria.rti.client.devices.Dome;
@@ -27,31 +28,32 @@ public class DeviceFactory {
 	public CCD createCCD(String host, String name) throws RTSException {
 		RTSHandler rts = RTSManager.getReference().getRTS(host);
 
-		return rts.getCCD(name);
+		return (CCD) rts.getDeviceHandler(name, DeviceType.CCD);
 	}
 
 	public Dome createDome(String host, String name) throws RTSException {
 		RTSHandler rts = RTSManager.getReference().getRTS(host);
 
-		return rts.getDome(name);
+		return (Dome) rts.getDeviceHandler(name, DeviceType.DOME);
 	}
 
 	public Mount createMount(String host, String name) throws RTSException {
 		RTSHandler rts = RTSManager.getReference().getRTS(host);
 
-		return rts.getMount(name);
+		return (Mount) rts.getDeviceHandler(name, DeviceType.MOUNT);
 	}
 
 	public Scam createSurveillanceCamera(String host, String name)
 			throws RTSException {
 		RTSHandler rts = RTSManager.getReference().getRTS(host);
 
-		return rts.getSurveillanceCamera(name);
+		return (Scam) rts
+				.getDeviceHandler(name, DeviceType.SURVEILLANCE_CAMERA);
 	}
 
 	public Focuser createFocuser(String host, String name) throws RTSException {
 		RTSHandler rts = RTSManager.getReference().getRTS(host);
 
-		return rts.getFocuser(name);
+		return (Focuser) rts.getDeviceHandler(name, DeviceType.FOCUS);
 	}
 }

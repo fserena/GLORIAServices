@@ -1,13 +1,13 @@
 package eu.gloria.rti.client;
 
-public class RTSException extends Exception {
+public class RTSNotAvailableException extends RTSException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3378992569190922738L;
 
-	public RTSException(String message) {
+	public RTSNotAvailableException(String message) {
 		super(message);
 	}
 }
