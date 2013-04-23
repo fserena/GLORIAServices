@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ExperimentBooker {
 
-	private final static long MILLISECONDS_PER_30M = 60 * 30 * 1000;
+	private final static long MILLISECONDS_PER_15M = 60 * 15 * 1000;
 	private final static long MILLISECONDS_PER_2H = 60 * 60 * 2 * 1000;
 	private final static int RESERVATION_DAYS = 7;
 	private ExperimentDBAdapter adapter;
@@ -65,7 +65,7 @@ public class ExperimentBooker {
 			calendar.setTime(fromDate);
 			Date endTimeSlotDate = calendar.getTime();
 			endTimeSlotDate.setTime(endTimeSlotDate.getTime()
-					+ MILLISECONDS_PER_30M);
+					+ MILLISECONDS_PER_15M);
 
 			boolean available = true;
 
@@ -92,7 +92,7 @@ public class ExperimentBooker {
 				timeSlots.add(ts);
 			}
 
-			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_30M);
+			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_15M);
 		}
 
 		return timeSlots;
