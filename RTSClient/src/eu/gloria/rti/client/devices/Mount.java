@@ -1,10 +1,10 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.mount.MountState;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityStateMount;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class Mount extends DeviceHandler implements MountInterface {

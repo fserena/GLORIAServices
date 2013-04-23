@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDState;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.devices.CCD;
 
 public class GetStateOperation extends CCDOperation {

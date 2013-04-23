@@ -1,7 +1,8 @@
 package eu.gloria.rti.client.devices;
 
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.scam.SCamState;
-import eu.gloria.rti.client.RTSException;
+
 
 public interface SCamInteface {
 

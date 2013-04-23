@@ -2,10 +2,10 @@ package eu.gloria.gs.services.teleoperation.scam.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.devices.Scam;
 
 public class SetBrightnessOperation extends SurveillanceCameraOperation {

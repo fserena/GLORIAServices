@@ -12,10 +12,10 @@ import eu.gloria.gs.services.repository.rt.data.RTCoordinates;
 import eu.gloria.gs.services.repository.rt.data.RTInformation;
 import eu.gloria.gs.services.repository.rt.data.RTRepositoryAdapter;
 import eu.gloria.gs.services.repository.rt.data.dbservices.RTRepositoryAdapterException;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.rt.entity.device.Device;
 import eu.gloria.rti.GloriaRti;
 import eu.gloria.rti.RtiError;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.RTSManager;
 
 public class RTRepository extends GSLogProducerService implements

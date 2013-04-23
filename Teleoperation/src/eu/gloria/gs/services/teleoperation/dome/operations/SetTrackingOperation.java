@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.dome.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.rti.client.devices.Dome;
 
 public class SetTrackingOperation extends DomeOperation {

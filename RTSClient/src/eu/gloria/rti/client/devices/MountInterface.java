@@ -1,8 +1,8 @@
 package eu.gloria.rti.client.devices;
 
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.mount.MountState;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
-import eu.gloria.rti.client.RTSException;
 
 public interface MountInterface {
 

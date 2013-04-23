@@ -1,5 +1,6 @@
 package eu.gloria.rti.client;
 
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.rt.entity.device.DeviceType;
 import eu.gloria.rti.client.devices.CCD;
 import eu.gloria.rti.client.devices.Focuser;

@@ -2,6 +2,7 @@ package eu.gloria.rti.client;
 
 import java.util.HashMap;
 
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class RTSManager {

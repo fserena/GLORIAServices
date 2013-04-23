@@ -1,4 +1,4 @@
-package eu.gloria.rti.client;
+package eu.gloria.gs.services.teleoperation.base;
 
 public class DeviceOperationFailedException extends RTSException {
 

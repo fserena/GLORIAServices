@@ -1,10 +1,10 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDState;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class CCD extends DeviceHandler implements CCDInterface {

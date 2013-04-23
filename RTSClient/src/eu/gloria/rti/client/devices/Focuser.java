@@ -1,7 +1,7 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class Focuser extends DeviceHandler implements FocuserInterface {

@@ -7,8 +7,16 @@ import java.net.URL;
 import java.util.Properties;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
+import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.IncorrectDeviceTypeException;
+import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.RTSNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
+import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
+import eu.gloria.gs.services.teleoperation.ccd.ImageTransferFailedException;
+import eu.gloria.gs.services.teleoperation.focuser.NotAbsoluteFocuserException;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
 import eu.gloria.rt.entity.device.ActivityStateDomeOpening;

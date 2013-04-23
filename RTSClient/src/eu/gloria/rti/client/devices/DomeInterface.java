@@ -1,7 +1,7 @@
 package eu.gloria.rti.client.devices;
 
+import eu.gloria.gs.services.teleoperation.base.RTSException;
 import eu.gloria.gs.services.teleoperation.dome.DomeOpeningState;
-import eu.gloria.rti.client.RTSException;
 
 public interface DomeInterface {
 
