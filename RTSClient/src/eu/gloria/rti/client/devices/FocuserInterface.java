@@ -1,12 +1,12 @@
 package eu.gloria.rti.client.devices;
 
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 
 public interface FocuserInterface {
 
-	public void moveAbsolute(long position) throws RTSException;
+	public void moveAbsolute(long position) throws TeleoperationException;
 
-	public void moveRelative(long steps) throws RTSException;
+	public void moveRelative(long steps) throws TeleoperationException;
 
-	public long getPosition() throws RTSException;
+	public long getPosition() throws TeleoperationException;
 }

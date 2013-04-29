@@ -6,6 +6,7 @@ import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.focuser.operations.GetPositionOperation;
 import eu.gloria.gs.services.teleoperation.focuser.operations.MoveAbsoluteOperation;
 import eu.gloria.gs.services.teleoperation.focuser.operations.MoveRelativeOperation;
@@ -13,42 +14,50 @@ import eu.gloria.gs.services.teleoperation.focuser.operations.MoveRelativeOperat
 public class FocuserTeleoperation extends AbstractTeleoperation implements
 		FocuserTeleoperationInterface {
 
-	private void processOperationException(String message, String rt,
-			String focus, String operation) {
+	private void processException(String message, String rt) {
 		try {
-			this.logAction(this.getClientUsername(), "Error while trying to "
-					+ operation + " of '" + focus + "' " + " of '"
-					+ rt + "': " + message);
-		} catch (ActionLogException e1) {
-			e1.printStackTrace();
+			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
+					+ message);
+		} catch (ActionLogException e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public long getPosition(String rt, String focuser)
-			throws FocuserTeleoperationException {
+			throws TeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
 		args.getArguments().add(focuser);
 
-		try {
-			GetPositionOperation operation = new GetPositionOperation(args);
+		GetPositionOperation operation = null;
 
+		try {
+			operation = new GetPositionOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getPosition/Bad args", rt);
+
+			throw new FocuserTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
 			OperationReturn returns = this.executeOperation(operation);
 			return (Long) returns.getReturns().get(0);
 
-		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, focuser,
-					"get position");
-			throw new FocuserTeleoperationException(e.getMessage());
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
 		}
 	}
 
 	@Override
 	public void moveAbsolute(String rt, String focuser, long position)
-			throws FocuserTeleoperationException {
+			throws TeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -56,19 +65,30 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(focuser);
 		args.getArguments().add(position);
 
+		MoveAbsoluteOperation operation = null;
+
 		try {
-			MoveAbsoluteOperation operation = new MoveAbsoluteOperation(args);
-			this.executeOperation(operation);
+			operation = new MoveAbsoluteOperation(args);
 		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, focuser,
-					"move absolute");
-			throw new FocuserTeleoperationException(e.getMessage());
+			this.processException(e.getClass().getSimpleName()
+					+ "/moveAbsolute/Bad args", rt);
+
+			throw new FocuserTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
 		}
 	}
 
 	@Override
 	public void moveRelative(String rt, String focuser, long steps)
-			throws FocuserTeleoperationException {
+			throws TeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -76,13 +96,24 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(focuser);
 		args.getArguments().add(steps);
 
+		MoveRelativeOperation operation = null;
+
 		try {
-			MoveRelativeOperation operation = new MoveRelativeOperation(args);
-			this.executeOperation(operation);
+			operation = new MoveRelativeOperation(args);
 		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, focuser,
-					"move relative");
-			throw new FocuserTeleoperationException(e.getMessage());
+			this.processException(e.getClass().getSimpleName()
+					+ "/moveRelative/Bad args", rt);
+
+			throw new FocuserTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
 		}
 	}
 }

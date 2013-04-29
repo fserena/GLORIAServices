@@ -4,10 +4,8 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperation;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
-import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
-import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
 import eu.gloria.rti.client.devices.Dome;
 
@@ -27,11 +25,11 @@ public abstract class DomeOperation extends DeviceOperation {
 	}
 
 	protected abstract void operateDome(Dome dome, OperationReturn returns)
-			throws RTSException;
+			throws TeleoperationException;
 
 	@Override
 	protected DeviceHandler getDeviceHandler(ServerResolver resolver)
-			throws Exception {
+			throws TeleoperationException {
 
 		String url = resolver.resolve(this.getServer());
 		return DeviceFactory.getReference().createDome(url, this.getDomeName());
@@ -40,12 +38,7 @@ public abstract class DomeOperation extends DeviceOperation {
 	@Override
 	protected void operateHandler(DeviceHandler handler, OperationReturn returns)
 			throws TeleoperationException {
-
-		try {
-			this.operateDome((Dome) handler, returns);
-		} catch (RTSException e) {
-			throw new RTSTeleoperationException(e.getMessage());
-		}
+		this.operateDome((Dome) handler, returns);
 
 	}
 

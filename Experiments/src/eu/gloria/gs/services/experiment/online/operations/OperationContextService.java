@@ -15,8 +15,11 @@ import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
+import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
+import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
 import eu.gloria.gs.services.teleoperation.dome.DomeOpeningState;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationException;
 import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationException;
@@ -145,31 +148,36 @@ public class OperationContextService extends ExperimentContextService {
 			try {
 				this.getCCDTeleoperation().setExposureTime(rtName, camName,
 						Math.min(2.0, exposure));
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be assigned"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
 			}
 
 			try {
 				this.getCCDTeleoperation().setBrightness(rtName, camName,
 						brightness);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be assigned"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
 			}
+
 			try {
 				this.getCCDTeleoperation().setContrast(rtName, camName,
 						contrast);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be assigned"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
+
 			try {
 				this.getCCDTeleoperation().setGain(rtName, camName, gain);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be assigned"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
+
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
 			throw new ExperimentOperationException(e.getMessage());
@@ -204,31 +212,37 @@ public class OperationContextService extends ExperimentContextService {
 			try {
 				exposure = this.getCCDTeleoperation().getExposureTime(rtName,
 						camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be recovered"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
 
 			try {
 				brightness = (int) this.getCCDTeleoperation().getBrightness(
 						rtName, camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be recovered"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
+
 			try {
 				contrast = (int) this.getCCDTeleoperation().getContrast(rtName,
 						camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be recovered"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
+
 			try {
 				gain = (int) this.getCCDTeleoperation()
 						.getGain(rtName, camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("be recovered"))
-					throw new ExperimentOperationException(e.getMessage());
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
 
 			operationContext.getExperimentContext().setParameterValue(
@@ -275,19 +289,20 @@ public class OperationContextService extends ExperimentContextService {
 				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
 				exposure = this.getCCDTeleoperation().getExposureTime(rtName,
 						camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("stop")) {
-					throw new ExperimentOperationException(
-							"Cannot recover the continuous image url from the camera");
-				}
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
 
 			try {
 				imageId = this.getCCDTeleoperation().startContinueMode(rtName,
 						camName);
 
-			} catch (CCDTeleoperationException e) {
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
+			} catch (TeleoperationException e) {
+
 			}
 
 			int retries = 0;
@@ -299,17 +314,13 @@ public class OperationContextService extends ExperimentContextService {
 							camName, imageId,
 							ImageExtensionFormat.valueOf(format));
 
-				} catch (CCDTeleoperationException e) {
-
-					if (e.getMessage().contains("yet")) {
-						System.out
-								.println("Wating for the image to be created...");
-						try {
-							Thread.sleep((int) (exposure * 1000 + 100));
-						} catch (InterruptedException s) {
-						}
-					} else
-						throw new ExperimentOperationException(e.getMessage());
+				} catch (ImageNotAvailableException e) {
+					try {
+						Thread.sleep((int) (exposure * 1000 + 100));
+					} catch (InterruptedException s) {
+					}
+				} catch (TeleoperationException e) {
+					throw new ExperimentOperationException(e.getMessage());
 				}
 
 				retries++;
@@ -330,7 +341,6 @@ public class OperationContextService extends ExperimentContextService {
 		}
 	}
 
-	// TODO: 
 	private void stopContinuousImage(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 		try {
@@ -341,19 +351,18 @@ public class OperationContextService extends ExperimentContextService {
 			String camNameParameter = (String) operationArguments[1];
 			String camName = (String) operationContext.getExperimentContext()
 					.getParameterValue(camNameParameter);
-			
+
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
 
-
 			try {
 				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
-			} catch (CCDTeleoperationException e) {
-				if (!e.getMessage().contains("stop")) {
-					throw new ExperimentOperationException(
-							"Cannot stop the continuous mode of the camera");
-				}
+			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+				throw new ExperimentOperationException(
+						"Cannot stop the continuous mode of the camera");
+			} catch (TeleoperationException e) {
 			}
+
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
 			throw new ExperimentOperationException(e.getMessage());
@@ -542,7 +551,6 @@ public class OperationContextService extends ExperimentContextService {
 	private void takeImage(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 		try {
-
 			String rtNameParameter = (String) operationArguments[0];
 			String rtName = (String) operationContext.getExperimentContext()
 					.getParameterValue(rtNameParameter);
@@ -552,27 +560,16 @@ public class OperationContextService extends ExperimentContextService {
 					.getParameterValue(camNameParameter);
 
 			String urlParameter = (String) operationArguments[2];
-
-			/*
-			 * String formatParameter = (String) operationArguments[3]; String
-			 * format = (String) operationContext.getExperimentContext()
-			 * .getParameterValue(formatParameter);
-			 */
-
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
 
 			String url = null;
 			String imageId = null;
-			// double exposure = 0.0;
 
 			try {
-
-				// exposure = this.getCCDTeleoperation().getExposureTime(rtName,
-				// camName);
 				imageId = this.getCCDTeleoperation().startExposure(rtName,
 						camName);
-			} catch (CCDTeleoperationException e) {
+			} catch (TeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
 			}
 

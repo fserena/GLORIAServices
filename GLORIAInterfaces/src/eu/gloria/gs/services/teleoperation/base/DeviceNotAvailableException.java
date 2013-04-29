@@ -1,6 +1,6 @@
 package eu.gloria.gs.services.teleoperation.base;
 
-public class DeviceNotAvailableException extends RTSException {
+public class DeviceNotAvailableException extends TeleoperationException {
 
 	/**
 	 * 

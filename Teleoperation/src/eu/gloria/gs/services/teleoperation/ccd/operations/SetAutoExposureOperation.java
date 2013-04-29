@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.ccd.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
@@ -39,7 +39,7 @@ public class SetAutoExposureOperation extends CCDOperation {
 					+ this.getCCDName());
 
 			return returns;
-		} catch (RTSException e) {
+		} catch (TeleoperationException e) {
 
 			throw new RTSTeleoperationException(e.getMessage());
 		}
@@ -47,7 +47,7 @@ public class SetAutoExposureOperation extends CCDOperation {
 
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		ccd.setAutoExposure(this.auto);
 
 		returns.setMessage("Set auto exposure operation executed: " + this.auto

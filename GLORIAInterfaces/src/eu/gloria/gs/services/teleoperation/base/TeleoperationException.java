@@ -5,12 +5,9 @@ public class TeleoperationException extends Exception {
 	/**
 	 * 
 	 */
-	public TeleoperationException(String message)
-	{
+	private static final long serialVersionUID = -3378992569190922738L;
+
+	public TeleoperationException(String message) {
 		super(message);
 	}
-	
-	
-	private static final long serialVersionUID = 5848333110207976076L;
-
 }

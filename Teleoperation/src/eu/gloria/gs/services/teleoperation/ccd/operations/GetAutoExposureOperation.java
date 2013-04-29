@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.CCD;
 
 public class GetAutoExposureOperation extends CCDOperation {
@@ -15,7 +15,7 @@ public class GetAutoExposureOperation extends CCDOperation {
 
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		boolean auto = ccd.getAutoExposure();
 
 		returns.setMessage("Get auto exposure operation executed: " + auto

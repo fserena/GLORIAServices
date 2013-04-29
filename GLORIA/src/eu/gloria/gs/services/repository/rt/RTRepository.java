@@ -12,7 +12,7 @@ import eu.gloria.gs.services.repository.rt.data.RTCoordinates;
 import eu.gloria.gs.services.repository.rt.data.RTInformation;
 import eu.gloria.gs.services.repository.rt.data.RTRepositoryAdapter;
 import eu.gloria.gs.services.repository.rt.data.dbservices.RTRepositoryAdapterException;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rt.entity.device.Device;
 import eu.gloria.rti.GloriaRti;
 import eu.gloria.rti.RtiError;
@@ -76,7 +76,7 @@ public class RTRepository extends GSLogProducerService implements
 		} catch (NullPointerException en) {
 			throw new RTRepositoryException("The RTS on " + url
 					+ " is not available.");
-		} catch (RTSException e1) {
+		} catch (TeleoperationException e1) {
 			throw new RTRepositoryException(e1.getMessage());
 		}
 

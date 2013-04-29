@@ -10,8 +10,8 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.IncorrectDeviceTypeException;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
-import eu.gloria.gs.services.teleoperation.base.RTSNotAvailableException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
 import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
@@ -66,7 +66,7 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public RTSHandler(String host) throws RTSException {
+	public RTSHandler(String host) throws TeleoperationException {
 
 		URL urlWsdl = null;
 		try {
@@ -91,16 +91,16 @@ public class RTSHandler implements ServerHandler {
 			rtsPort = proxyFactory.getProxy(urlWsdl, urlWs, false, user,
 					password);
 		} catch (Exception e) {
-			throw new RTSNotAvailableException("Get rt handler for " + host);
+			throw new ServerNotAvailableException("Get rt handler for " + host);
 		}
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException("Get rt handler for " + host);
+			throw new ServerNotAvailableException("Get rt handler for " + host);
 		}
 	}
 
 	public DeviceHandler getDeviceHandler(String name, DeviceType type)
-			throws RTSException {
+			throws TeleoperationException {
 		Device device = null;
 
 		try {
@@ -108,7 +108,7 @@ public class RTSHandler implements ServerHandler {
 		} catch (RtiError e) {
 			throw new DeviceNotAvailableException(name);
 		} catch (NullPointerException ne) {
-			throw new RTSNotAvailableException("Get device handler for " + name
+			throw new ServerNotAvailableException("Get device handler for " + name
 					+ " " + type.name());
 		}
 
@@ -133,23 +133,23 @@ public class RTSHandler implements ServerHandler {
 		return this.rtsPort;
 	}
 
-	public boolean isConnected(String device) throws RTSException {
+	public boolean isConnected(String device) throws TeleoperationException {
 		try {
 			return rtsPort.devIsConnected(null, device);
 		} catch (RtiError e) {
-			throw new RTSException("The device " + device
+			throw new TeleoperationException("The device " + device
 					+ " does not exist or its information cannot be recovered");
 		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new TeleoperationException("The RTS is not available.");
 		}
 	}
 
-	public long getBrightness(String camera) throws RTSException {
+	public long getBrightness(String camera) throws TeleoperationException {
 
 		String actionMessage = "Get brightness of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -171,12 +171,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setBrightness(String camera, double value) throws RTSException {
+	public void setBrightness(String camera, double value) throws TeleoperationException {
 
 		String actionMessage = "Set brightness of " + camera + " to " + value;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -199,12 +199,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public double getExposureTime(String camera) throws RTSException {
+	public double getExposureTime(String camera) throws TeleoperationException {
 
 		String actionMessage = "Get exposure of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -228,12 +228,12 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void setExposureTime(String camera, double value)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Set exposure of " + camera + " to " + value;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -255,12 +255,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public boolean getAutoExposure(String camera) throws RTSException {
+	public boolean getAutoExposure(String camera) throws TeleoperationException {
 
 		String actionMessage = "Get auto-exposure of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -273,12 +273,12 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void setAutoExposure(String camera, boolean mode)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Set auto-exposure of " + camera + " to " + mode;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -289,12 +289,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public long getContrast(String camera) throws RTSException {
+	public long getContrast(String camera) throws TeleoperationException {
 
 		String actionMessage = "Get contrast of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -316,12 +316,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setContrast(String camera, long value) throws RTSException {
+	public void setContrast(String camera, long value) throws TeleoperationException {
 
 		String actionMessage = "Set contrast of " + camera + " to " + value;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -343,12 +343,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public long getGain(String camera) throws RTSException {
+	public long getGain(String camera) throws TeleoperationException {
 
 		String actionMessage = "Get gain of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -358,12 +358,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setGain(String camera, long value) throws RTSException {
+	public void setGain(String camera, long value) throws TeleoperationException {
 
 		String actionMessage = "Set gain of " + camera + " to " + value;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -373,11 +373,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public boolean getAutoGain(String camera) throws RTSException {
+	public boolean getAutoGain(String camera) throws TeleoperationException {
 		String actionMessage = "Get auto-gain of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -387,11 +387,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setAutoGain(String camera, boolean mode) throws RTSException {
+	public void setAutoGain(String camera, boolean mode) throws TeleoperationException {
 		String actionMessage = "Set auto-gain of " + camera + " to " + mode;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -401,11 +401,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public String startExposure(String camera) throws RTSException {
+	public String startExposure(String camera) throws TeleoperationException {
 		String actionMessage = "Start exposure of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -415,12 +415,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public String startContinueMode(String camera) throws RTSException {
+	public String startContinueMode(String camera) throws TeleoperationException {
 
 		String actionMessage = "Start continue mode of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -430,11 +430,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void stopContinueMode(String camera) throws RTSException {
+	public void stopContinueMode(String camera) throws TeleoperationException {
 		String actionMessage = "Stop continue mode of " + camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -445,13 +445,13 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public String getImageURL(String camera, String imageId,
-			ImageExtensionFormat format) throws RTSException {
+			ImageExtensionFormat format) throws TeleoperationException {
 
 		String actionMessage = "Get URL of " + imageId + " image from camera "
 				+ camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		Device device = null;
@@ -477,16 +477,16 @@ public class RTSHandler implements ServerHandler {
 			else if (e.getMessage().equals("FAILED"))
 				throw new ImageTransferFailedException(actionMessage);
 			else
-				throw new RTSException(actionMessage);
+				throw new TeleoperationException(actionMessage);
 		}
 	}
 
-	public String getContinuousImagePath(String camera) throws RTSException {
+	public String getContinuousImagePath(String camera) throws TeleoperationException {
 		String actionMessage = "Get URL of the continuous image of camera "
 				+ camera;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -497,12 +497,12 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public ActivityContinueStateCamera getCCDState(String ccd)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Get continue mode state of " + ccd;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -516,11 +516,11 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public ActivityContinueStateCamera getSCamState(String scam)
-			throws RTSException {
+			throws TeleoperationException {
 		String actionMessage = "Get continue mode state of " + scam;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -533,11 +533,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void open(String dome) throws RTSException {
+	public void open(String dome) throws TeleoperationException {
 		String actionMessage = "Open dome " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -548,11 +548,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void close(String dome) throws RTSException {
+	public void close(String dome) throws TeleoperationException {
 		String actionMessage = "Close dome " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -563,11 +563,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void parkDome(String dome) throws RTSException {
+	public void parkDome(String dome) throws TeleoperationException {
 		String actionMessage = "Park dome " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -578,11 +578,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void parkMount(String mount) throws RTSException {
+	public void parkMount(String mount) throws TeleoperationException {
 		String actionMessage = "Park mount " + mount;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -593,11 +593,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public double getDomeAzimuth(String dome) throws RTSException {
+	public double getDomeAzimuth(String dome) throws TeleoperationException {
 		String actionMessage = "Get dome azimuth of " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -609,11 +609,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public boolean getDomeTracking(String dome) throws RTSException {
+	public boolean getDomeTracking(String dome) throws TeleoperationException {
 		String actionMessage = "Get dome tracking of " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -623,11 +623,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setDomeTracking(String dome, boolean mode) throws RTSException {
+	public void setDomeTracking(String dome, boolean mode) throws TeleoperationException {
 		String actionMessage = "Set dome tracking of " + dome + " to " + mode;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -638,11 +638,11 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public ActivityStateDomeOpening getDomeState(String dome)
-			throws RTSException {
+			throws TeleoperationException {
 		String actionMessage = "Get dome state of " + dome;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -656,11 +656,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void moveNorth(String mount) throws RTSException {
+	public void moveNorth(String mount) throws TeleoperationException {
 		String actionMessage = "Move " + mount + "  to north";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -670,11 +670,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void moveSouth(String mount) throws RTSException {
+	public void moveSouth(String mount) throws TeleoperationException {
 		String actionMessage = "Move " + mount + "  to south";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -684,11 +684,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void moveEast(String mount) throws RTSException {
+	public void moveEast(String mount) throws TeleoperationException {
 		String actionMessage = "Move " + mount + "  to east";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -698,11 +698,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void moveWest(String mount) throws RTSException {
+	public void moveWest(String mount) throws TeleoperationException {
 		String actionMessage = "Move " + mount + "  to west";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -712,11 +712,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void setSlewRate(String mount, String rate) throws RTSException {
+	public void setSlewRate(String mount, String rate) throws TeleoperationException {
 		String actionMessage = "Set slew rate of " + mount + " to " + rate;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -727,12 +727,12 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void setTrackingRate(String mount, TrackingRate rate)
-			throws RTSException {
+			throws TeleoperationException {
 		String actionMessage = "Set tracking rate of " + mount + " to "
 				+ rate.name();
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -744,12 +744,12 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void setMountTracking(String mount, boolean mode)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Set tracking mode of " + mount + " to " + mode;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -759,11 +759,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void slewToObject(String mount, String object) throws RTSException {
+	public void slewToObject(String mount, String object) throws TeleoperationException {
 		String actionMessage = "Slew " + mount + " to " + object;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -773,11 +773,11 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public ActivityStateMount getMountState(String mount) throws RTSException {
+	public ActivityStateMount getMountState(String mount) throws TeleoperationException {
 		String actionMessage = "Get state of " + mount;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {
@@ -792,13 +792,13 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void relativeFocuserMove(String focuser, long steps)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Relative " + focuser + " move of " + steps
 				+ " steps";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		long effectiveMove = steps;
@@ -816,13 +816,13 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void absoluteFocuserMove(String focuser, long position)
-			throws RTSException {
+			throws TeleoperationException {
 
 		String actionMessage = "Absolute " + focuser + " move to " + position
 				+ " position";
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		long effectiveMove = position;
@@ -839,12 +839,12 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public long getFocuserAbsolutePosition(String focuser) throws RTSException {
+	public long getFocuserAbsolutePosition(String focuser) throws TeleoperationException {
 
 		String actionMessage = "Get absolute position of" + focuser;
 
 		if (rtsPort == null) {
-			throw new RTSNotAvailableException(actionMessage);
+			throw new ServerNotAvailableException(actionMessage);
 		}
 
 		try {

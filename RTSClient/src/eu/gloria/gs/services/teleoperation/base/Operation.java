@@ -15,6 +15,6 @@ public abstract class Operation {
 		return this.server;
 	}
 	
-	public abstract OperationReturn execute(ServerResolver resolver) throws Exception;
+	public abstract OperationReturn execute(ServerResolver resolver) throws TeleoperationException;
 	
 }

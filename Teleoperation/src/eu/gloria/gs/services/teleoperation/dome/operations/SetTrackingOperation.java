@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.dome.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.Dome;
 
 public class SetTrackingOperation extends DomeOperation {
@@ -17,7 +17,7 @@ public class SetTrackingOperation extends DomeOperation {
 
 	@Override
 	protected void operateDome(Dome dome, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		dome.setTracking(this.tracking);
 
 		returns.setMessage("Set dome tracking mode operation executed: "

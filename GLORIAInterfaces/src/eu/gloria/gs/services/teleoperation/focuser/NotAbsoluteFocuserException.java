@@ -1,8 +1,8 @@
 package eu.gloria.gs.services.teleoperation.focuser;
 
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 
-public class NotAbsoluteFocuserException extends RTSException {
+public class NotAbsoluteFocuserException extends TeleoperationException {
 
 	/**
 	 * 

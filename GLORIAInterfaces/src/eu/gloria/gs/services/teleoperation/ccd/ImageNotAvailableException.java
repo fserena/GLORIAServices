@@ -1,8 +1,8 @@
 package eu.gloria.gs.services.teleoperation.ccd;
 
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 
-public class ImageNotAvailableException extends RTSException {
+public class ImageNotAvailableException extends TeleoperationException {
 
 	/**
 	 * 

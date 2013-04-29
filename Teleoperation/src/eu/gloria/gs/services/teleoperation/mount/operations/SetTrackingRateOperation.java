@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.mount.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rti.client.devices.Mount;
 
@@ -18,7 +18,7 @@ public class SetTrackingRateOperation extends MountOperation {
 
 	@Override
 	protected void operateMount(Mount mount, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		mount.setTrackingRate(this.rate);
 
 		returns.setMessage("Set tracking rate operation executed: "

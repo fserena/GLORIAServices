@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.MountState;
 import eu.gloria.rti.client.devices.Mount;
 
@@ -17,7 +17,7 @@ public class GetStateOperation extends MountOperation {
 
 	@Override
 	protected void operateMount(Mount mount, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		MountState state = mount.getState();
 		
 		returns.setReturns(new ArrayList<>());

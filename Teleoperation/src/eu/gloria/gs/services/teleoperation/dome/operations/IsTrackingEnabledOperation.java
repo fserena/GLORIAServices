@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.Dome;
 
 public class IsTrackingEnabledOperation extends DomeOperation {
@@ -15,7 +15,7 @@ public class IsTrackingEnabledOperation extends DomeOperation {
 
 	@Override
 	protected void operateDome(Dome dome, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		boolean tracking = dome.isTrackingEnabled();
 
 		returns.setMessage("Get dome tracking mode operation executed: "
