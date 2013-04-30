@@ -1,7 +1,7 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class Focuser extends DeviceHandler implements FocuserInterface {
@@ -9,24 +9,24 @@ public class Focuser extends DeviceHandler implements FocuserInterface {
 	private RTSHandler rts;
 	private String focuser;
 
-	public Focuser(RTSHandler rts, String focuser) throws RTSException {
+	public Focuser(RTSHandler rts, String focuser) throws TeleoperationException {
 
 		this.rts = rts;
 		this.focuser = focuser;
 	}
 
 	@Override
-	public void moveAbsolute(long position) throws RTSException {
+	public void moveAbsolute(long position) throws TeleoperationException {
 		rts.absoluteFocuserMove(this.focuser, position);
 	}
 
 	@Override
-	public void moveRelative(long steps) throws RTSException {
+	public void moveRelative(long steps) throws TeleoperationException {
 		rts.relativeFocuserMove(this.focuser, steps);
 	}
 
 	@Override
-	public long getPosition() throws RTSException {
+	public long getPosition() throws TeleoperationException {
 		return rts.getFocuserAbsolutePosition(this.focuser);
 	}
 }

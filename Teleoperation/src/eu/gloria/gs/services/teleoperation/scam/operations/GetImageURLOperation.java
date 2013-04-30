@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.Scam;
 
 public class GetImageURLOperation extends SurveillanceCameraOperation {
@@ -15,7 +15,7 @@ public class GetImageURLOperation extends SurveillanceCameraOperation {
 
 	@Override
 	protected void operateSCam(Scam scam, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		String url = scam.getImageURL();
 		
 		returns.setMessage("Get image URL operation executed: " + url + ", "

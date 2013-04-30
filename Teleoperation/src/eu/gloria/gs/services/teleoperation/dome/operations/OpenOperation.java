@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.dome.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.Dome;
 
 public class OpenOperation extends DomeOperation {
@@ -14,7 +14,7 @@ public class OpenOperation extends DomeOperation {
 
 	@Override
 	protected void operateDome(Dome dome, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		dome.open();
 
 		returns.setMessage("Open dome operation executed: " + this.getServer()
