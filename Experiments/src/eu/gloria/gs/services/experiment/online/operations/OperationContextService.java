@@ -15,8 +15,7 @@ import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
-import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
-import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
 import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
@@ -148,34 +147,34 @@ public class OperationContextService extends ExperimentContextService {
 			try {
 				this.getCCDTeleoperation().setExposureTime(rtName, camName,
 						Math.min(2.0, exposure));
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
+
 			}
 
 			try {
 				this.getCCDTeleoperation().setBrightness(rtName, camName,
 						brightness);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
+
 			}
 
 			try {
 				this.getCCDTeleoperation().setContrast(rtName, camName,
 						contrast);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
-
+			} catch (DeviceOperationFailedException e) {
 			}
 
 			try {
 				this.getCCDTeleoperation().setGain(rtName, camName, gain);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
-
+			} catch (DeviceOperationFailedException e) {
 			}
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
@@ -212,36 +211,36 @@ public class OperationContextService extends ExperimentContextService {
 			try {
 				exposure = this.getCCDTeleoperation().getExposureTime(rtName,
 						camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
 
 			}
 
 			try {
 				brightness = (int) this.getCCDTeleoperation().getBrightness(
 						rtName, camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
 
 			}
 
 			try {
 				contrast = (int) this.getCCDTeleoperation().getContrast(rtName,
 						camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
 
 			}
 
 			try {
 				gain = (int) this.getCCDTeleoperation()
 						.getGain(rtName, camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
+			} catch (DeviceOperationFailedException e) {
 
 			}
 
@@ -289,20 +288,18 @@ public class OperationContextService extends ExperimentContextService {
 				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
 				exposure = this.getCCDTeleoperation().getExposureTime(rtName,
 						camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
-
+			} catch (DeviceOperationFailedException e) {
 			}
 
 			try {
 				imageId = this.getCCDTeleoperation().startContinueMode(rtName,
 						camName);
 
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (TeleoperationException e) {
-
+			} catch (DeviceOperationFailedException e) {
 			}
 
 			int retries = 0;
@@ -319,7 +316,7 @@ public class OperationContextService extends ExperimentContextService {
 						Thread.sleep((int) (exposure * 1000 + 100));
 					} catch (InterruptedException s) {
 					}
-				} catch (TeleoperationException e) {
+				} catch (CCDTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
 				}
 
@@ -357,10 +354,9 @@ public class OperationContextService extends ExperimentContextService {
 
 			try {
 				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
-			} catch (ServerNotAvailableException | CCDTeleoperationException e) {
-				throw new ExperimentOperationException(
-						"Cannot stop the continuous mode of the camera");
-			} catch (TeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (DeviceOperationFailedException e) {				
 			}
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
@@ -407,7 +403,7 @@ public class OperationContextService extends ExperimentContextService {
 						"The movement direction is incorrect: '" + movement
 								+ "'");
 			}
-		} catch (DomeTeleoperationException e) {
+		} catch (DomeTeleoperationException | DeviceOperationFailedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
 	}
@@ -443,7 +439,7 @@ public class OperationContextService extends ExperimentContextService {
 			this.getFocuserTeleoperation().moveRelative(rtName, focusName,
 					steps);
 
-		} catch (FocuserTeleoperationException e) {
+		} catch (FocuserTeleoperationException | DeviceOperationFailedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
 	}
@@ -478,64 +474,40 @@ public class OperationContextService extends ExperimentContextService {
 
 			if (direction.equals("LEFT")) {
 				if (currentMoves > -maxMoves) {
-					try {
-						this.getMountTeleoperation()
-								.moveWest(rtName, mountName);
+					this.getMountTeleoperation().moveWest(rtName, mountName);
 
-						operationContext.getExperimentContext()
-								.setParameterValue(currentMovesParameter,
-										currentMoves - 1);
-					} catch (MountTeleoperationException e) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					operationContext.getExperimentContext().setParameterValue(
+							currentMovesParameter, currentMoves - 1);
 				} else {
 					throw new ExperimentOperationException(
 							"Cannot move left because it is on the limit");
 				}
 			} else if (direction.equals("RIGHT")) {
 				if (currentMoves < maxMoves) {
-					try {
-						this.getMountTeleoperation()
-								.moveEast(rtName, mountName);
+					this.getMountTeleoperation().moveEast(rtName, mountName);
 
-						operationContext.getExperimentContext()
-								.setParameterValue(currentMovesParameter,
-										currentMoves + 1);
-					} catch (MountTeleoperationException e) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					operationContext.getExperimentContext().setParameterValue(
+							currentMovesParameter, currentMoves + 1);
 				} else {
 					throw new ExperimentOperationException(
 							"Cannot move right because it is on the limit");
 				}
 			} else if (direction.equals("UP")) {
 				if (currentMoves < maxMoves) {
-					try {
-						this.getMountTeleoperation().moveNorth(rtName,
-								mountName);
+					this.getMountTeleoperation().moveNorth(rtName, mountName);
 
-						operationContext.getExperimentContext()
-								.setParameterValue(currentMovesParameter,
-										currentMoves + 1);
-					} catch (MountTeleoperationException e) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					operationContext.getExperimentContext().setParameterValue(
+							currentMovesParameter, currentMoves + 1);
 				} else {
 					throw new ExperimentOperationException(
 							"Cannot move up because it is on the limit");
 				}
 			} else if (direction.equals("DOWN")) {
 				if (currentMoves > -maxMoves) {
-					try {
-						this.getMountTeleoperation().moveSouth(rtName,
-								mountName);
+					this.getMountTeleoperation().moveSouth(rtName, mountName);
 
-						operationContext.getExperimentContext()
-								.setParameterValue(currentMovesParameter,
-										currentMoves - 1);
-					} catch (MountTeleoperationException e) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					operationContext.getExperimentContext().setParameterValue(
+							currentMovesParameter, currentMoves - 1);
 				} else {
 					throw new ExperimentOperationException(
 							"Cannot move down because it is on the limit");
@@ -543,7 +515,8 @@ public class OperationContextService extends ExperimentContextService {
 			}
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException
-				| UndefinedExperimentParameterException e) {
+				| UndefinedExperimentParameterException
+				| MountTeleoperationException | DeviceOperationFailedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
 	}
@@ -569,8 +542,9 @@ public class OperationContextService extends ExperimentContextService {
 			try {
 				imageId = this.getCCDTeleoperation().startExposure(rtName,
 						camName);
-			} catch (TeleoperationException e) {
+			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
+			} catch (DeviceOperationFailedException e) {
 			}
 
 			int retries = 0;
@@ -641,7 +615,7 @@ public class OperationContextService extends ExperimentContextService {
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException
-				| SCamTeleoperationException
+				| SCamTeleoperationException | DeviceOperationFailedException
 				| UndefinedExperimentParameterException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
@@ -678,6 +652,7 @@ public class OperationContextService extends ExperimentContextService {
 					this.getDomeTeleoperation().close(rtName, domeName);
 				} catch (DomeTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
 				}
 			}
 
@@ -688,14 +663,14 @@ public class OperationContextService extends ExperimentContextService {
 					this.getMountTeleoperation().setTracking(rtName, mountName,
 							false);
 				} catch (MountTeleoperationException e) {
-					if (!e.getMessage().contains("not tracking")) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
 				}
 				try {
 					this.getMountTeleoperation().park(rtName, mountName);
 				} catch (MountTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
 				}
 			} else {
 				throw new ExperimentOperationException(
@@ -748,9 +723,8 @@ public class OperationContextService extends ExperimentContextService {
 					this.getDomeTeleoperation().open(rtName, domeName);
 					// }
 				} catch (DomeTeleoperationException e) {
-					if (!e.getMessage().contains("already open")) {
-						throw new ExperimentOperationException(e.getMessage());
-					}
+					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
 				}
 			}
 
@@ -766,11 +740,14 @@ public class OperationContextService extends ExperimentContextService {
 					this.getMountTeleoperation().setTracking(rtName, mountName,
 							true);
 
+					this.getMountTeleoperation().setSlewRate(rtName, mountName, "CENTER");
+					
 					this.getMountTeleoperation().slewToObject(rtName,
 							mountName, object);
 
 				} catch (MountTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
 				}
 			}
 

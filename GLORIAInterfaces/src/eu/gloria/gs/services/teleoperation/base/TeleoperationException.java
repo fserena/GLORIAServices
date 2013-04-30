@@ -1,6 +1,6 @@
 package eu.gloria.gs.services.teleoperation.base;
 
-public class TeleoperationException extends Exception {
+public abstract class TeleoperationException extends Exception {
 
 	/**
 	 * 

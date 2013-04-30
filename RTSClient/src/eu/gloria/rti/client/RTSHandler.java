@@ -477,7 +477,7 @@ public class RTSHandler implements ServerHandler {
 			else if (e.getMessage().equals("FAILED"))
 				throw new ImageTransferFailedException(actionMessage);
 			else
-				throw new TeleoperationException(actionMessage);
+				throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 

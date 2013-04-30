@@ -46,7 +46,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 	@Override
 	public String getImageURL(String rt, String ccd, String imageId,
-			ImageExtensionFormat format) throws TeleoperationException,
+			ImageExtensionFormat format) throws ImageNotAvailableException,
 			CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
@@ -75,17 +75,19 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 			return url;
 
-		} catch (DeviceOperationFailedException | ImageTransferFailedException e) {
+		} catch (ImageNotAvailableException e) {
+			throw e;
+		} catch (TeleoperationException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 
-			throw e;
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void setExposureTime(String rt, String ccd, double value)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -106,19 +108,21 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		}
 
 		try {
-
 			this.executeOperation(operation);
-
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public double getExposureTime(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -142,16 +146,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (Double) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void setBrightness(String rt, String ccd, long value)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -174,16 +182,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public long getBrightness(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -207,16 +219,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (Long) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void setContrast(String rt, String ccd, long value)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -237,16 +253,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public long getContrast(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -270,16 +290,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (Long) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void setGain(String rt, String ccd, long value)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -301,15 +325,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
-	public long getGain(String rt, String ccd) throws TeleoperationException {
+	public long getGain(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -333,16 +362,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (Long) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public CCDState getState(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -366,16 +399,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (CCDState) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public String startExposure(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -404,16 +441,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 			return imageId;
 
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
 		} catch (TeleoperationException | ImageRepositoryException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
-			throw new TeleoperationException(e.getMessage());
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public String startContinueMode(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -438,16 +479,20 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			return (String) returns.getReturns().get(0);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void stopContinueMode(String rt, String ccd)
-			throws TeleoperationException {
+			throws DeviceOperationFailedException, CCDTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -469,10 +514,14 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
-		} catch (TeleoperationException e) {
+		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
 }

@@ -13,6 +13,7 @@ import eu.gloria.gs.services.repository.image.data.dbservices.ImageRepositoryAda
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
+import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
 
 public class ImageURLRetrieveExecutor extends ServerThread {
 
@@ -49,8 +50,10 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		try {
 			if (thereArePending) {
 				Thread.sleep(100);
+				System.out.println("Image daemon alive...images pending!");
 			} else {
 				Thread.sleep(1000);
+				System.out.println("Image daemon alive...no images pending!");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -73,6 +76,11 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			}
 
 		} catch (ImageRepositoryAdapterException e) {
+			try {
+				alog.registerAction(username, new Date(), e.getMessage());
+			} catch (ActionLogException ei) {
+				System.out.println(ei.getMessage());
+			}
 		}
 
 		thereArePending = false;
@@ -87,31 +95,37 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 				adapter.setUrlByRT(imageInfo.getRt(), imageInfo.getLocalid(),
 						url);
+			} catch (ImageNotAvailableException e) {
+				// Ignore the image this time, it will be treated by the
+				// next
+				// iteration of the executor
+				thereArePending = true;
 			} catch (CCDTeleoperationException e) {
-				if (e.getMessage().contains("yet")) {
-					// Ignore the image this time, it will be treated by the
-					// next
-					// iteration of the executor
-					thereArePending = true;
-				} else {
-					try {
-						adapter.removeImage(imageInfo.getId());
-					} catch (ImageRepositoryAdapterException e1) {
-						e1.printStackTrace();
-					}
 
-					try {
-						alog.registerAction(username, new Date(),
-								"Image entry " + imageInfo.getId() + " removed");
-					} catch (ActionLogException ea) {
-						System.out.println(ea.getMessage());
-					}
+				try {
+					alog.registerAction(username, new Date(), e.getMessage());
+				} catch (ActionLogException ei) {
+					System.out.println(ei.getMessage());
 				}
 
-			} catch (ImageRepositoryAdapterException e) {
-				System.out.println(e.getMessage());
+				try {
+					adapter.removeImage(imageInfo.getId());
+				} catch (ImageRepositoryAdapterException e1) {
+					e1.printStackTrace();
+				}
+
+				try {
+					alog.registerAction(username, new Date(), "Image entry "
+							+ imageInfo.getId() + " removed");
+				} catch (ActionLogException ea) {
+					System.out.println(ea.getMessage());
+				}
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				try {
+					alog.registerAction(username, new Date(), e.getMessage());
+				} catch (ActionLogException ei) {
+					System.out.println(ei.getMessage());
+				}
 			}
 		}
 	}
