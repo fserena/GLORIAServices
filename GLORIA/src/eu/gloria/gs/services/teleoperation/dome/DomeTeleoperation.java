@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
+import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationException;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.dome.operations.CloseOperation;
@@ -19,20 +21,18 @@ import eu.gloria.gs.services.teleoperation.dome.operations.SetTrackingOperation;
 public class DomeTeleoperation extends AbstractTeleoperation implements
 		DomeTeleoperationInterface {
 
-	private void processOperationException(String message, String rt,
-			String dome, String operation) {
+	private void processException(String message, String rt) {
 		try {
-			this.logAction(this.getClientUsername(), "Error while trying to "
-					+ operation + " of '" + dome + "' " + " of '"
-					+ rt + "': " + message);
-		} catch (ActionLogException e1) {
-			e1.printStackTrace();
+			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
+					+ message);
+		} catch (ActionLogException e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public DomeOpeningState getState(String rt, String dome)
-			throws DomeTeleoperationException {
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -41,22 +41,36 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
-		try {
-			GetStateOperation operation = new GetStateOperation(args);
+		GetStateOperation operation = null;
 
+		try {
+			operation = new GetStateOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getDomeState/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
 			OperationReturn returns = this.executeOperation(operation);
 			return (DomeOpeningState) returns.getReturns().get(0);
 
-		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome,
-					"get state");
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void setTracking(String rt, String dome, boolean mode)
-			throws DomeTeleoperationException {
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 
 		OperationArgs args = new OperationArgs();
 
@@ -66,21 +80,34 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(dome);
 		args.getArguments().add(mode);
 
+		SetTrackingOperation operation = null;
+
 		try {
-			SetTrackingOperation operation = new SetTrackingOperation(args);
-
-			this.executeOperation(operation);
-
+			operation = new SetTrackingOperation(args);
 		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome,
-					"set tracking mode");
+			this.processException(e.getClass().getSimpleName()
+					+ "/setTracking/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public boolean isTrackingEnabled(String rt, String dome)
-			throws DomeTeleoperationException {
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -88,23 +115,36 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
-		try {
-			IsTrackingEnabledOperation operation = new IsTrackingEnabledOperation(
-					args);
+		IsTrackingEnabledOperation operation = null;
 
+		try {
+			operation = new IsTrackingEnabledOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/isTrackingEnabled/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
 			OperationReturn returns = this.executeOperation(operation);
 			return (Boolean) returns.getReturns().get(0);
 
-		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome,
-					"get tracking enable");
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
 	public double getAzimuth(String rt, String dome)
-			throws DomeTeleoperationException {
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -112,21 +152,36 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
-		try {
-			GetAzimuthOperation operation = new GetAzimuthOperation(args);
+		GetAzimuthOperation operation = null;
 
+		try {
+			operation = new GetAzimuthOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getAzimuth/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
 			OperationReturn returns = this.executeOperation(operation);
 			return (Double) returns.getReturns().get(0);
 
-		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome,
-					"get azimuth");
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
-	public void open(String rt, String dome) throws DomeTeleoperationException {
+	public void open(String rt, String dome)
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -134,19 +189,34 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
+		OpenOperation operation = null;
+
 		try {
-			OpenOperation operation = new OpenOperation(args);
-
-			this.executeOperation(operation);
-
+			operation = new OpenOperation(args);
 		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome, "open");
+			this.processException(e.getClass().getSimpleName()
+					+ "/openDome/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
-	public void close(String rt, String dome) throws DomeTeleoperationException {
+	public void close(String rt, String dome)
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -154,19 +224,35 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
-		try {
-			CloseOperation operation = new CloseOperation(args);
+		CloseOperation operation = null;
 
+		try {
+			operation = new CloseOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/closeDome/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
 			this.executeOperation(operation);
 
-		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome, "close");
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
 
 	@Override
-	public void park(String rt, String dome) throws DomeTeleoperationException {
+	public void park(String rt, String dome)
+			throws DeviceOperationFailedException, DomeTeleoperationException {
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -174,13 +260,27 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		args.getArguments().add(rt);
 		args.getArguments().add(dome);
 
+		ParkOperation operation = null;
+
 		try {
-			ParkOperation operation = new ParkOperation(args);
-
-			this.executeOperation(operation);
-
+			operation = new ParkOperation(args);
 		} catch (Exception e) {
-			this.processOperationException(e.getMessage(), rt, dome, "park");
+			this.processException(e.getClass().getSimpleName()
+					+ "/parkDome/Bad args", rt);
+
+			throw new DomeTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+		} catch (DeviceOperationFailedException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(
+					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}

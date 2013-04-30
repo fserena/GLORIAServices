@@ -1,10 +1,10 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.MountState;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityStateMount;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class Mount extends DeviceHandler implements MountInterface {
@@ -12,55 +12,55 @@ public class Mount extends DeviceHandler implements MountInterface {
 	private RTSHandler rts;
 	private String mount;
 
-	public Mount(RTSHandler rts, String mount) throws RTSException {
+	public Mount(RTSHandler rts, String mount) throws TeleoperationException {
 
 		this.rts = rts;
 		this.mount = mount;
 	}
 
 	@Override
-	public void moveNorth() throws RTSException {
+	public void moveNorth() throws TeleoperationException {
 		rts.moveNorth(mount);
 	}
 
 	@Override
-	public void moveSouth() throws RTSException {
+	public void moveSouth() throws TeleoperationException {
 		rts.moveSouth(mount);
 	}
 
 	@Override
-	public void moveEast() throws RTSException {
+	public void moveEast() throws TeleoperationException {
 		rts.moveEast(mount);
 	}
 
 	@Override
-	public void moveWest() throws RTSException {
+	public void moveWest() throws TeleoperationException {
 		rts.moveWest(mount);
 	}
 
 	@Override
-	public void setSlewRate(String rate) throws RTSException {
+	public void setSlewRate(String rate) throws TeleoperationException {
 		rts.setSlewRate(mount, rate);
 	}
 	
 	@Override
-	public void setTrackingRate(TrackingRate rate) throws RTSException {
+	public void setTrackingRate(TrackingRate rate) throws TeleoperationException {
 		rts.setTrackingRate(mount, rate);
 	}
 	
 
 	@Override
-	public void setTracking(boolean mode) throws RTSException {
+	public void setTracking(boolean mode) throws TeleoperationException {
 		rts.setMountTracking(mount, mode);
 	}
 
 	@Override
-	public void slewToObject(String object) throws RTSException {
+	public void slewToObject(String object) throws TeleoperationException {
 		rts.slewToObject(mount, object);
 	}
 
 	@Override
-	public MountState getState() throws RTSException {
+	public MountState getState() throws TeleoperationException {
 		ActivityStateMount state = rts.getMountState(mount);
 
 		if (state.equals(ActivityStateMount.MOVING)) {
@@ -82,7 +82,7 @@ public class Mount extends DeviceHandler implements MountInterface {
 	}
 
 	@Override
-	public void park() throws RTSException {
+	public void park() throws TeleoperationException {
 		rts.parkMount(mount);
 	}
 

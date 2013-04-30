@@ -17,8 +17,7 @@ public abstract class DeviceOperation extends Operation {
 		return this.device;
 	}
 
-	protected abstract DeviceHandler getDeviceHandler(ServerResolver resolver)
-			throws Exception;
+	protected abstract DeviceHandler getDeviceHandler(ServerResolver resolver) throws TeleoperationException;
 
 	protected abstract void operateHandler(DeviceHandler handler,
 			OperationReturn returns) throws TeleoperationException;
@@ -28,13 +27,7 @@ public abstract class DeviceOperation extends Operation {
 
 		DeviceHandler handler = null;
 
-		try {
-
-			handler = this.getDeviceHandler(resolver);
-
-		} catch (NullPointerException e) {
-			throw new Exception("The device server is not available.");
-		}
+		handler = this.getDeviceHandler(resolver);
 
 		OperationReturn returns = new OperationReturn();
 		returns.setReturns(new ArrayList<Object>());

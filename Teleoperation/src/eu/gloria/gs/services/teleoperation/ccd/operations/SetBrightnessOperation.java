@@ -2,10 +2,10 @@ package eu.gloria.gs.services.teleoperation.ccd.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.devices.CCD;
 
 public class SetBrightnessOperation extends CCDOperation {
@@ -39,7 +39,7 @@ public class SetBrightnessOperation extends CCDOperation {
 					+ this.getCCDName());
 
 			return returns;
-		} catch (RTSException e) {
+		} catch (TeleoperationException e) {
 
 			throw new RTSTeleoperationException(e.getMessage());
 		}
@@ -47,7 +47,7 @@ public class SetBrightnessOperation extends CCDOperation {
 
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		ccd.setBrightness((long)this.brightness);
 
 		returns.setMessage("Set brightness operation executed: "

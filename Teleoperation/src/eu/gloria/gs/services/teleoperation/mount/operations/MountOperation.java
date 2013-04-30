@@ -4,11 +4,9 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperation;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
-import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.devices.Mount;
 
 public abstract class MountOperation extends DeviceOperation {
@@ -27,11 +25,11 @@ public abstract class MountOperation extends DeviceOperation {
 	}
 
 	protected abstract void operateMount(Mount mount, OperationReturn returns)
-			throws RTSException;
+			throws TeleoperationException;
 
 	@Override
 	protected DeviceHandler getDeviceHandler(ServerResolver resolver)
-			throws Exception {
+			throws TeleoperationException {
 
 		String url = resolver.resolve(this.getServer());
 		return DeviceFactory.getReference().createMount(url,
@@ -42,12 +40,7 @@ public abstract class MountOperation extends DeviceOperation {
 	protected void operateHandler(DeviceHandler handler, OperationReturn returns)
 			throws TeleoperationException {
 
-		try {
-			this.operateMount((Mount) handler, returns);
-		} catch (RTSException e) {
-			throw new RTSTeleoperationException(e.getMessage());
-		}
-
+		this.operateMount((Mount) handler, returns);
 	}
 
 }

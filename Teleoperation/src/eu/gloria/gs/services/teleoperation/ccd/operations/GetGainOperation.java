@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.CCD;
 
 public class GetGainOperation extends CCDOperation {
@@ -15,7 +15,7 @@ public class GetGainOperation extends CCDOperation {
 
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		long gain = ccd.getGain();
 
 		returns.setMessage("Get gain operation executed: " + gain + ", "

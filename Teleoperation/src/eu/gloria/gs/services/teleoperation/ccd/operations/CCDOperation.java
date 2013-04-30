@@ -4,11 +4,9 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperation;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
-import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
-import eu.gloria.rti.client.RTSException;
 import eu.gloria.rti.client.devices.CCD;
 
 public abstract class CCDOperation extends DeviceOperation {
@@ -27,10 +25,11 @@ public abstract class CCDOperation extends DeviceOperation {
 	}
 
 	protected abstract void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException;
+			throws TeleoperationException;
 
 	@Override
-	protected DeviceHandler getDeviceHandler(ServerResolver resolver) throws Exception {
+	protected DeviceHandler getDeviceHandler(ServerResolver resolver)
+			throws TeleoperationException {
 
 		String url = resolver.resolve(this.getServer());
 		return DeviceFactory.getReference().createCCD(url, this.getCCDName());
@@ -39,12 +38,7 @@ public abstract class CCDOperation extends DeviceOperation {
 	@Override
 	protected void operateHandler(DeviceHandler handler, OperationReturn returns)
 			throws TeleoperationException {
-
-		try {
-			this.operateCCD((CCD) handler, returns);
-		} catch (RTSException e) {
-			throw new RTSTeleoperationException(e.getMessage());
-		}
+		this.operateCCD((CCD) handler, returns);
 
 	}
 

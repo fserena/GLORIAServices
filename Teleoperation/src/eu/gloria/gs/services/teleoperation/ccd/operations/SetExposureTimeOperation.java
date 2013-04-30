@@ -2,7 +2,7 @@ package eu.gloria.gs.services.teleoperation.ccd.operations;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.CCD;
 
 public class SetExposureTimeOperation extends CCDOperation {
@@ -17,7 +17,7 @@ public class SetExposureTimeOperation extends CCDOperation {
 
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 
 		ccd.setExposureTime(this.exposure);
 

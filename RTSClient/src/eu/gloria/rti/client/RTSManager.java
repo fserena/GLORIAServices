@@ -2,6 +2,7 @@ package eu.gloria.rti.client;
 
 import java.util.HashMap;
 
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class RTSManager {
@@ -26,7 +27,7 @@ public class RTSManager {
 		return instance;
 	}
 	
-	public RTSHandler getRTS(String url) throws RTSException
+	public RTSHandler getRTS(String url) throws TeleoperationException
 	{
 		synchronized(rtsTable)
 		{

@@ -6,8 +6,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
+import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.IncorrectDeviceTypeException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
+import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
+import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
+import eu.gloria.gs.services.teleoperation.ccd.ImageTransferFailedException;
+import eu.gloria.gs.services.teleoperation.focuser.NotAbsoluteFocuserException;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
 import eu.gloria.rt.entity.device.ActivityStateDomeOpening;
@@ -31,10 +40,10 @@ import eu.gloria.rti.factory.ProxyFactory;
 public class RTSHandler implements ServerHandler {
 
 	private GloriaRti rtsPort;
-	private static String port = "8443";
-	private static String serviceName = "RTI";
-	private static String user = "gloria_user";
-	private static String password = "12345";
+	private static String port;
+	private static String serviceName;
+	private static String user;
+	private static String password;
 
 	static {
 
@@ -57,13 +66,7 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public RTSHandler(String host) throws RTSException {
-		/*
-		 * RTIProxyConnection proxyConnection = new RTIProxyConnection(host,
-		 * port, serviceName, user, password, pk);
-		 * 
-		 * rtsPort = proxyConnection.getProxy();
-		 */
+	public RTSHandler(String host) throws TeleoperationException {
 
 		URL urlWsdl = null;
 		try {
@@ -88,174 +91,131 @@ public class RTSHandler implements ServerHandler {
 			rtsPort = proxyFactory.getProxy(urlWsdl, urlWs, false, user,
 					password);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ServerNotAvailableException("Get rt handler for " + host);
 		}
 
 		if (rtsPort == null) {
-			throw new RTSException(
-					"The RTS on "
-							+ host
-							+ " is not available or does not exist (or maybe, the public key is not correct)");
+			throw new ServerNotAvailableException("Get rt handler for " + host);
 		}
 	}
 
-	public CCD getCCD(String name) throws RTSException {
+	public DeviceHandler getDeviceHandler(String name, DeviceType type)
+			throws TeleoperationException {
 		Device device = null;
 
 		try {
 			device = rtsPort.devGetDevice(null, name, false);
 		} catch (RtiError e) {
-			throw new RTSException("The device " + name + " does not exist: "
-					+ e.getMessage());
+			throw new DeviceNotAvailableException(name);
 		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new ServerNotAvailableException("Get device handler for " + name
+					+ " " + type.name());
 		}
 
-		if (device.getType().equals(DeviceType.CCD)) {
-			return new CCD(this, name);
+		if (device.getType().equals(type)) {
+			if (type.equals(DeviceType.CCD)) {
+				return new CCD(this, name);
+			} else if (type.equals(DeviceType.MOUNT)) {
+				return new Mount(this, name);
+			} else if (type.equals(DeviceType.SURVEILLANCE_CAMERA)) {
+				return new Scam(this, name);
+			} else if (type.equals(DeviceType.FOCUS)) {
+				return new Focuser(this, name);
+			} else if (type.equals(DeviceType.DOME)) {
+				return new Dome(this, name);
+			}
 		}
 
-		throw new RTSException("The device " + name + " is not a CCD.");
-	}
-
-	public Dome getDome(String name) throws RTSException {
-		Device device = null;
-
-		try {
-			device = rtsPort.devGetDevice(null, name, false);
-		} catch (RtiError e) {
-			throw new RTSException("The device " + name + " does not exist: "
-					+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
-		}
-
-		if (device.getType().equals(DeviceType.DOME)) {
-			return new Dome(this, name);
-		}
-
-		throw new RTSException("The device " + name + " is not a Dome.");
-	}
-
-	public Mount getMount(String name) throws RTSException {
-		Device device = null;
-
-		try {
-			device = rtsPort.devGetDevice(null, name, false);
-		} catch (RtiError e) {
-			throw new RTSException("The device " + name + " does not exist: "
-					+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
-		}
-
-		if (device.getType().equals(DeviceType.MOUNT)) {
-			return new Mount(this, name);
-		}
-
-		throw new RTSException("The device " + name + " is not a Mount.");
-	}
-
-	public Scam getSurveillanceCamera(String name) throws RTSException {
-
-		Device device = null;
-
-		try {
-			device = rtsPort.devGetDevice(null, name, false);
-		} catch (RtiError e) {
-			throw new RTSException("The device " + name + " does not exist: "
-					+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
-		}
-
-		if (device.getType().equals(DeviceType.SURVEILLANCE_CAMERA)) {
-			return new Scam(this, name);
-		}
-
-		throw new RTSException("The device " + name
-				+ " is not a Surveillance Camera.");
-
-	}
-
-	public Focuser getFocuser(String name) throws RTSException {
-
-		Device device = null;
-
-		try {
-			device = rtsPort.devGetDevice(null, name, false);
-		} catch (RtiError e) {
-			throw new RTSException("The device " + name + " does not exist: "
-					+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
-		}
-
-		if (device.getType().equals(DeviceType.FOCUS)) {
-			return new Focuser(this, name);
-		}
-
-		throw new RTSException("The device " + name + " is not a Focuser.");
-
+		throw new IncorrectDeviceTypeException(name);
 	}
 
 	public GloriaRti getPort() {
 		return this.rtsPort;
 	}
 
-	public boolean isConnected(String device) throws RTSException {
+	public boolean isConnected(String device) throws TeleoperationException {
 		try {
 			return rtsPort.devIsConnected(null, device);
 		} catch (RtiError e) {
-			throw new RTSException("The device " + device
-					+ " does not exist or its information cannot be recovered.");
+			throw new TeleoperationException("The device " + device
+					+ " does not exist or its information cannot be recovered");
 		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new TeleoperationException("The RTS is not available.");
 		}
 	}
 
-	public long getBrightness(String camera) throws RTSException {
-		try {
-			Device device = rtsPort.devGetDevice(null, camera, false);
+	public long getBrightness(String camera) throws TeleoperationException {
 
+		String actionMessage = "Get brightness of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
+
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
 				return rtsPort.camGetBrightness(null, camera);
 			} else {
 				return rtsPort.scamGetBrightness(null, camera);
 			}
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its brightness cannot be recovered.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void setBrightness(String camera, double value) throws RTSException {
-		try {
+	public void setBrightness(String camera, double value) throws TeleoperationException {
 
-			Device device = rtsPort.devGetDevice(null, camera, false);
+		String actionMessage = "Set brightness of " + camera + " to " + value;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
+
+		try {
 
 			if (device.getType().equals(DeviceType.CCD)) {
 				rtsPort.camSetBrightness(null, camera, (long) value);
 			} else {
 				rtsPort.scamSetBrightness(null, camera, (long) value);
 			}
-
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its brightness cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public double getExposureTime(String camera) throws RTSException {
+	public double getExposureTime(String camera) throws TeleoperationException {
+
+		String actionMessage = "Get exposure of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
 		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
 
-			Device device = rtsPort.devGetDevice(null, camera, false);
-
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
 				return rtsPort.camGetExposureTime(null, camera);
 			} else {
@@ -263,196 +223,247 @@ public class RTSHandler implements ServerHandler {
 			}
 
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its exposure cannot be recovered.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void setExposureTime(String camera, double value)
-			throws RTSException {
-		try {
-			Device device = rtsPort.devGetDevice(null, camera, false);
+			throws TeleoperationException {
 
+		String actionMessage = "Set exposure of " + camera + " to " + value;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
+
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
 				rtsPort.camSetExposureTime(null, camera, value);
 			} else {
 				rtsPort.scamSetExposureTime(null, camera, (long) value);
 			}
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its exposure cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public boolean getAutoExposure(String camera) throws RTSException {
+	public boolean getAutoExposure(String camera) throws TeleoperationException {
+
+		String actionMessage = "Get auto-exposure of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 
 			return rtsPort.camGetAutoExposureTime(null, camera);
 
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or does not have auto exposure mode.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void setAutoExposure(String camera, boolean mode)
-			throws RTSException {
+			throws TeleoperationException {
+
+		String actionMessage = "Set auto-exposure of " + camera + " to " + mode;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.camSetAutoExposureTime(null, camera, mode);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ camera
-							+ " does not exist or its auto exposure cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public long getContrast(String camera) throws RTSException {
-		try {
-			Device device = rtsPort.devGetDevice(null, camera, false);
+	public long getContrast(String camera) throws TeleoperationException {
 
+		String actionMessage = "Get contrast of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
+
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
 				return rtsPort.camGetContrast(null, camera);
 			} else {
 				return rtsPort.scamGetContrast(null, camera);
 			}
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its contrast cannot be recovered.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void setContrast(String camera, long value) throws RTSException {
-		try {
-			Device device = rtsPort.devGetDevice(null, camera, false);
+	public void setContrast(String camera, long value) throws TeleoperationException {
 
+		String actionMessage = "Set contrast of " + camera + " to " + value;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
+
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
 				rtsPort.camSetContrast(null, camera, value);
 			} else {
 				rtsPort.scamSetContrast(null, camera, value);
 			}
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its contrast cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public long getGain(String camera) throws RTSException {
+	public long getGain(String camera) throws TeleoperationException {
+
+		String actionMessage = "Get gain of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			return rtsPort.camGetGain(null, camera);
-
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its gain cannot be recovered.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void setGain(String camera, long value) throws RTSException {
+	public void setGain(String camera, long value) throws TeleoperationException {
+
+		String actionMessage = "Set gain of " + camera + " to " + value;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.camSetGain(null, camera, value);
-
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its gain cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public boolean getAutoGain(String camera) throws RTSException {
+	public boolean getAutoGain(String camera) throws TeleoperationException {
+		String actionMessage = "Get auto-gain of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
-
 			return rtsPort.camGetAutoGain(null, camera);
-
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or does not have auto gain mode.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void setAutoGain(String camera, boolean mode) throws RTSException {
+	public void setAutoGain(String camera, boolean mode) throws TeleoperationException {
+		String actionMessage = "Set auto-gain of " + camera + " to " + mode;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.camSetAutoGain(null, camera, mode);
-
 		} catch (RtiError e) {
-			throw new RTSException("The camera " + camera
-					+ " does not exist or its auto gain cannot be assigned.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public String startExposure(String camera) throws RTSException {
+	public String startExposure(String camera) throws TeleoperationException {
+		String actionMessage = "Start exposure of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			return rtsPort.camStartExposure(null, camera, true);
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ camera
-							+ " does not exist or an error has occured while trying to start exposure.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
-
 	}
 
-	public String startContinueMode(String camera) throws RTSException {
-		try {
+	public String startContinueMode(String camera) throws TeleoperationException {
 
+		String actionMessage = "Start continue mode of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		try {
 			return rtsPort.camStartContinueMode(null, camera);
-
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ camera
-							+ " does not exist or an error has occured while trying to start continuous mode: "
-							+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void stopContinueMode(String camera) throws RTSException {
+	public void stopContinueMode(String camera) throws TeleoperationException {
+		String actionMessage = "Stop continue mode of " + camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
-
 			rtsPort.camStopContinueMode(null, camera);
-
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ camera
-							+ " does not exist or an error has occured while trying to stop continuous mode: "
-							+ e.getMessage());
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public String getImageURL(String camera, String imageId,
-			ImageExtensionFormat format) throws RTSException {
+			ImageExtensionFormat format) throws TeleoperationException {
+
+		String actionMessage = "Get URL of " + imageId + " image from camera "
+				+ camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		Device device = null;
+
 		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (RtiError e) {
+			throw new DeviceNotAvailableException(actionMessage);
+		}
 
-			Device device = rtsPort.devGetDevice(null, camera, false);
-
+		try {
 			if (device.getType().equals(DeviceType.CCD)) {
-
 				ImageFormat imageFormat = ImageFormat.valueOf(format.name());
 
 				return rtsPort.camGetImageURLProperFormat(null, camera,
@@ -462,165 +473,178 @@ public class RTSHandler implements ServerHandler {
 			}
 		} catch (RtiError e) {
 			if (e.getMessage().equals("NOT_AVAILABLE"))
-				throw new RTSException("The image is not yet available.");
+				throw new ImageNotAvailableException(actionMessage);
 			else if (e.getMessage().equals("FAILED"))
-				throw new RTSException(
-						"An error has occured while saving the image. It will not be available.");
+				throw new ImageTransferFailedException(actionMessage);
 			else
-				throw new RTSException(
-						"The camera "
-								+ camera
-								+ " does not exist or an error has occured while trying to recover the image url.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+				throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public String getContinuousImagePath(String camera) throws RTSException {
+	public String getContinuousImagePath(String camera) throws TeleoperationException {
+		String actionMessage = "Get URL of the continuous image of camera "
+				+ camera;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
-
 			return rtsPort.camGetContinueModeImagePath(null, camera);
-
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ camera
-							+ " does not exist or an error has occured while trying to recover the continue mode path.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public ActivityContinueStateCamera getCCDState(String ccd)
-			throws RTSException {
-		try {
+			throws TeleoperationException {
 
+		String actionMessage = "Get continue mode state of " + ccd;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		try {
 			DeviceCamera deviceCamera = (DeviceCamera) rtsPort.devGetDevice(
 					null, ccd, false);
 
 			return deviceCamera.getActivityContinueState();
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ ccd
-							+ " does not exist or an error has occured while trying to recover the image url.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public ActivityContinueStateCamera getSCamState(String scam)
-			throws RTSException {
-		try {
+			throws TeleoperationException {
+		String actionMessage = "Get continue mode state of " + scam;
 
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		try {
 			DeviceCamera deviceCamera = (DeviceCamera) rtsPort.devGetDevice(
 					null, scam, false);
 
 			return deviceCamera.getActivityContinueState();
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The camera "
-							+ scam
-							+ " does not exist or an error has occured while trying to recover the image url.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void open(String dome) throws RTSException {
+	public void open(String dome) throws TeleoperationException {
+		String actionMessage = "Open dome " + dome;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.domOpen(null, dome, 0);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The dome "
-							+ dome
-							+ " does not exist or an error has occured while trying to open (may be it is already opened).");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void close(String dome) throws RTSException {
-		try {
+	public void close(String dome) throws TeleoperationException {
+		String actionMessage = "Close dome " + dome;
 
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
+		try {
 			rtsPort.domClose(null, dome, 0);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The dome "
-							+ dome
-							+ " does not exist or an error has occured while trying to close (may be it is already closed).");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void parkDome(String dome) throws RTSException {
+	public void parkDome(String dome) throws TeleoperationException {
+		String actionMessage = "Park dome " + dome;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.domPark(null, dome);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The dome "
-							+ dome
-							+ " does not exist or an error has occured while trying to park.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void parkMount(String mount) throws RTSException {
+	public void parkMount(String mount) throws TeleoperationException {
+		String actionMessage = "Park mount " + mount;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntPark(null, mount);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The mount "
-							+ mount
-							+ " does not exist or an error has occured while trying to park.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public double getDomeAzimuth(String dome) throws RTSException {
+	public double getDomeAzimuth(String dome) throws TeleoperationException {
+		String actionMessage = "Get dome azimuth of " + dome;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 
 			return rtsPort.domGetAzimuth(null, dome);
 
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The dome "
-							+ dome
-							+ " does not exist or an error has occured while trying to recover its azimuth value.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public boolean getDomeTracking(String dome) throws RTSException {
+	public boolean getDomeTracking(String dome) throws TeleoperationException {
+		String actionMessage = "Get dome tracking of " + dome;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			return rtsPort.domGetTracking(null, dome);
 		} catch (RtiError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DeviceOperationFailedException(actionMessage);
 		}
-
-		return false;
 	}
 
-	public void setDomeTracking(String dome, boolean mode) throws RTSException {
+	public void setDomeTracking(String dome, boolean mode) throws TeleoperationException {
+		String actionMessage = "Set dome tracking of " + dome + " to " + mode;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.domSetTracking(null, dome, mode);
 		} catch (RtiError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public ActivityStateDomeOpening getDomeState(String dome)
-			throws RTSException {
+			throws TeleoperationException {
+		String actionMessage = "Get dome state of " + dome;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 
 			DeviceDome domeDevice = (DeviceDome) rtsPort.devGetDevice(null,
@@ -628,87 +652,134 @@ public class RTSHandler implements ServerHandler {
 
 			return domeDevice.getActivityStateOpening();
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The dome "
-							+ dome
-							+ " does not exist or an error has occured while trying to recover its status.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void moveNorth(String mount) throws RTSException {
+	public void moveNorth(String mount) throws TeleoperationException {
+		String actionMessage = "Move " + mount + "  to north";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntMoveNorth(null, mount);
-			// rtsPort.mntSetTracking(null, mount, false);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void moveSouth(String mount) throws RTSException {
+	public void moveSouth(String mount) throws TeleoperationException {
+		String actionMessage = "Move " + mount + "  to south";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntMoveSouth(null, mount);
-			// rtsPort.mntSetTracking(null, mount, false);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void moveEast(String mount) throws RTSException {
+	public void moveEast(String mount) throws TeleoperationException {
+		String actionMessage = "Move " + mount + "  to east";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntMoveEast(null, mount);
-			// rtsPort.mntSetTracking(null, mount, false);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void moveWest(String mount) throws RTSException {
+	public void moveWest(String mount) throws TeleoperationException {
+		String actionMessage = "Move " + mount + "  to west";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntMoveWest(null, mount);
-			// rtsPort.mntSetTracking(null, mount, false);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void setSlewRate(String mount, String rate) throws RTSException {
+	public void setSlewRate(String mount, String rate) throws TeleoperationException {
+		String actionMessage = "Set slew rate of " + mount + " to " + rate;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntSetSlewRate(null, mount, rate);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void setTrackingRate(String mount, TrackingRate rate)
-			throws RTSException {
+			throws TeleoperationException {
+		String actionMessage = "Set tracking rate of " + mount + " to "
+				+ rate.name();
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntSetTrackingRate(null, mount,
 					TrackingRateType.valueOf(rate.name()));
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void setMountTracking(String mount, boolean mode)
-			throws RTSException {
+			throws TeleoperationException {
+
+		String actionMessage = "Set tracking mode of " + mount + " to " + mode;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntSetTracking(null, mount, mode);
 		} catch (RtiError e) {
-			throw new RTSException("The mount has a problem: " + e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public void slewToObject(String mount, String object) throws RTSException {
+	public void slewToObject(String mount, String object) throws TeleoperationException {
+		String actionMessage = "Slew " + mount + " to " + object;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 			rtsPort.mntSlewObject(null, mount, object);
 		} catch (RtiError e) {
-			throw new RTSException(e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public ActivityStateMount getMountState(String mount) throws RTSException {
+	public ActivityStateMount getMountState(String mount) throws TeleoperationException {
+		String actionMessage = "Get state of " + mount;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
+
 		try {
 
 			DeviceMount mountDevice = (DeviceMount) rtsPort.devGetDevice(null,
@@ -716,17 +787,19 @@ public class RTSHandler implements ServerHandler {
 
 			return mountDevice.getActivityState();
 		} catch (RtiError e) {
-			throw new RTSException(
-					"The mount "
-							+ mount
-							+ " does not exist or an error has occured while trying to recover its status.");
-		} catch (NullPointerException ne) {
-			throw new RTSException("The RTS is not available.");
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void relativeFocuserMove(String focuser, long steps)
-			throws RTSException {
+			throws TeleoperationException {
+
+		String actionMessage = "Relative " + focuser + " move of " + steps
+				+ " steps";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
 
 		long effectiveMove = steps;
 
@@ -738,12 +811,19 @@ public class RTSHandler implements ServerHandler {
 
 			rtsPort.focMove(null, focuser, effectiveMove);
 		} catch (RtiError e) {
-			throw new RTSException(e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
 	public void absoluteFocuserMove(String focuser, long position)
-			throws RTSException {
+			throws TeleoperationException {
+
+		String actionMessage = "Absolute " + focuser + " move to " + position
+				+ " position";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
 
 		long effectiveMove = position;
 
@@ -755,21 +835,26 @@ public class RTSHandler implements ServerHandler {
 
 			rtsPort.focMove(null, focuser, effectiveMove);
 		} catch (RtiError e) {
-			throw new RTSException(e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 	}
 
-	public long getFocuserAbsolutePosition(String focuser) throws RTSException {
+	public long getFocuserAbsolutePosition(String focuser) throws TeleoperationException {
+
+		String actionMessage = "Get absolute position of" + focuser;
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage);
+		}
 
 		try {
 			if (rtsPort.focIsAbsolute(null, focuser)) {
 				return rtsPort.focGetPosition(null, focuser);
 			}
 		} catch (RtiError e) {
-			throw new RTSException(e.getMessage());
+			throw new DeviceOperationFailedException(actionMessage);
 		}
 
-		throw new RTSException("The focuser '" + focuser
-				+ "' does not work in absolute mode");
+		throw new NotAbsoluteFocuserException(actionMessage);
 	}
 }

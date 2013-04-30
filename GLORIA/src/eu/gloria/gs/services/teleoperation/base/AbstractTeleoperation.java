@@ -13,7 +13,7 @@ public abstract class AbstractTeleoperation extends GSLogProducerService impleme
 
 	@Override
 	public OperationReturn executeOperation(Operation operation)
-			throws Exception {
+			throws TeleoperationException {
 
 		return operation.execute(this.getServerResolver());
 	}

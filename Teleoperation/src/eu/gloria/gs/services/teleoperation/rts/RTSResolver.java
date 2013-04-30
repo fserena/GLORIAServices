@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
+import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.RTSManager;
@@ -17,14 +18,19 @@ public class RTSResolver implements ServerResolver {
 	public void setRTRepository(RTRepositoryInterface repository) {
 		this.repository = repository;
 	}
-	
+
 	@Override
-	public String resolve(String server) throws Exception {
+	public String resolve(String server) throws ServerNotAvailableException {
 
 		synchronized (urlTable) {
 			if (!urlTable.containsKey(server)) {
 
-				String url = repository.getRTUrl(server);
+				String url = null;
+				try {
+					url = repository.getRTUrl(server);
+				} catch (Exception e) {
+					throw new ServerNotAvailableException(server);
+				}
 				urlTable.put(server, url);
 				dateTable.put(server, new Date());
 
@@ -36,7 +42,12 @@ public class RTSResolver implements ServerResolver {
 
 			if (currentDate.getTime() - savedDate.getTime() > 10000) {
 
-				String url = repository.getRTUrl(server);
+				String url = null;
+				try {
+					url = repository.getRTUrl(server);
+				} catch (Exception e) {
+					throw new ServerNotAvailableException(server);
+				}
 				urlTable.put(server, url);
 				dateTable.put(server, new Date());
 			}

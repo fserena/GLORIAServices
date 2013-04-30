@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
-import eu.gloria.rti.client.RTSException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.devices.Scam;
 
 public class GetGainOperation extends SurveillanceCameraOperation {
@@ -15,7 +15,7 @@ public class GetGainOperation extends SurveillanceCameraOperation {
 
 	@Override
 	protected void operateSCam(Scam scam, OperationReturn returns)
-			throws RTSException {
+			throws TeleoperationException {
 		long gain = scam.getGain();
 
 		returns.setMessage("Get gain operation executed: " + gain + ", "
