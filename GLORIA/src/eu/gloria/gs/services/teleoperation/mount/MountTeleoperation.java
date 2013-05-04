@@ -1,8 +1,6 @@
 package eu.gloria.gs.services.teleoperation.mount;
 
 import java.util.ArrayList;
-
-import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -23,15 +21,6 @@ import eu.gloria.gs.services.teleoperation.mount.operations.SlewToObjectOperatio
 
 public class MountTeleoperation extends AbstractTeleoperation implements
 		MountTeleoperationInterface {
-
-	private void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
-					+ message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public MountState getState(String rt, String mount)
@@ -56,7 +45,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (MountState) returns.getReturns().get(0);
+			MountState state = (MountState) returns.getReturns().get(0);
+			this.processSuccess(rt, mount, "getState", null, state.name());
+
+			return state;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -95,6 +87,7 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 
 			this.executeOperation(operation);
+			this.processSuccess(rt, mount, "moveNorth", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -129,6 +122,7 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			this.processSuccess(rt, mount, "moveSouth", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -163,6 +157,7 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			this.processSuccess(rt, mount, "moveEast", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -197,6 +192,7 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			this.processSuccess(rt, mount, "moveWest", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -233,6 +229,8 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 
 			this.executeOperation(operation);
+			this.processSuccess(rt, mount, "setSlewRate",
+					new Object[] { rate }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -269,6 +267,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, mount, "slewToObject",
+					new Object[] { object }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -303,6 +304,8 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, mount, "park", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -338,6 +341,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, mount, "setTrackingRate",
+					new Object[] { rate.name() }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -373,6 +379,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, mount, "setTracking",
+					new Object[] { mode }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);

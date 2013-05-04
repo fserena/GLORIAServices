@@ -68,8 +68,8 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 			if (notUrlCompleted.size() > 0) {
 				try {
-					alog.registerAction(username, new Date(), "There are "
-							+ notUrlCompleted.size() + " image entries to fill");
+					alog.registerAction(username, new Date(), "images/fill?"
+							+ notUrlCompleted.size());
 				} catch (ActionLogException e) {
 					System.out.println(e.getMessage());
 				}
@@ -95,6 +95,16 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 				adapter.setUrlByRT(imageInfo.getRt(), imageInfo.getLocalid(),
 						url);
+
+				try {
+					alog.registerAction(
+							username,
+							new Date(),
+							"images/" + imageInfo.getId() + "/setURL?"
+									+ url.substring(0, 15));
+				} catch (ActionLogException e) {
+					System.out.println(e.getMessage());
+				}
 			} catch (ImageNotAvailableException e) {
 				// Ignore the image this time, it will be treated by the
 				// next
@@ -103,23 +113,30 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			} catch (CCDTeleoperationException e) {
 
 				try {
-					alog.registerAction(username, new Date(), e.getMessage());
-				} catch (ActionLogException ei) {
-					System.out.println(ei.getMessage());
+					alog.registerAction(
+							username,
+							new Date(),
+							"images/" + imageInfo.getId() + "/setURL?"
+									+ url.substring(0, 15)
+									+ "->CCD_TELEOPERATION_ERROR");
+				} catch (ActionLogException el) {
+					System.out.println(el.getMessage());
 				}
 
 				try {
 					adapter.removeImage(imageInfo.getId());
+
+					try {
+						alog.registerAction(username, new Date(),
+								"images/remove?" + imageInfo.getId());
+					} catch (ActionLogException el) {
+						System.out.println(el.getMessage());
+					}
+
 				} catch (ImageRepositoryAdapterException e1) {
 					e1.printStackTrace();
 				}
 
-				try {
-					alog.registerAction(username, new Date(), "Image entry "
-							+ imageInfo.getId() + " removed");
-				} catch (ActionLogException ea) {
-					System.out.println(ea.getMessage());
-				}
 			} catch (Exception e) {
 				try {
 					alog.registerAction(username, new Date(), e.getMessage());

@@ -2,7 +2,6 @@ package eu.gloria.gs.services.teleoperation.focuser;
 
 import java.util.ArrayList;
 
-import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -14,15 +13,6 @@ import eu.gloria.gs.services.teleoperation.focuser.operations.MoveRelativeOperat
 
 public class FocuserTeleoperation extends AbstractTeleoperation implements
 		FocuserTeleoperationInterface {
-
-	private void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
-					+ message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public long getPosition(String rt, String focuser)
@@ -48,7 +38,11 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long position = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, focuser, "getPosition", null, position);
+
+			return position;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -86,6 +80,9 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, focuser, "moveAbsolute",
+					new Object[] { position }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -122,6 +119,9 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			
+			this.processSuccess(rt, focuser, "moveRelative",
+					new Object[] { steps }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);

@@ -2,7 +2,6 @@ package eu.gloria.gs.services.teleoperation.scam;
 
 import java.util.ArrayList;
 
-import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -23,15 +22,6 @@ import eu.gloria.gs.services.teleoperation.scam.operations.SetGainOperation;
 
 public class SCamTeleoperation extends AbstractTeleoperation implements
 		SCamTeleoperationInterface {
-
-	private void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
-					+ message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public String getImageURL(String rt, String scam)
@@ -57,7 +47,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (String) returns.getReturns().get(0);
+			String url = (String) returns.getReturns().get(0);
+
+			this.processSuccess(rt, scam, "getImageURL", null, url);
+
+			return url;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -96,6 +90,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
+			this.processSuccess(rt, scam, "setExposure",
+					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -130,7 +126,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Double) returns.getReturns().get(0);
+			double exposure = (Double) returns.getReturns().get(0);
+
+			this.processSuccess(rt, scam, "getExposure", null, exposure);
+
+			return exposure;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -168,6 +168,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
+			this.processSuccess(rt, scam, "setBrightness",
+					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -202,7 +204,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long brightness = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, scam, "getBrightness", null, brightness);
+
+			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -239,6 +245,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, scam, "setContrast",
+					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -273,7 +282,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long contrast = (Long) returns.getReturns().get(0);
+			
+			this.processSuccess(rt, scam, "getContrast", null, contrast);
+			
+			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -311,6 +324,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
+			this.processSuccess(rt, scam, "setGain", new Object[] { value },
+					null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -345,7 +360,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long gain = (Long) returns.getReturns().get(0);
+			
+			this.processSuccess(rt, scam, "getContrast", null, gain);
+			
+			return gain;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -381,7 +400,11 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (SCamState) returns.getReturns().get(0);
+			SCamState state = (SCamState) returns.getReturns().get(0);
+			
+			this.processSuccess(rt, scam, "getState", null, state.name());
+			
+			return state;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(

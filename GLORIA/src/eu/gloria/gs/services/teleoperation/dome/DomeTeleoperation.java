@@ -2,7 +2,6 @@ package eu.gloria.gs.services.teleoperation.dome;
 
 import java.util.ArrayList;
 
-import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -20,15 +19,6 @@ import eu.gloria.gs.services.teleoperation.dome.operations.SetTrackingOperation;
 
 public class DomeTeleoperation extends AbstractTeleoperation implements
 		DomeTeleoperationInterface {
-
-	private void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
-					+ message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public DomeOpeningState getState(String rt, String dome)
@@ -55,7 +45,12 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (DomeOpeningState) returns.getReturns().get(0);
+			DomeOpeningState state = (DomeOpeningState) returns.getReturns()
+					.get(0);
+
+			this.processSuccess(rt, dome, "getState", null, state.name());
+
+			return state;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -94,6 +89,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, dome, "setTracking", new Object[] { mode },
+					null);
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -129,7 +128,11 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Boolean) returns.getReturns().get(0);
+			boolean mode = (Boolean) returns.getReturns().get(0);
+
+			this.processSuccess(rt, dome, "isTrackingEnabled", null, mode);
+
+			return mode;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -166,7 +169,11 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Double) returns.getReturns().get(0);
+			double azimuth = (Double) returns.getReturns().get(0);
+			
+			this.processSuccess(rt, dome, "getAzimuth", null, azimuth);
+			
+			return azimuth;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -203,6 +210,8 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			
+			this.processSuccess(rt, dome, "open", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -238,6 +247,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			this.processSuccess(rt, dome, "close", null, null);
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -274,6 +284,8 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+			
+			this.processSuccess(rt, dome, "park", null, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);

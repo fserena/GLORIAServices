@@ -2,7 +2,6 @@ package eu.gloria.gs.services.teleoperation.ccd;
 
 import java.util.ArrayList;
 
-import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
@@ -30,15 +29,6 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		CCDTeleoperationInterface {
 
 	private ImageRepositoryInterface imageRepository;
-
-	private void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), "'" + rt + "' error: "
-					+ message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public void setImageRepository(ImageRepositoryInterface repository) {
 		this.imageRepository = repository;
@@ -72,6 +62,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			String url = (String) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getImageURL",
+					new Object[] { imageId }, url.substring(0, 15) + "...");
 
 			return url;
 
@@ -109,6 +102,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "setExposure", new Object[] { value },
+					null);
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -144,8 +141,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Double) returns.getReturns().get(0);
+			double exposure = (Double) returns.getReturns().get(0);
 
+			this.processSuccess(rt, ccd, "getExposure", null, exposure);
+
+			return exposure;
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -182,6 +182,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
+			this.processSuccess(rt, ccd, "setBrightness",
+					new Object[] { value }, null);
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -217,7 +220,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long brightness = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getBrightness", null, brightness);
+
+			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -253,6 +260,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "setContrast", new Object[] { value },
+					null);
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -288,7 +299,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long contrast = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getContrast", null, contrast);
+
+			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -325,6 +340,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.executeOperation(operation);
 
+			this.processSuccess(rt, ccd, "setGain", new Object[] { value },
+					null);
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -360,8 +378,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			return (Long) returns.getReturns().get(0);
+			long gain = (Long) returns.getReturns().get(0);
 
+			this.processSuccess(rt, ccd, "getGain", null, gain);
+
+			return gain;
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
 					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
@@ -439,6 +460,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			imageRepository.saveImage(this.getClientUsername(), rt, ccd,
 					imageId);
 
+			this.processSuccess(rt, ccd, "startExposure", null, imageId);
+
 			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
@@ -477,7 +500,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 
 			OperationReturn returns = this.executeOperation(operation);
-			return (String) returns.getReturns().get(0);
+			String imageId = (String) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "startContinueMode", null, imageId);
+
+			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
@@ -513,6 +540,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "stopContinueMode", null, null);
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(
