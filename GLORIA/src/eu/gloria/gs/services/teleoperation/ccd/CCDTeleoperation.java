@@ -71,8 +71,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		} catch (ImageNotAvailableException e) {
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 
 			throw new CCDTeleoperationException(e.getMessage());
 		}
@@ -107,12 +106,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -147,12 +144,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 			return exposure;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -186,12 +181,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 					new Object[] { value }, null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -227,12 +220,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -265,12 +256,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -306,12 +295,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -344,12 +331,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -384,12 +369,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 			return gain;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -421,12 +404,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			return (CCDState) returns.getReturns().get(0);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -465,12 +446,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException | ImageRepositoryException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -507,12 +486,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}
@@ -544,12 +521,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, ccd, "stopContinueMode", null, null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new CCDTeleoperationException(e.getMessage());
 		}
 	}

@@ -51,14 +51,11 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -89,12 +86,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.executeOperation(operation);
 			this.processSuccess(rt, mount, "moveNorth", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -124,12 +119,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.executeOperation(operation);
 			this.processSuccess(rt, mount, "moveSouth", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -159,12 +152,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.executeOperation(operation);
 			this.processSuccess(rt, mount, "moveEast", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -194,12 +185,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.executeOperation(operation);
 			this.processSuccess(rt, mount, "moveWest", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -232,12 +221,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, mount, "setSlewRate",
 					new Object[] { rate }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -271,12 +258,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, mount, "slewToObject",
 					new Object[] { object }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -307,12 +292,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 			this.processSuccess(rt, mount, "park", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -345,12 +328,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, mount, "setTrackingRate",
 					new Object[] { rate.name() }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}
@@ -383,12 +364,10 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, mount, "setTracking",
 					new Object[] { mode }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new MountTeleoperationException(e.getMessage());
 		}
 	}

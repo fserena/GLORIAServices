@@ -53,12 +53,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -94,12 +92,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -135,12 +131,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			return mode;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -170,18 +164,16 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double azimuth = (Double) returns.getReturns().get(0);
-			
+
 			this.processSuccess(rt, dome, "getAzimuth", null, azimuth);
-			
+
 			return azimuth;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -210,15 +202,13 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
-			
+
 			this.processSuccess(rt, dome, "open", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -250,12 +240,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, dome, "close", null, null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}
@@ -284,15 +272,13 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
-			
+
 			this.processSuccess(rt, dome, "park", null, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new DomeTeleoperationException(e.getMessage());
 		}
 	}

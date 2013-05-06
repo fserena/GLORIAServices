@@ -54,12 +54,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			return url;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -93,12 +91,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, scam, "setExposure",
 					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -133,12 +129,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			return exposure;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -171,12 +165,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, scam, "setBrightness",
 					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -211,12 +203,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -249,12 +239,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, scam, "setContrast",
 					new Object[] { value }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -283,18 +271,16 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long contrast = (Long) returns.getReturns().get(0);
-			
+
 			this.processSuccess(rt, scam, "getContrast", null, contrast);
-			
+
 			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -327,12 +313,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, scam, "setGain", new Object[] { value },
 					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -361,18 +345,16 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long gain = (Long) returns.getReturns().get(0);
-			
+
 			this.processSuccess(rt, scam, "getContrast", null, gain);
-			
+
 			return gain;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -401,18 +383,16 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			SCamState state = (SCamState) returns.getReturns().get(0);
-			
+
 			this.processSuccess(rt, scam, "getState", null, state.name());
-			
+
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}

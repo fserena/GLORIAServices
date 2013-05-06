@@ -45,12 +45,10 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 			return position;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new FocuserTeleoperationException(e.getMessage());
 		}
 	}
@@ -84,12 +82,10 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, focuser, "moveAbsolute",
 					new Object[] { position }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new FocuserTeleoperationException(e.getMessage());
 		}
 	}
@@ -119,16 +115,14 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 
 		try {
 			this.executeOperation(operation);
-			
+
 			this.processSuccess(rt, focuser, "moveRelative",
 					new Object[] { steps }, null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(
-					e.getClass().getSimpleName() + "/" + e.getMessage(), rt);
+			this.processException(e.getMessage(), rt);
 			throw new FocuserTeleoperationException(e.getMessage());
 		}
 	}
