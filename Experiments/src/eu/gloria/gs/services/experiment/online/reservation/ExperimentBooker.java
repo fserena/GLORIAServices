@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ExperimentBooker {
 
-	private final static long MILLISECONDS_PER_30M = 60 * 30 * 1000;
+	private final static long MILLISECONDS_PER_15M = 60 * 15 * 1000;
 	private final static long MILLISECONDS_PER_2H = 60 * 60 * 2 * 1000;
 	private final static int RESERVATION_DAYS = 7;
 	private ExperimentDBAdapter adapter;
@@ -20,7 +20,7 @@ public class ExperimentBooker {
 
 	public ExperimentBooker() {
 	}
-	
+
 	public void setRTBooker(RTBooker rtBooker) {
 		this.rtBooker = rtBooker;
 	}
@@ -65,7 +65,7 @@ public class ExperimentBooker {
 			calendar.setTime(fromDate);
 			Date endTimeSlotDate = calendar.getTime();
 			endTimeSlotDate.setTime(endTimeSlotDate.getTime()
-					+ MILLISECONDS_PER_30M);
+					+ MILLISECONDS_PER_15M);
 
 			boolean available = true;
 
@@ -92,7 +92,7 @@ public class ExperimentBooker {
 				timeSlots.add(ts);
 			}
 
-			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_30M);
+			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_15M);
 		}
 
 		return timeSlots;
@@ -101,8 +101,8 @@ public class ExperimentBooker {
 	public void reserve(String experiment, String username,
 			List<String> telescopes, TimeSlot timeSlot)
 			throws NoReservationsAvailableException,
-			ExperimentReservationArgumentException, MaxReservationTimeException,
-			ExperimentDatabaseException {
+			ExperimentReservationArgumentException,
+			MaxReservationTimeException, ExperimentDatabaseException {
 
 		testAndThrowIfNull(experiment, "Experiment name cannot be null");
 		testAndThrowIfNull(telescopes, "Telescope list name cannot be null");
@@ -173,8 +173,7 @@ public class ExperimentBooker {
 	}
 
 	public void cancelReservation(String username, int reservationId)
-			throws NoSuchReservationException,
-			ExperimentDatabaseException {
+			throws NoSuchReservationException, ExperimentDatabaseException {
 
 		boolean allowCancel = true;
 

@@ -101,7 +101,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 							username,
 							new Date(),
 							"images/" + imageInfo.getId() + "/setURL?"
-									+ url.substring(0, 15));
+									+ url.substring(0, 15) + "...");
 				} catch (ActionLogException e) {
 					System.out.println(e.getMessage());
 				}
@@ -113,11 +113,16 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			} catch (CCDTeleoperationException e) {
 
 				try {
+
+					if (url == null) {
+						url = "";
+					}
+
 					alog.registerAction(
 							username,
 							new Date(),
 							"images/" + imageInfo.getId() + "/setURL?"
-									+ url.substring(0, 15)
+									+ url.substring(0, 15) + "..."
 									+ "->CCD_TELEOPERATION_ERROR");
 				} catch (ActionLogException el) {
 					System.out.println(el.getMessage());
@@ -139,7 +144,8 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 			} catch (Exception e) {
 				try {
-					alog.registerAction(username, new Date(), e.getMessage());
+					alog.registerAction(username, new Date(), "images/error->"
+							+ e.getMessage());
 				} catch (ActionLogException ei) {
 					System.out.println(ei.getMessage());
 				}
