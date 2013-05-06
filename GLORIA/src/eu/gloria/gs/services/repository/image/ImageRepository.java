@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jws.WebParam;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
+import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageRepositoryAdapterException;
@@ -28,10 +29,17 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "rt") String rt,
 			@WebParam(name = "ccd") String ccd,
 			@WebParam(name = "lid") String lid) throws ImageRepositoryException {
-		
+
+		try {
+			this.adapter.saveImage(rt, ccd, user, new Date(), lid);
+
 			try {
-			this.adapter.saveImage(rt, ccd, user, new Date(),
-					lid);
+				this.logAction(this.getClientUsername(), "/images/new?" + user
+						+ "&" + rt + "&" + ccd + "&" + lid);
+			} catch (ActionLogException e) {
+				e.printStackTrace();
+			}
+
 		} catch (ImageRepositoryAdapterException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
@@ -48,6 +56,14 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "rid") int rid) throws ImageRepositoryException {
 		try {
 			this.adapter.setExperimentReservation(id, rid);
+
+			try {
+				this.logAction(this.getClientUsername(), "/images/" + id
+						+ "/setReservation?" + rid);
+			} catch (ActionLogException e) {
+				e.printStackTrace();
+			}
+
 		} catch (ImageRepositoryAdapterException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
@@ -66,6 +82,14 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		try {
 			this.adapter.setUser(id, user);
+
+			try {
+				this.logAction(this.getClientUsername(), "/images/" + id
+						+ "/setUser?" + user);
+			} catch (ActionLogException e) {
+				e.printStackTrace();
+			}
+
 		} catch (ImageRepositoryAdapterException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
@@ -204,6 +228,14 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "url") String url) throws ImageRepositoryException {
 		try {
 			this.adapter.setUrl(id, url);
+
+			try {
+				this.logAction(this.getClientUsername(), "/images/" + id
+						+ "/setUrl?" + url);
+			} catch (ActionLogException e) {
+				e.printStackTrace();
+			}
+
 		} catch (ImageRepositoryAdapterException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}

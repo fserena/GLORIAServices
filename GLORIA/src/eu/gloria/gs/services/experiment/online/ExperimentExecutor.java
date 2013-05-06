@@ -66,7 +66,8 @@ public class ExperimentExecutor extends ServerThread {
 			List<ReservationInformation> reservations = adapter
 					.getAllReservationsActiveNow();
 
-			System.out.println("Active reservations: " + reservations.size());
+			System.out.println("[ExperimentExecutor] Active reservations: "
+					+ reservations.size());
 
 			for (ReservationInformation reservation : reservations) {
 
@@ -78,42 +79,33 @@ public class ExperimentExecutor extends ServerThread {
 						reservation.getUser(), reservation.getReservationId());
 
 				if (!instantiated) {
-					System.out.println("Trying to instantiate: "
-							+ reservation.getReservationId());
-
-					try {
-						alog.registerAction(
-								username,
-								new Date(),
-								"Trying to instantiate an online experiment reservation ("
-										+ reservation.getReservationId()
-										+ ") for user '"
-										+ reservation.getUser() + "'");
-
-					} catch (ActionLogException e1) {
-						e1.printStackTrace();
-					}
-
 					adapter.deleteExperimentContext(reservation
 							.getReservationId());
 
 					context.instantiate();
 
 					try {
-						alog.registerAction(
-								username,
-								new Date(),
-								"Online experiment reservation sucessfully instantiated ("
-										+ reservation.getReservationId()
-										+ ") for user '"
-										+ reservation.getUser() + "'");
-
-					} catch (ActionLogException e1) {
-						e1.printStackTrace();
+						alog.registerAction(username, new Date(),
+								"experiments/contexts/instantiate?"
+										+ reservation.getReservationId() + "&"
+										+ reservation.getUser());
+					} catch (ActionLogException e) {
+						System.out.println(e.getMessage());
 					}
 
 					try {
 						context.init();
+
+						try {
+							alog.registerAction(
+									username,
+									new Date(),
+									"experiments/contexts/init?"
+											+ reservation.getReservationId()
+											+ "&" + reservation.getUser());
+						} catch (ActionLogException e) {
+							System.out.println(e.getMessage());
+						}
 					} catch (ExperimentOperationException e) {
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
@@ -122,29 +114,15 @@ public class ExperimentExecutor extends ServerThread {
 							alog.registerAction(
 									username,
 									new Date(),
-									"Online experiment reservation cannot be initialized ("
+									"experiments/contexts/init?"
 											+ reservation.getReservationId()
-											+ ") for user '"
-											+ reservation.getUser() + "': "
-											+ e.getMessage());
-
-						} catch (ActionLogException e1) {
-							e1.printStackTrace();
+											+ "&" + reservation.getUser()
+											+ "->ERROR");
+						} catch (ActionLogException el) {
+							System.out.println(el.getMessage());
 						}
 					}
 
-					try {
-						alog.registerAction(
-								username,
-								new Date(),
-								"Online experiment reservation sucessfully initialized ("
-										+ reservation.getReservationId()
-										+ ") for user '"
-										+ reservation.getUser() + "'");
-
-					} catch (ActionLogException e1) {
-						e1.printStackTrace();
-					}
 				} else {
 
 					ExperimentRuntimeInformation runtimeInfo = adapter
@@ -152,13 +130,6 @@ public class ExperimentExecutor extends ServerThread {
 									.getReservationId());
 
 					if (runtimeInfo.getRemainingTime() < 10) {
-
-						System.out.println("Ending: "
-								+ reservation.getReservationId()
-								+ ", remaining time= "
-								+ runtimeInfo.getRemainingTime()
-								+ ", elapsed time= "
-								+ runtimeInfo.getElapsedTime());
 						try {
 							context.end();
 
@@ -166,11 +137,10 @@ public class ExperimentExecutor extends ServerThread {
 								alog.registerAction(
 										username,
 										new Date(),
-										"Online experiment reservation sucessfully terminated ("
+										"experiments/contexts/end?"
 												+ reservation
 														.getReservationId()
-												+ ") for user '"
-												+ reservation.getUser() + "'");
+												+ "&" + reservation.getUser());
 
 							} catch (ActionLogException e1) {
 								e1.printStackTrace();
@@ -181,12 +151,11 @@ public class ExperimentExecutor extends ServerThread {
 								alog.registerAction(
 										username,
 										new Date(),
-										"Online experiment reservation cannot finalize ("
+										"experiments/contexts/init?"
 												+ reservation
 														.getReservationId()
-												+ ") for user '"
-												+ reservation.getUser() + "': "
-												+ e.getMessage());
+												+ "&" + reservation.getUser()
+												+ "->ERROR");
 
 							} catch (ActionLogException e1) {
 								e1.printStackTrace();
@@ -204,9 +173,8 @@ public class ExperimentExecutor extends ServerThread {
 			try {
 
 				alog.registerAction(username, new Date(),
-						"Error ocurred: " + e.getMessage());
+						"experiments/contexts/error->" + e.getMessage());
 			} catch (ActionLogException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		} catch (NoReservationsAvailableException
@@ -216,9 +184,8 @@ public class ExperimentExecutor extends ServerThread {
 			try {
 
 				alog.registerAction(username, new Date(),
-						"Error ocurred: " + e.getMessage());
+						"experiments/contexts/error->" + e.getMessage());
 			} catch (ActionLogException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -229,9 +196,8 @@ public class ExperimentExecutor extends ServerThread {
 		} catch (ExperimentDatabaseException e) {
 			try {
 				alog.registerAction(username, new Date(),
-						"Error ocurred: " + e.getMessage());
+						"experiments/contexts/clearObsolete->ERROR");
 			} catch (ActionLogException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
