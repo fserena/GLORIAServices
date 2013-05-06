@@ -20,7 +20,7 @@ public class ExperimentBooker {
 
 	public ExperimentBooker() {
 	}
-	
+
 	public void setRTBooker(RTBooker rtBooker) {
 		this.rtBooker = rtBooker;
 	}
@@ -101,8 +101,8 @@ public class ExperimentBooker {
 	public void reserve(String experiment, String username,
 			List<String> telescopes, TimeSlot timeSlot)
 			throws NoReservationsAvailableException,
-			ExperimentReservationArgumentException, MaxReservationTimeException,
-			ExperimentDatabaseException {
+			ExperimentReservationArgumentException,
+			MaxReservationTimeException, ExperimentDatabaseException {
 
 		testAndThrowIfNull(experiment, "Experiment name cannot be null");
 		testAndThrowIfNull(telescopes, "Telescope list name cannot be null");
@@ -173,8 +173,7 @@ public class ExperimentBooker {
 	}
 
 	public void cancelReservation(String username, int reservationId)
-			throws NoSuchReservationException,
-			ExperimentDatabaseException {
+			throws NoSuchReservationException, ExperimentDatabaseException {
 
 		boolean allowCancel = true;
 

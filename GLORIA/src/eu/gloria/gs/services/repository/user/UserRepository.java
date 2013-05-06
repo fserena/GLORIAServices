@@ -29,8 +29,8 @@ public class UserRepository extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(), "Creates a new user: '"
-					+ name + "'");
+			this.logAction(this.getClientUsername(), "/repository/user/new?"
+					+ name);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -48,8 +48,8 @@ public class UserRepository extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Activate an existing user: '" + name + "'");
+			this.logAction(this.getClientUsername(), "/repository/user/activate?"
+					+ name);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -78,8 +78,8 @@ public class UserRepository extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Deactivate an existing user: '" + name + "'");
+			this.logAction(this.getClientUsername(), "/repository/user/deactivate?"
+					+ name);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -97,8 +97,8 @@ public class UserRepository extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Changes the password of an existing user: '" + name + "'");
+			this.logAction(this.getClientUsername(), "/repository/user/changePassword?"
+					+ name + "&" + password);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -132,7 +132,17 @@ public class UserRepository extends GSLogProducerService implements
 			if (adapter.contains(name) && adapter.isActivated(name)) {
 				String actualPassword = adapter.getPassword(name);
 
-				return password.equals(actualPassword);
+				boolean result = false;				
+				result = password.equals(actualPassword);
+				
+				try {
+					this.logAction(this.getClientUsername(), "/repository/user/authenticate?"
+							+ name + "&" + result);
+				} catch (ActionLogException e) {
+					e.printStackTrace();
+				}
+				
+				return result;
 			}
 		} catch (UserRepositoryAdapterException e) {
 			throw new UserRepositoryException(e.getMessage());

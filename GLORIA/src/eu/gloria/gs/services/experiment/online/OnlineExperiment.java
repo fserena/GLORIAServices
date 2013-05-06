@@ -78,23 +78,22 @@ public class OnlineExperiment extends GSLogProducerService implements
 			throws DuplicateExperimentException, OnlineExperimentException {
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Trying to create a new experiment named '" + experiment
-							+ "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-
-		try {
 			modelManager.createModel(experiment, this.getClientUsername());
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/new?name=" + experiment + "->ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Succesful creation of a new experiment named '"
-							+ experiment + "'");
+			this.logAction(this.getClientUsername(), "experiments/new?name="
+					+ experiment);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -129,8 +128,8 @@ public class OnlineExperiment extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(), "Set the '" + experiment
-					+ "' experiment description");
+			this.logAction(this.getClientUsername(), "experiments/"
+					+ experiment + "/setDescription");
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
@@ -146,6 +145,14 @@ public class OnlineExperiment extends GSLogProducerService implements
 			experiments = adapter.getAllOnlineExperiments();
 
 			if (experiments == null || experiments.size() == 0) {
+
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/online/list->ERROR");
+				} catch (ActionLogException e) {
+					e.printStackTrace();
+				}
+
 				throw new OnlineExperimentException(
 						"There is no online experiments registered");
 			}
@@ -181,10 +188,32 @@ public class OnlineExperiment extends GSLogProducerService implements
 			resInfo = adapter.getUserPendingReservations(this
 					.getClientUsername());
 
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/pending->" + resInfo.size());
+			} catch (ActionLogException e) {
+				e.printStackTrace();
+			}
+
 			return resInfo;
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/pending->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			throw new OnlineExperimentException(e.getMessage());
 		} catch (NoReservationsAvailableException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/pending->[]");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw e;
 		}
 	}
@@ -197,8 +226,23 @@ public class OnlineExperiment extends GSLogProducerService implements
 			anyActiveNow = adapter.anyUserReservationActiveNow(this
 					.getClientUsername());
 
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/anyactive->" + anyActiveNow);
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			return anyActiveNow;
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/anyactive->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			throw new OnlineExperimentException(e.getMessage());
 		}
 	}
@@ -212,10 +256,31 @@ public class OnlineExperiment extends GSLogProducerService implements
 			reservations = adapter.getUserReservationActiveNow(this
 					.getClientUsername());
 
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/reservations/activenow->"
+								+ reservations.size());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			return reservations;
 		} catch (ExperimentDatabaseException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/activenow->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		} catch (NoReservationsAvailableException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/activenow->[]");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw e;
 		}
 	}
@@ -229,26 +294,30 @@ public class OnlineExperiment extends GSLogProducerService implements
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Trying to make a reservation of the '" + experiment
-							+ "' experiment on '" + telescopes.toString() + "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-
-		try {
 			experimentBooker.reserve(experiment, this.getClientUsername(),
 					telescopes, timeSlot);
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/reservations/make?" + experiment + "&"
+								+ telescopes.toString() + "&{"
+							+ timeSlot.getBegin() + timeSlot.getEnd() + "}" + "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Successful reservation of the '" + experiment
-							+ "' experiment on '" + telescopes.toString() + "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+			this.logAction(
+					this.getClientUsername(),
+					"experiments/reservations/make?" + experiment + "&"
+							+ telescopes.toString() + "&{"
+							+ timeSlot.getBegin() + timeSlot.getEnd() + "}");
+		} catch (ActionLogException el) {
+			el.printStackTrace();
 		}
 	}
 
@@ -264,12 +333,38 @@ public class OnlineExperiment extends GSLogProducerService implements
 					experiment, telescopes);
 
 			if (timeSlots == null | timeSlots.size() == 0) {
+				try {
+					this.logAction(
+							this.getClientUsername(),
+							"experiments/reservations/available?"
+									+ telescopes.toString() + "[]");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new OnlineExperimentException(
 						"There is no timeslots available");
 			}
 
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/reservations/available?"
+								+ telescopes.toString() + "->"
+								+ timeSlots.size());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			return timeSlots;
 		} catch (ExperimentDatabaseException e) {
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/reservations/available?"
+								+ telescopes.toString() + "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
@@ -282,25 +377,26 @@ public class OnlineExperiment extends GSLogProducerService implements
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
 		try {
-			this.logAction(this.getClientUsername(),
-					"Trying to cancel the reservation '" + reservationId + "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-
-		try {
 			experimentBooker.cancelReservation(this.getClientUsername(),
 					reservationId);
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/cancel?" + reservationId
+								+ "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
 		try {
 			this.logAction(this.getClientUsername(),
-					"Successful cancel of the reservation '" + reservationId
-							+ "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+					"experiments/reservations/cancel?" + reservationId);
+		} catch (ActionLogException el) {
+			el.printStackTrace();
 		}
 	}
 
@@ -321,16 +417,24 @@ public class OnlineExperiment extends GSLogProducerService implements
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
 				| InvalidUserContextException
 				| UndefinedExperimentParameterException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/execute?" + reservationId + "&"
+								+ operation + "->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
 		try {
 			this.logAction(this.getClientUsername(),
-					"'" + context.getExperimentName()
-							+ "' experiment operation executed: '" + operation
-							+ "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+					"experiments/contexts/execute?" + reservationId + "&"
+							+ operation);
+		} catch (ActionLogException el) {
+			el.printStackTrace();
 		}
 	}
 
@@ -341,15 +445,41 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 		try {
 			if (!adapter.anyUserReservationActiveNow(this.getClientUsername())) {
+
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/get?" + reservationId
+									+ "->INACTIVE");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
+
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
 		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/get?" + reservationId
+								+ "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
 		try {
 			if (!adapter.isReservationContextInstantiated(reservationId)) {
+
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/get?" + reservationId
+									+ "->NOT_INSTANTIATED");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
+
 				throw new ExperimentNotInstantiatedException(
 						"The experiment is not instantiated");
 			}
@@ -378,10 +508,26 @@ public class OnlineExperiment extends GSLogProducerService implements
 			expInfo = adapter.getExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
+				try {
+					this.logAction(
+							this.getClientUsername(),
+							"experiments/" + experiment
+									+ "/model/operations/add?"
+									+ operation.getModelName() + "->OWN_ERROR");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new NoSuchExperimentException(
 						"You cannot edit an experiment that is not yours");
 			}
 		} catch (ExperimentDatabaseException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/" + experiment + "/model/operations/add?"
+								+ operation.getModelName() + "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
@@ -397,10 +543,11 @@ public class OnlineExperiment extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(), "'" + experiment
-					+ "' experiment operation added: '" + operation + "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+			this.logAction(this.getClientUsername(),
+					"experiments/" + experiment + "/model/operations/add?"
+							+ operation.getModelName());
+		} catch (ActionLogException el) {
+			el.printStackTrace();
 		}
 	}
 
@@ -414,11 +561,27 @@ public class OnlineExperiment extends GSLogProducerService implements
 					.getExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
+
+				try {
+					this.logAction(
+							this.getClientUsername(),
+							"experiments/" + experiment
+									+ "/model/parameters/add?"
+									+ parameter.getModelName() + "->OWN_ERROR");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new OnlineExperimentException(
 						"You cannot edit an experiment that is not yours");
 			}
 		} catch (ExperimentDatabaseException e) {
-
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/" + experiment + "/model/parameters/add?"
+								+ parameter.getModelName() + "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
@@ -433,10 +596,11 @@ public class OnlineExperiment extends GSLogProducerService implements
 		}
 
 		try {
-			this.logAction(this.getClientUsername(), "'" + experiment
-					+ "' experiment parameter added: '" + parameter + "'");
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+			this.logAction(this.getClientUsername(),
+					"experiments/" + experiment + "/model/parameters/add?"
+							+ parameter.getModelName());
+		} catch (ActionLogException el) {
+			el.printStackTrace();
 		}
 	}
 
@@ -447,11 +611,28 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 		try {
 			if (!adapter.anyUserReservationActiveNow(this.getClientUsername())) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/parameters/set?" + parameter + "&"
+									+ String.valueOf(value) + "->INACTIVE");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
 
 			if (!adapter.isReservationContextInstantiated(reservationId)) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/parameters/set?" + parameter + "&"
+									+ String.valueOf(value)
+									+ "->NOT_INSTANTIATED");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new ExperimentNotInstantiatedException(
 						"The experiment is not instantiated");
 			}
@@ -462,18 +643,29 @@ public class OnlineExperiment extends GSLogProducerService implements
 			context.setParameterValue(parameter, value);
 
 			try {
-				this.logAction(this.getClientUsername(),
-						"'" + context.getExperimentName()
-								+ "' experiment value parameter modified: '"
-								+ parameter + "'");
-			} catch (ActionLogException e) {
-				e.printStackTrace();
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/parameters/set?" + parameter + "&"
+								+ String.valueOf(value));
+			} catch (ActionLogException el) {
+				el.printStackTrace();
 			}
 
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
 				| InvalidUserContextException | ExperimentParameterException
 				| UndefinedExperimentParameterException
 				| NoSuchExperimentException e) {
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/parameters/set?" + parameter + "&"
+								+ String.valueOf(value) + "->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 	}
@@ -485,11 +677,27 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 		try {
 			if (!adapter.anyUserReservationActiveNow(this.getClientUsername())) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/parameters/get?" + parameter
+									+ "->INACTIVE");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
 
 			if (!adapter.isReservationContextInstantiated(reservationId)) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/parameters/get?" + parameter
+									+ "->NOT_INSTANTIATED");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new ExperimentNotInstantiatedException(
 						"The experiment is not instantiated");
 			}
@@ -498,10 +706,30 @@ public class OnlineExperiment extends GSLogProducerService implements
 			context = contextManager.getContext(this.getClientUsername(),
 					reservationId);
 
-			return context.getParameterValue(parameter);
+			Object value = context.getParameterValue(parameter);
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/parameters/get?" + parameter + "->"
+								+ String.valueOf(value));
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
+			return value;
+
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
 				| InvalidUserContextException | ExperimentParameterException
 				| NoSuchExperimentException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/parameters/get?" + parameter + "->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
 			throw new OnlineExperimentException(e.getMessage());
 		}
 	}
@@ -527,8 +755,22 @@ public class OnlineExperiment extends GSLogProducerService implements
 					.getReservationInformation(reservationId);
 
 			if (!reservationInfo.getUser().equals(this.getClientUsername())) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/reservation/get?" + reservationId
+									+ "->OWN_ERROR");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
 				throw new NoSuchReservationException(
 						"You have nothing to do with that reservation :)");
+			}
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservation/get?" + reservationId);
+			} catch (ActionLogException el) {
+				el.printStackTrace();
 			}
 
 			return reservationInfo;
