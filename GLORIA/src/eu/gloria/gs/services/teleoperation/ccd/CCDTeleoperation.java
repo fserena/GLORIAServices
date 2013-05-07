@@ -15,12 +15,14 @@ import eu.gloria.gs.services.teleoperation.ccd.operations.GetBrightnessOperation
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetContrastOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetExposureTimeOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetGainOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GetGammaOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetImageURLOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetStateOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetBrightnessOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetContrastOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetExposureTimeOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetGainOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.SetGammaOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.StartContinueModeOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.StartExposureOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.StopContinueModeOperation;
@@ -520,6 +522,79 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 
 			this.processSuccess(rt, ccd, "stopContinueMode", null, null);
 
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void setGamma(String rt, String ccd, long value)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+		args.getArguments().add(value);
+
+		SetGammaOperation operation = null;
+
+		try {
+			operation = new SetGammaOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/setGamma/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "setGamma", new Object[] { value },
+					null);
+
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	@Override
+	public long getGamma(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+
+		GetGammaOperation operation = null;
+
+		try {
+			operation = new GetGammaOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getGamma/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			long gain = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getGamma", null, gain);
+
+			return gain;
 		} catch (DeviceOperationFailedException e) {
 			this.processException(e.getMessage(), rt);
 			throw e;

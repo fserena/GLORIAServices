@@ -140,6 +140,10 @@ public class OperationContextService extends ExperimentContextService {
 			String exposureParameter = (String) operationArguments[5];
 			Double exposure = (Double) operationContext.getExperimentContext()
 					.getParameterValue(exposureParameter);
+			
+			String gammaParameter = (String) operationArguments[6];
+			Integer gamma = (Integer) operationContext.getExperimentContext()
+					.getParameterValue(gammaParameter);
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
@@ -176,6 +180,13 @@ public class OperationContextService extends ExperimentContextService {
 				throw new ExperimentOperationException(e.getMessage());
 			} catch (DeviceOperationFailedException e) {
 			}
+			
+			try {
+				this.getCCDTeleoperation().setGamma(rtName, camName, gamma);
+			} catch (CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (DeviceOperationFailedException e) {
+			}
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
@@ -199,6 +210,7 @@ public class OperationContextService extends ExperimentContextService {
 			String contrastParameter = (String) operationArguments[3];
 			String gainParameter = (String) operationArguments[4];
 			String exposureParameter = (String) operationArguments[5];
+			String gammaParameter = (String) operationArguments[6];
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
@@ -207,6 +219,7 @@ public class OperationContextService extends ExperimentContextService {
 			int brightness = -1;
 			int contrast = -1;
 			int gain = -1;
+			int gamma = -1;
 
 			try {
 				exposure = this.getCCDTeleoperation().getExposureTime(rtName,
@@ -244,12 +257,23 @@ public class OperationContextService extends ExperimentContextService {
 
 			}
 
+			try {
+				gamma = (int) this.getCCDTeleoperation()
+						.getGamma(rtName, camName);
+			} catch (CCDTeleoperationException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			} catch (DeviceOperationFailedException e) {
+
+			}
+			
 			operationContext.getExperimentContext().setParameterValue(
 					brightnessParameter, brightness);
 			operationContext.getExperimentContext().setParameterValue(
 					contrastParameter, contrast);
 			operationContext.getExperimentContext().setParameterValue(
 					gainParameter, gain);
+			operationContext.getExperimentContext().setParameterValue(
+					gammaParameter, gamma);
 			operationContext.getExperimentContext().setParameterValue(
 					exposureParameter, exposure);
 

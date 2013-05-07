@@ -34,6 +34,12 @@ public interface CCDTeleoperationInterface {
 
 	public long getGain(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
+	
+	public void setGamma(String rt, String ccd, long value)
+			throws DeviceOperationFailedException, CCDTeleoperationException;
+
+	public long getGamma(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public CCDState getState(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;

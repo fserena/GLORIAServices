@@ -501,6 +501,10 @@
 	<bean id="CCD_GAIN" parent="CCD_PROPERTY" scope="singleton">
 		<property name="type" ref="NAMED_INTEGER"></property>
 	</bean>
+	
+	<bean id="CCD_GAMMA" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
 
 	<bean id="CCD_EXPOSURE" parent="CCD_PROPERTY" scope="singleton">
 		<property name="name" value="CCD_EXPOSURE"></property>
@@ -714,6 +718,7 @@
 				<ref bean="CCD_CONTRAST"></ref>
 				<ref bean="CCD_GAIN"></ref>
 				<ref bean="CCD_EXPOSURE"></ref>
+				<ref bean="CCD_GAMMA"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -726,6 +731,7 @@
 						<value>arg3</value>
 						<value>arg4</value>
 						<value>arg5</value>
+						<value>arg6</value>
 					</list>
 				</entry>
 			</map>
@@ -741,6 +747,7 @@
 				<ref bean="CCD_CONTRAST"></ref>
 				<ref bean="CCD_GAIN"></ref>
 				<ref bean="CCD_EXPOSURE"></ref>
+				<ref bean="CCD_GAMMA"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -753,6 +760,7 @@
 						<value>arg3</value>
 						<value>arg4</value>
 						<value>arg5</value>
+						<value>arg6</value>
 					</list>
 				</entry>
 			</map>
@@ -1756,6 +1764,24 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="ccd_gamma">
+					<bean
+						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="CCD_GAMMA"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>ccd_name</value>
+							</list>
+						</property>
+						<property name="nameSuffix">
+							<list>
+								<value>arg0</value>
+								<value>arg1</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
 				<entry key="ccd_exposure">
 					<bean
 						class="eu.gloria.gs.services.experiment.online.models.ParameterFeature"
@@ -1791,6 +1817,7 @@
 								<value>ccd_contrast</value>
 								<value>ccd_gain</value>
 								<value>ccd_exposure</value>
+								<value>ccd_gamma</value>
 							</list>
 						</property>
 						<property name="nameSuffix">
@@ -1814,6 +1841,7 @@
 								<value>ccd_contrast</value>
 								<value>ccd_gain</value>
 								<value>ccd_exposure</value>
+								<value>ccd_gamma</value>
 							</list>
 						</property>
 						<property name="nameSuffix">

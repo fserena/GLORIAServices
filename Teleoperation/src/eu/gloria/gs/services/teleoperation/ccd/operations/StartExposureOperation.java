@@ -17,8 +17,6 @@ public class StartExposureOperation extends CCDOperation {
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
 		String imageId = ccd.startExposure();
-		returns.setMessage("Start exposure operation executed: " + imageId + ", "
-				+ this.getServer() + ", " + this.getCCDName());
 
 		returns.setReturns(new ArrayList<Object>());
 		returns.getReturns().add(imageId);
