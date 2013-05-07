@@ -12,7 +12,8 @@ import java.util.List;
 
 public class ExperimentBooker {
 
-	private final static long MILLISECONDS_PER_15M = 60 * 15 * 1000;
+	private final static int MINUTES_FRAME = 15;
+	private final static long MILLISECONDS_PER_FRAME = 60 * MINUTES_FRAME * 1000;
 	private final static long MILLISECONDS_PER_2H = 60 * 60 * 2 * 1000;
 	private final static int RESERVATION_DAYS = 7;
 	private ExperimentDBAdapter adapter;
@@ -36,7 +37,7 @@ public class ExperimentBooker {
 	}
 
 	public List<TimeSlot> getAvailableTimeSlots(String experiment,
-			List<String> telescopes)
+			List<String> telescopes, boolean adminMode)
 			throws ExperimentReservationArgumentException,
 			ExperimentDatabaseException {
 
@@ -48,11 +49,16 @@ public class ExperimentBooker {
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 
-		if (calendar.get(Calendar.MINUTE) < 30) {
+		int currentMinutes = calendar.get(Calendar.MINUTE);
+		int integerFactor = currentMinutes / MINUTES_FRAME;
+		
+		calendar.set(Calendar.MINUTE, integerFactor * MINUTES_FRAME);
+		/*
+		if (calendar.get(Calendar.MINUTE) < MINUTES_FRAME) {
 			calendar.set(Calendar.MINUTE, 0);
 		} else {
-			calendar.set(Calendar.MINUTE, 30);
-		}
+			calendar.set(Calendar.MINUTE, MINUTES_FRAME);
+		}*/
 
 		Date fromDate = calendar.getTime();
 		calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)
@@ -65,7 +71,7 @@ public class ExperimentBooker {
 			calendar.setTime(fromDate);
 			Date endTimeSlotDate = calendar.getTime();
 			endTimeSlotDate.setTime(endTimeSlotDate.getTime()
-					+ MILLISECONDS_PER_15M);
+					+ MILLISECONDS_PER_FRAME);
 
 			boolean available = true;
 
@@ -73,7 +79,9 @@ public class ExperimentBooker {
 			timeSlot.setBegin(fromDate);
 			timeSlot.setEnd(endTimeSlotDate);
 
-			available = rtBooker.available(telescopes, timeSlot);
+			if (!adminMode) {
+				available = rtBooker.available(telescopes, timeSlot);
+			}
 
 			if (available) {
 				try {
@@ -92,7 +100,7 @@ public class ExperimentBooker {
 				timeSlots.add(ts);
 			}
 
-			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_15M);
+			fromDate.setTime(fromDate.getTime() + MILLISECONDS_PER_FRAME);
 		}
 
 		return timeSlots;

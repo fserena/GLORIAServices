@@ -45,6 +45,11 @@ import eu.gloria.gs.services.experiment.online.reservation.MaxReservationTimeExc
 import eu.gloria.gs.services.experiment.online.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.online.reservation.ExperimentBooker;
 import eu.gloria.gs.services.log.action.ActionLogException;
+import eu.gloria.gs.services.repository.user.UserRepositoryException;
+import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
+import eu.gloria.gs.services.repository.user.data.UserInformation;
+import eu.gloria.gs.services.repository.user.data.UserRepositoryAdapter;
+import eu.gloria.gs.services.repository.user.data.UserRole;
 
 public class OnlineExperiment extends GSLogProducerService implements
 		OnlineExperimentInterface {
@@ -53,6 +58,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	private ExperimentBooker experimentBooker;
 	private ExperimentModelManager modelManager;
 	private ExperimentContextManager contextManager;
+	private UserRepositoryInterface userRepository;
 
 	public OnlineExperiment() {
 	}
@@ -71,6 +77,10 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	public void setContextManager(ExperimentContextManager manager) {
 		this.contextManager = manager;
+	}
+
+	public void setUserRepository(UserRepositoryInterface userRepository) {
+		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -303,7 +313,8 @@ public class OnlineExperiment extends GSLogProducerService implements
 						this.getClientUsername(),
 						"experiments/reservations/make?" + experiment + "&"
 								+ telescopes.toString() + "&{"
-							+ timeSlot.getBegin() + timeSlot.getEnd() + "}" + "->DB_ERROR");
+								+ timeSlot.getBegin() + timeSlot.getEnd() + "}"
+								+ "->DB_ERROR");
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
@@ -327,10 +338,21 @@ public class OnlineExperiment extends GSLogProducerService implements
 			ExperimentReservationArgumentException {
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
 
 		try {
 			List<TimeSlot> timeSlots = experimentBooker.getAvailableTimeSlots(
-					experiment, telescopes);
+					experiment, telescopes, adminMode);
 
 			if (timeSlots == null | timeSlots.size() == 0) {
 				try {
@@ -342,7 +364,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 					el.printStackTrace();
 				}
 				throw new OnlineExperimentException(
-						"There is no timeslots available");
+						"There are no timeslots available");
 			}
 
 			try {
