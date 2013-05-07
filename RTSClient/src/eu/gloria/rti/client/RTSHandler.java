@@ -416,6 +416,41 @@ public class RTSHandler implements ServerHandler {
 					+ "OPERATION_FAILED");
 		}
 	}
+	
+	public long getGamma(String camera) throws TeleoperationException {
+
+		String actionMessage = camera + "/gamma" + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.camGetGamma(null, camera);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
+	public void setGamma(String camera, long value)
+			throws TeleoperationException {
+
+		String actionMessage = camera + "/gamma?" + value + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			rtsPort.camSetGain(null, camera, value);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
 
 	public boolean getAutoGain(String camera) throws TeleoperationException {
 		String actionMessage = camera + "/auto-gain" + "->";

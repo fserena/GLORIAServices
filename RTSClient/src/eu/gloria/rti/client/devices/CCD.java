@@ -109,4 +109,15 @@ public class CCD extends DeviceHandler implements CCDInterface {
 
 		return CCDState.UNDEFINED;
 	}
+
+	@Override
+	public void setGamma(long value) throws TeleoperationException {
+		rts.setGamma(this.ccd, value);
+		
+	}
+
+	@Override
+	public long getGamma() throws TeleoperationException {
+		return rts.getGamma(this.ccd);
+	}
 }

@@ -25,6 +25,10 @@ public interface CCDInterface {
 	public void setGain(long value) throws TeleoperationException;
 
 	public long getGain() throws TeleoperationException;
+	
+	public void setGamma(long value) throws TeleoperationException;
+
+	public long getGamma() throws TeleoperationException;
 
 	public void setAutoGain(boolean mode) throws TeleoperationException;
 
