@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public interface OnlineExperimentDBService {
 
@@ -128,7 +128,7 @@ public interface OnlineExperimentDBService {
 	 */
 	public boolean isReservationContextInstantiated(
 			@Param(value = "rid_") int rid);
-		
+
 	/**
 	 * @param opid
 	 * @return
@@ -231,6 +231,14 @@ public interface OnlineExperimentDBService {
 
 	/**
 	 * @param user
+	 * @param from
+	 * @return
+	 */
+	public List<ReservationEntry> getAllReservationsFrom(
+			@Param(value = "from_") Date from);
+
+	/**
+	 * @param user
 	 * @param experiment
 	 * @param begin
 	 * @param end
@@ -258,6 +266,12 @@ public interface OnlineExperimentDBService {
 	 */
 	public boolean anyUserReservationAt(@Param(value = "user_") String user,
 			@Param(value = "when_") Date when);
+
+	/**
+	 * @param when
+	 * @return
+	 */
+	public boolean anyReservationAt(@Param(value = "when_") Date when);
 
 	/**
 	 * @param user
@@ -333,5 +347,6 @@ public interface OnlineExperimentDBService {
 	/**
 	 * @param idreservation
 	 */
-	public void removeReservationContext(@Param(value = "rid_") int idreservation);
+	public void removeReservationContext(
+			@Param(value = "rid_") int idreservation);
 }

@@ -25,7 +25,7 @@ import eu.gloria.gs.services.experiment.online.reservation.NoReservationsAvailab
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class ExperimentDBAdapter {
 
@@ -183,6 +183,25 @@ public class ExperimentDBAdapter {
 		}
 
 		return !available;
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean anyUserReservationActiveNow()
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.anyReservationAt(new Date());
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+
+		return anyActive;
 	}
 
 	/**
@@ -732,6 +751,59 @@ public class ExperimentDBAdapter {
 
 			throw new NoReservationsAvailableException("The user '" + username
 					+ "' has no pending reservations");
+		}
+
+		return reservationInfos;
+	}
+	
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getUserPendingReservations() throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		List<ReservationInformation> reservationInfos = null;
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsFrom(new Date());
+
+			if (reservationEntries != null) {
+				reservationInfos = new ArrayList<ReservationInformation>();
+
+				for (ReservationEntry reservationEntry : reservationEntries) {
+					ReservationInformation resInfo = new ReservationInformation();
+
+					ExperimentEntry experimentEntry = service
+							.getExperimentById(reservationEntry.getExperiment());
+
+					resInfo.setExperiment(experimentEntry.getName());
+					TimeSlot timeSlot = new TimeSlot();
+					timeSlot.setBegin(reservationEntry.getBegin());
+					timeSlot.setEnd(reservationEntry.getEnd());
+					resInfo.setTimeSlot(timeSlot);
+					resInfo.setUser(reservationEntry.getUser());
+
+					List<String> telescopes = service
+							.getAllRTOfReservation(reservationEntry
+									.getIdreservation());
+					resInfo.setTelescopes(telescopes);
+					resInfo.setReservationId(reservationEntry
+							.getIdreservation());
+
+					reservationInfos.add(resInfo);
+				}
+			}
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+
+		if (reservationInfos == null || reservationInfos.size() == 0) {
+
+			throw new NoReservationsAvailableException("There are no pending reservations");
 		}
 
 		return reservationInfos;

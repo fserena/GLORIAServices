@@ -51,14 +51,13 @@ public class ExperimentBooker {
 
 		int currentMinutes = calendar.get(Calendar.MINUTE);
 		int integerFactor = currentMinutes / MINUTES_FRAME;
-		
+
 		calendar.set(Calendar.MINUTE, integerFactor * MINUTES_FRAME);
 		/*
-		if (calendar.get(Calendar.MINUTE) < MINUTES_FRAME) {
-			calendar.set(Calendar.MINUTE, 0);
-		} else {
-			calendar.set(Calendar.MINUTE, MINUTES_FRAME);
-		}*/
+		 * if (calendar.get(Calendar.MINUTE) < MINUTES_FRAME) {
+		 * calendar.set(Calendar.MINUTE, 0); } else {
+		 * calendar.set(Calendar.MINUTE, MINUTES_FRAME); }
+		 */
 
 		Date fromDate = calendar.getTime();
 		calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)
@@ -107,7 +106,7 @@ public class ExperimentBooker {
 	}
 
 	public void reserve(String experiment, String username,
-			List<String> telescopes, TimeSlot timeSlot)
+			List<String> telescopes, TimeSlot timeSlot, boolean adminMode)
 			throws NoReservationsAvailableException,
 			ExperimentReservationArgumentException,
 			MaxReservationTimeException, ExperimentDatabaseException {
@@ -133,10 +132,12 @@ public class ExperimentBooker {
 							+ " days");
 		}
 
-		if (!rtBooker.available(telescopes, timeSlot))
-			throw new ExperimentReservationArgumentException(
-					"The reservation is incompatible with the availability "
-							+ "of at least one telescope");
+		if (!adminMode) {
+			if (!rtBooker.available(telescopes, timeSlot))
+				throw new ExperimentReservationArgumentException(
+						"The reservation is incompatible with the availability "
+								+ "of at least one telescope");
+		}
 
 		List<ReservationInformation> pendingReservations = null;
 

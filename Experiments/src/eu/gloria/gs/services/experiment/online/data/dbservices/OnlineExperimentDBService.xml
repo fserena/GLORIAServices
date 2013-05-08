@@ -403,13 +403,22 @@
 		idreservation=#{rid_} ORDER BY begin
 	</select>
 
+	<select id="getAllReservationsFrom"
+		resultType="eu.gloria.gs.services.experiment.online.data.dbservices.ReservationEntry">
+		SELECT * FROM
+		`gloria_services`.`reservation`
+		WHERE begin
+		&gt;=#{from_} OR end &gt; #{from_} ORDER BY begin
+	</select>
+
 	<select id="getUserReservationsFrom"
 		resultType="eu.gloria.gs.services.experiment.online.data.dbservices.ReservationEntry">
 		SELECT * FROM
 		`gloria_services`.`reservation`
 		WHERE
 		user=#{user_} AND (begin
-		&gt;=#{from_} OR end &gt; #{from_}) ORDER BY begin
+		&gt;=#{from_} OR end &gt; #{from_}) ORDER BY
+		begin
 	</select>
 
 	<select id="getReservation"
@@ -437,6 +446,15 @@
 		WHERE
 		user=#{user_} AND
 		experiment=#{experiment_} AND begin=#{begin_} AND end=#{end_}
+	</select>
+
+	<select id="anyReservationAt" resultType="boolean">
+		SELECT count(*)>0
+		FROM
+		`gloria_services`.`reservation`
+		WHERE begin &lt;=
+		#{when_} AND end &gt;=
+		#{when_}
 	</select>
 
 	<select id="anyUserReservationAt" resultType="boolean">

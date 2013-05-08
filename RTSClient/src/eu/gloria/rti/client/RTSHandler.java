@@ -445,7 +445,7 @@ public class RTSHandler implements ServerHandler {
 		}
 
 		try {
-			rtsPort.camSetGain(null, camera, value);
+			rtsPort.camSetGamma(null, camera, value);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");
