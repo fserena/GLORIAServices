@@ -56,7 +56,6 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				System.out.println("Image daemon alive...no images pending!");
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);
