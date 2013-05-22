@@ -17,7 +17,7 @@ import eu.gloria.gs.services.repository.image.data.ImageInformation;
  * @author Fernando Serena (fserena@ciclope.info)
  * 
  */
-@WebService(name = "OnlineExperimentInterface", targetNamespace = "http://online.experiment.services.gs.gloria.eu/")
+@WebService(name = "OnlineExperimentInterface", targetNamespace = "http://image.repository.services.gs.gloria.eu/")
 public interface ImageRepositoryInterface {
 
 	public void saveImage(@WebParam(name = "user") String user,
