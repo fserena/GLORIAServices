@@ -88,6 +88,15 @@
 		rid=#{rid_}
 	</select>
 
+	<select id="getAllBetweenDates"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`gloria_services`.`image`
+		WHERE date &gt;=
+		#{from_}
+		AND date &lt;=#{to_}
+	</select>
+
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		INSERT INTO

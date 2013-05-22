@@ -182,7 +182,23 @@ public class ImageRepositoryAdapter {
 
 		return imageInfos;
 	}
+	
+	public List<Integer> getAllImagesBetween(Date from, Date to) {
+		
+		List<Integer> imageIds = new ArrayList<Integer>();
+		List<ImageEntry> entries = imageService.getAllBetweenDates(from, to);
 
+		System.out.println(from);
+		System.out.println(to);
+		
+		for (ImageEntry entry : entries) {
+			imageIds.add(entry.getIdimage());
+		}
+
+		System.out.println(entries.size());
+		return imageIds;
+	}
+	
 	/**
 	 * @param service
 	 */

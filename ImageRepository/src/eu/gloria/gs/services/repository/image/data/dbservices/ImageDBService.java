@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.repository.image.data.dbservices;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -42,6 +43,9 @@ public interface ImageDBService {
 	public List<ImageEntry> getByUser(@Param(value = "user_") String user);
 
 	public List<ImageEntry> getByReservation(@Param(value = "rid_") int rid);
+
+	public List<ImageEntry> getAllBetweenDates(
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
 	public List<ImageEntry> getByRT(@Param(value = "rt_") String rt);
 
