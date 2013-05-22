@@ -1,5 +1,9 @@
 package eu.gloria.gs.services.core.tasks;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -9,28 +13,31 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public abstract class ServerTask implements ServletContextListener {
 
 	protected ServerThread myThread = null;
+	protected static ExecutorService executor = Executors
+			.newFixedThreadPool(10);
 
-	protected abstract ServerThread createServerThread(ApplicationContext context);
+	protected abstract ServerThread createServerThread(
+			ApplicationContext context);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
 		ApplicationContext cxt = WebApplicationContextUtils
 				.getWebApplicationContext(sce.getServletContext());
-		
-		if ((myThread == null) || (!myThread.isAlive())) {
+
+		try {
+
 			myThread = this.createServerThread(cxt);
-			System.out.println("Initializing thread!");
-			myThread.start();
+
+			executor.submit(myThread);
+		} catch (RejectedExecutionException e) {
 		}
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		try {
-			myThread.doShutdown();
-			myThread.interrupt();
-			System.out.println("Destroying thread!");
+			myThread.end();
 		} catch (Exception ex) {
 		}
 	}
