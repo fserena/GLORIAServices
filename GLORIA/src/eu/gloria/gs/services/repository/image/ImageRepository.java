@@ -160,8 +160,10 @@ public class ImageRepository extends GSLogProducerService implements
 	public List<Integer> getAllImageIdentifiersByDate(
 			@WebParam(name = "dateFrom") Date from,
 			@WebParam(name = "dateTo") Date to) {
-		// TODO Auto-generated method stub
-		return null;
+	
+		System.out.println("Getting images by date ----------------------------->>>>>>");
+
+		return this.adapter.getAllImagesBetween(from, to);
 	}
 
 	/*

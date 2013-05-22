@@ -3,36 +3,6 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-        <dependent-module archiveName="ServiceTools-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ServiceTools/ServiceTools">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="SClientTools-0.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/SClientTools/SClientTools">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="Experiments-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Experiments/Experiments">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="ActionLog-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ActionsLog/ActionsLog">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="ImageRepository-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ImageRepository/ImageRepository">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="RTSClient-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/RTSClient/RTSClient">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="RTRepository-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/RTRepository/RTRepository">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="Teleoperation-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Teleoperation/Teleoperation">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="UserRepository-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/UserRepository/UserRepository">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="GLORIAInterfaces-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/GLORIAInterfaces/GLORIAInterfaces">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="java-output-path" value="/GLORIA/build/classes"/>
         <property name="context-root" value="GLORIA"/>
     </wb-module>
