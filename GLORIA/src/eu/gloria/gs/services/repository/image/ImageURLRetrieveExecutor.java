@@ -148,6 +148,20 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				} catch (ActionLogException ei) {
 					System.out.println(ei.getMessage());
 				}
+				
+				try {
+					adapter.removeImage(imageInfo.getId());
+
+					try {
+						alog.registerAction(username, new Date(),
+								"images/remove?" + imageInfo.getId());
+					} catch (ActionLogException el) {
+						System.out.println(el.getMessage());
+					}
+
+				} catch (ImageRepositoryAdapterException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
