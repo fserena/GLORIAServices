@@ -6,12 +6,11 @@ import eu.gloria.rti.client.RTSHandler;
 
 public class Focuser extends DeviceHandler implements FocuserInterface {
 
-	private RTSHandler rts;
 	private String focuser;
 
 	public Focuser(RTSHandler rts, String focuser) throws TeleoperationException {
 
-		this.rts = rts;
+		super(rts);
 		this.focuser = focuser;
 	}
 
