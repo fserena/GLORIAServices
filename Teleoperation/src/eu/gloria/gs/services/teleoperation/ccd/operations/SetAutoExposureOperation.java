@@ -19,33 +19,6 @@ public class SetAutoExposureOperation extends CCDOperation {
 	}
 
 	@Override
-	public OperationReturn execute(ServerResolver resolver) throws Exception {
-
-		RTSHandler rts;
-
-		try {
-			rts = (RTSHandler) resolver.getHandler(getServer());
-		} catch (NullPointerException e) {
-			throw new Exception("The RTS is not available.");
-		}
-
-		try {
-			rts.setAutoExposure(this.getCCDName(), this.auto);
-
-			OperationReturn returns = new OperationReturn();
-
-			returns.setMessage("Set auto exposure operation executed: "
-					+ this.auto + ", " + this.getServer() + ","
-					+ this.getCCDName());
-
-			return returns;
-		} catch (TeleoperationException e) {
-
-			throw new RTSTeleoperationException(e.getMessage());
-		}
-	}
-
-	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
 		ccd.setAutoExposure(this.auto);
