@@ -44,6 +44,7 @@ public class RTSHandler implements ServerHandler {
 	private static String serviceName;
 	private static String user;
 	private static String password;
+	private static boolean teleoperationStarted = false;
 
 	static {
 
@@ -101,6 +102,38 @@ public class RTSHandler implements ServerHandler {
 			throw new ServerNotAvailableException(actionMessage
 					+ "SERVER_NOT_AVAILABLE");
 		}
+	}
+
+	public void startTeleoperation() {
+		try {
+			rtsPort.execStopOp(null);
+			teleoperationStarted = false;
+		} catch (RtiError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			rtsPort.execStartOp(null, null, "GLORIA", 0);
+			teleoperationStarted = true;
+		} catch (RtiError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void stopTeleoperation() {
+		try {
+			rtsPort.execStopOp(null);
+			teleoperationStarted = false;
+		} catch (RtiError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isTeleoperationStarted() {
+		return teleoperationStarted;
 	}
 
 	public DeviceHandler getDeviceHandler(String name, DeviceType type)
@@ -416,7 +449,7 @@ public class RTSHandler implements ServerHandler {
 					+ "OPERATION_FAILED");
 		}
 	}
-	
+
 	public long getGamma(String camera) throws TeleoperationException {
 
 		String actionMessage = camera + "/gamma" + "->";
@@ -565,9 +598,11 @@ public class RTSHandler implements ServerHandler {
 			}
 		} catch (RtiError e) {
 			if (e.getMessage().equals("NOT_AVAILABLE"))
-				throw new ImageNotAvailableException(actionMessage + "IMAGE_NOT_AVAILABLE");
+				throw new ImageNotAvailableException(actionMessage
+						+ "IMAGE_NOT_AVAILABLE");
 			else if (e.getMessage().equals("FAILED"))
-				throw new ImageTransferFailedException(actionMessage + "IMAGE_TRANSFER_FAILED");
+				throw new ImageTransferFailedException(actionMessage
+						+ "IMAGE_TRANSFER_FAILED");
 			else
 				throw new DeviceOperationFailedException(actionMessage
 						+ "OPERATION_FAILED");
@@ -996,6 +1031,7 @@ public class RTSHandler implements ServerHandler {
 					+ "OPERATION_FAILED");
 		}
 
-		throw new NotAbsoluteFocuserException(actionMessage + "NOT_ABSOLUTE_FOCUSER");
+		throw new NotAbsoluteFocuserException(actionMessage
+				+ "NOT_ABSOLUTE_FOCUSER");
 	}
 }

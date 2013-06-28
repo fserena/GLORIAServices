@@ -8,12 +8,11 @@ import eu.gloria.rti.client.RTSHandler;
 
 public class Scam extends DeviceHandler implements SCamInteface {
 
-	private RTSHandler rts;
 	private String camera;
 
 	public Scam(RTSHandler rts, String scam) throws TeleoperationException {
 
-		this.rts = rts;
+		super(rts);
 		this.camera = scam;
 	}
 

@@ -9,12 +9,11 @@ import eu.gloria.rti.client.RTSHandler;
 
 public class Mount extends DeviceHandler implements MountInterface {
 
-	private RTSHandler rts;
 	private String mount;
 
 	public Mount(RTSHandler rts, String mount) throws TeleoperationException {
 
-		this.rts = rts;
+		super(rts);
 		this.mount = mount;
 	}
 
