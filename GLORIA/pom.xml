@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>RTIProxy</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -85,6 +85,6 @@
 	<parent>
 		<groupId>eu.gloriaproject</groupId>
 		<artifactId>gloria</artifactId>
-		<version>1.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 </project>

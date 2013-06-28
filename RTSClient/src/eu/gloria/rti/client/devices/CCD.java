@@ -9,12 +9,11 @@ import eu.gloria.rti.client.RTSHandler;
 
 public class CCD extends DeviceHandler implements CCDInterface {
 
-	private RTSHandler rts;
 	private String ccd;
 
 	public CCD(RTSHandler rts, String ccd) throws TeleoperationException {
 
-		this.rts = rts;
+		super(rts);
 		this.ccd = ccd;
 	}
 
@@ -85,11 +84,12 @@ public class CCD extends DeviceHandler implements CCDInterface {
 
 	@Override
 	public String startContinueMode() throws TeleoperationException {
+		rts.startTeleoperation();
 		return rts.startContinueMode(this.ccd);
 	}
 
 	@Override
-	public void stopContinueMode() throws TeleoperationException {
+	public void stopContinueMode() throws TeleoperationException {		
 		rts.stopContinueMode(this.ccd);
 	}
 

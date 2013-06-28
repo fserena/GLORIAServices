@@ -8,12 +8,11 @@ import eu.gloria.rti.client.RTSHandler;
 
 public class Dome extends DeviceHandler implements DomeInterface {
 
-	private RTSHandler rts;
 	private String dome;
 
 	public Dome(RTSHandler rts, String ccd) throws TeleoperationException {
 
-		this.rts = rts;
+		super(rts);
 		this.dome = ccd;
 	}
 

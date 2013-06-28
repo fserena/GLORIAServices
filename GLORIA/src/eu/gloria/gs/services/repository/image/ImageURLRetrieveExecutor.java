@@ -1,7 +1,9 @@
 package eu.gloria.gs.services.repository.image;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.core.tasks.ServerThread;
@@ -23,6 +25,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private boolean thereArePending;
+	private Map<Integer, Integer> recoverRetries = null;
 
 	public void setAdapter(ImageRepositoryAdapter adapter) {
 		this.adapter = adapter;
@@ -47,6 +50,10 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	@Override
 	protected void doWork() {
 
+		if (recoverRetries == null) {
+			recoverRetries = new HashMap<Integer, Integer>();
+		}
+		
 		try {
 			if (thereArePending) {
 				Thread.sleep(100);
@@ -108,7 +115,33 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				// Ignore the image this time, it will be treated by the
 				// next
 				// iteration of the executor
-				thereArePending = true;
+				
+				int gid = imageInfo.getId();
+				
+				if (recoverRetries.containsKey(gid)) {
+					recoverRetries.put(gid, recoverRetries.get(gid) + 1);
+					
+					if (recoverRetries.get(gid) == 20) {
+						try {
+							adapter.removeImage(imageInfo.getId());
+
+							try {
+								alog.registerAction(username, new Date(),
+										"images/remove?" + imageInfo.getId());
+							} catch (ActionLogException el) {
+								System.out.println(el.getMessage());
+							}
+
+						} catch (ImageRepositoryAdapterException e1) {
+							e1.printStackTrace();
+						}
+						
+						recoverRetries.remove(gid);
+					}
+				} else {
+					recoverRetries.put(gid, 0);
+					thereArePending = true;
+				}										
 			} catch (CCDTeleoperationException e) {
 
 				try {

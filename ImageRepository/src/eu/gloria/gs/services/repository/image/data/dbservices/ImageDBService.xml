@@ -105,12 +105,18 @@
 		local_id, ccd)
 		VALUE ( #{rt}, #{user}, #{date}, #{local_id}, #{ccd})
 	</insert>
+	
+	<delete id="remove">
+		DELETE FROM `gloria_services`.`image`
+		WHERE
+		idimage=#{id_}
+	</delete>
 
-	<delete id="removeByUser">
+	<!-- <delete id="removeByUser">
 		DELETE FROM `gloria_services`.`image`
 		WHERE
 		user=#{user_}
-	</delete>
+	</delete>-->
 
 	<update id="setUser">
 		UPDATE `gloria_services`.`image`
