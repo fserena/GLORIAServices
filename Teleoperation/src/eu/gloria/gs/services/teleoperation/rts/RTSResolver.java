@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
+import eu.gloria.gs.services.repository.rt.data.RTCredentials;
+import eu.gloria.gs.services.repository.rt.data.RTInformation;
+import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
@@ -12,7 +15,7 @@ import eu.gloria.rti.client.RTSManager;
 public class RTSResolver implements ServerResolver {
 
 	private RTRepositoryInterface repository = null;
-	private HashMap<String, String> urlTable = new HashMap<String, String>();
+	private HashMap<String, ServerKeyData> urlTable = new HashMap<String, ServerKeyData>();
 	private HashMap<String, Date> dateTable = new HashMap<String, Date>();
 
 	public void setRTRepository(RTRepositoryInterface repository) {
@@ -20,21 +23,28 @@ public class RTSResolver implements ServerResolver {
 	}
 
 	@Override
-	public String resolve(String server) throws ServerNotAvailableException {
+	public ServerKeyData resolve(String server)
+			throws ServerNotAvailableException {
 
 		synchronized (urlTable) {
 			if (!urlTable.containsKey(server)) {
 
-				String url = null;
+				ServerKeyData keyData = new ServerKeyData();
 				try {
-					url = repository.getRTUrl(server);
+					RTInformation rtInfo = repository.getRTInformation(server);
+
+					keyData.setUrl(rtInfo.getUrl());
+					RTCredentials rtCredentials = new RTCredentials();
+					rtCredentials.setUser(rtInfo.getUser());
+					rtCredentials.setPassword(rtInfo.getPassword());
+					keyData.setCredentials(rtCredentials);
 				} catch (Exception e) {
 					throw new ServerNotAvailableException(server);
 				}
-				urlTable.put(server, url);
+				urlTable.put(server, keyData);
 				dateTable.put(server, new Date());
 
-				return url;
+				return keyData;
 			}
 
 			Date savedDate = dateTable.get(server);
@@ -42,13 +52,22 @@ public class RTSResolver implements ServerResolver {
 
 			if (currentDate.getTime() - savedDate.getTime() > 10000) {
 
-				String url = null;
+				RTInformation rtInfo = null;
 				try {
-					url = repository.getRTUrl(server);
+					rtInfo = repository.getRTInformation(server);
 				} catch (Exception e) {
 					throw new ServerNotAvailableException(server);
 				}
-				urlTable.put(server, url);
+
+				ServerKeyData keyData = new ServerKeyData();
+
+				keyData.setUrl(rtInfo.getUrl());
+				RTCredentials rtCredentials = new RTCredentials();
+				rtCredentials.setUser(rtInfo.getUser());
+				rtCredentials.setPassword(rtInfo.getPassword());
+				keyData.setCredentials(rtCredentials);
+
+				urlTable.put(server, keyData);
 				dateTable.put(server, new Date());
 			}
 
@@ -60,8 +79,8 @@ public class RTSResolver implements ServerResolver {
 	public ServerHandler getHandler(String server) {
 
 		try {
-			String url = this.resolve(server);
-			return RTSManager.getReference().getRTS(url);
+			ServerKeyData keyData = this.resolve(server);
+			return RTSManager.getReference().getRTS(keyData);
 		} catch (Exception e) {
 			return null;
 		}
