@@ -42,8 +42,6 @@ public class RTSHandler implements ServerHandler {
 	private GloriaRti rtsPort;
 	private static String port;
 	private static String serviceName;
-	private static String user;
-	private static String password;
 	private static boolean teleoperationStarted = false;
 
 	static {
@@ -58,8 +56,8 @@ public class RTSHandler implements ServerHandler {
 
 			port = (String) properties.get("port");
 			serviceName = (String) properties.get("service_name");
-			user = (String) properties.get("user");
-			password = (String) properties.get("password");
+			//user = (String) properties.get("user");
+			//password = (String) properties.get("password");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -67,7 +65,7 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public RTSHandler(String host) throws TeleoperationException {
+	public RTSHandler(String host, String user, String password) throws TeleoperationException {
 
 		String actionMessage = "rts/" + host + "?" + host + "->";
 
@@ -89,7 +87,8 @@ public class RTSHandler implements ServerHandler {
 					+ "MALFORMED_SERVER_URL");
 		}
 
-		ProxyFactory proxyFactory = new ProxyFactory();
+		ProxyFactory proxyFactory = new ProxyFactory();		
+		
 		try {
 			rtsPort = proxyFactory.getProxy(urlWsdl, urlWs, false, user,
 					password);
