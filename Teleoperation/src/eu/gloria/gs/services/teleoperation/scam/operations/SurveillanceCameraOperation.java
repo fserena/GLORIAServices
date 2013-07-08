@@ -4,6 +4,7 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperation;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
+import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
@@ -31,8 +32,8 @@ public abstract class SurveillanceCameraOperation extends DeviceOperation {
 	protected DeviceHandler getDeviceHandler(ServerResolver resolver)
 			throws TeleoperationException {
 
-		String url = resolver.resolve(this.getServer());
-		return DeviceFactory.getReference().createSurveillanceCamera(url,
+		ServerKeyData keyData = resolver.resolve(this.getServer());
+		return DeviceFactory.getReference().createSurveillanceCamera(keyData,
 				this.getSCamName());
 	}
 

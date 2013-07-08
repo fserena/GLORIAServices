@@ -7,20 +7,25 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `gloria_services`.`rt` (
-		`name` varchar(50) NOT NULL,
+		`name`
+		varchar(50) NOT NULL,
 		`description` varchar(100) DEFAULT NULL,
-		`url` varchar(100) NOT NULL,
+		`url`
+		varchar(100) NOT NULL,
 		`public_key` blob,
-		`owner` varchar(50) NOT
-		NULL,
+		`owner` varchar(50) NOT NULL,
 		`oid` int(11) DEFAULT NULL,
 		`longitude` double DEFAULT NULL,
-		`latitude` double DEFAULT NULL,
+		`latitude`
+		double DEFAULT NULL,
 		`starting_avl` datetime DEFAULT NULL,
-		`ending_avl` datetime DEFAULT NULL,
+		`ending_avl`
+		datetime DEFAULT NULL,
+		`user` varchar(45) NOT NULL,
+		`password`
+		varchar(45) NOT NULL,
 		PRIMARY KEY (`name`),
-		KEY `oid`
-		(`oid`),
+		KEY `oid` (`oid`),
 		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES
 		`gloria_services`.`observatory` (`oid`) ON DELETE
 		CASCADE ON UPDATE
@@ -41,10 +46,11 @@
 		INSERT INTO
 		`gloria_services`.`rt`
 		(name,
-		owner, url)
+		owner, url, user,
+		password)
 		VALUE
 		( #{name}, #{owner},
-		#{url} )
+		#{url}, #{user}, #{password} )
 	</insert>
 
 	<delete id="remove">

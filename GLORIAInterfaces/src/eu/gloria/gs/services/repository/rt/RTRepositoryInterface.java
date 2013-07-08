@@ -15,7 +15,7 @@ import javax.jws.WebService;
 @WebService(name = "RTRepositoryInterface", targetNamespace = "http://rt.repository.services.gs.gloria.eu/")
 public interface RTRepositoryInterface {
 
-	public void registerRT(String rt, String owner, String url)
+	public void registerRT(String rt, String owner, String url, String user, String password)
 			throws RTRepositoryException;
 
 	public void unregisterRT(String rt) throws RTRepositoryException;
