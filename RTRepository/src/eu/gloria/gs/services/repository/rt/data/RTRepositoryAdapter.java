@@ -49,7 +49,7 @@ public class RTRepositoryAdapter {
 		rtdevService.create();
 	}
 
-	public void registerRT(String rt, String owner, String url)
+	public void registerRT(String rt, String owner, String url, String user, String password)
 			throws RTRepositoryAdapterException {
 		if (rt == null)
 			throw new RTRepositoryAdapterException("The RT name cannot be null");
@@ -58,6 +58,10 @@ public class RTRepositoryAdapter {
 					"The owner name cannot be null");
 		if (url == null)
 			throw new RTRepositoryAdapterException("The URL cannot be null");
+		if (user == null)
+			throw new RTRepositoryAdapterException("The user cannot be null");
+		if (password == null)
+			throw new RTRepositoryAdapterException("The password cannot be null");
 
 		boolean previouslyContained = false;
 
@@ -68,6 +72,8 @@ public class RTRepositoryAdapter {
 			entry.setOwner(owner);
 			entry.setUrl(url);
 			entry.setName(rt);
+			entry.setPassword(password);
+			entry.setUser(user);
 
 			rtService.save(entry);
 
@@ -551,7 +557,7 @@ public class RTRepositoryAdapter {
 		}
 	}
 
-	public String getRTUrl(String rt) throws Exception {
+	public String getRTUrl(String rt) throws RTRepositoryAdapterException {
 
 		RTEntry entry = null;
 
@@ -670,6 +676,25 @@ public class RTRepositoryAdapter {
 		}
 	}
 
+	public RTCredentials getRTCredentials(String rt)
+			throws RTRepositoryAdapterException {
+
+		RTEntry entry = null;
+		RTCredentials credentials = new RTCredentials();
+
+		try {
+			entry = rtService.get(rt);
+			
+			credentials.setUser(entry.getUser());
+			credentials.setPassword(entry.getPassword());
+			
+			return credentials;
+			
+		} catch (PersistenceException e) {
+			throw new RTRepositoryAdapterException(e.getMessage());
+		}
+	}
+	
 	public RTAvailability getRTAvailability(String rt)
 			throws RTRepositoryAdapterException {
 
