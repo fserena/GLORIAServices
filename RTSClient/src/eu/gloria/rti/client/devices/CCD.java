@@ -79,6 +79,7 @@ public class CCD extends DeviceHandler implements CCDInterface {
 
 	@Override
 	public String startExposure() throws TeleoperationException {
+		rts.startTeleoperation();
 		return rts.startExposure(this.ccd);
 	}
 
