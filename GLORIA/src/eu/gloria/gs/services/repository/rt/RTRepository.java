@@ -9,9 +9,11 @@ import eu.gloria.gs.services.repository.rt.data.DeviceType;
 import eu.gloria.gs.services.repository.rt.data.ObservatoryInformation;
 import eu.gloria.gs.services.repository.rt.data.RTAvailability;
 import eu.gloria.gs.services.repository.rt.data.RTCoordinates;
+import eu.gloria.gs.services.repository.rt.data.RTCredentials;
 import eu.gloria.gs.services.repository.rt.data.RTInformation;
 import eu.gloria.gs.services.repository.rt.data.RTRepositoryAdapter;
 import eu.gloria.gs.services.repository.rt.data.dbservices.RTRepositoryAdapterException;
+import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rt.entity.device.Device;
 import eu.gloria.rti.GloriaRti;
@@ -31,8 +33,8 @@ public class RTRepository extends GSLogProducerService implements
 	}
 
 	@Override
-	public void registerRT(String rt, String owner, String url)
-			throws RTRepositoryException {
+	public void registerRT(String rt, String owner, String url, String user,
+			String password) throws RTRepositoryException {
 
 		try {
 			this.logAction(this.getClientUsername(),
@@ -42,7 +44,7 @@ public class RTRepository extends GSLogProducerService implements
 		}
 
 		try {
-			adapter.registerRT(rt, owner, url);
+			adapter.registerRT(rt, owner, url, user, password);
 		} catch (RTRepositoryAdapterException e) {
 
 			throw new RTRepositoryException(e.getMessage());
@@ -50,7 +52,15 @@ public class RTRepository extends GSLogProducerService implements
 
 		GloriaRti rti;
 		try {
-			rti = RTSManager.getReference().getRTS(url).getPort();
+
+			ServerKeyData keyData = new ServerKeyData();
+			keyData.setUrl(url);
+			RTCredentials rtCredentials = new RTCredentials();
+			rtCredentials.setUser(user);
+			rtCredentials.setPassword(password);
+			keyData.setCredentials(rtCredentials);
+
+			rti = RTSManager.getReference().getRTS(keyData).getPort();
 
 			try {
 				List<Device> devices = rti.devGetDevices(null, false);
@@ -480,6 +490,9 @@ public class RTRepository extends GSLogProducerService implements
 			rtInfo.setCoordinates(adapter.getRTCoordinates(rt));
 			rtInfo.setAvailability(adapter.getRTAvailability(rt));
 			rtInfo.setObservatory(adapter.getRTObservatory(rt));
+			rtInfo.setUrl(adapter.getRTUrl(rt));
+			rtInfo.setUser(adapter.getRTCredentials(rt).getUser());
+			rtInfo.setPassword(adapter.getRTCredentials(rt).getPassword());
 
 			return rtInfo;
 
