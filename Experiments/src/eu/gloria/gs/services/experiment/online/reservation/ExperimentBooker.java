@@ -14,7 +14,7 @@ public class ExperimentBooker {
 
 	private final static int MINUTES_FRAME = 15;
 	private final static long MILLISECONDS_PER_FRAME = 60 * MINUTES_FRAME * 1000;
-	private final static long MILLISECONDS_PER_2H = 60 * 60 * 2 * 1000;
+	private final static long MILLISECONDS_PER_30MIN = 30 * 60 * 1000;
 	private final static int RESERVATION_DAYS = 7;
 	private ExperimentDBAdapter adapter;
 	private RTBooker rtBooker;
@@ -161,7 +161,7 @@ public class ExperimentBooker {
 		}
 
 		try {
-			if (msReserved + msReservation <= MILLISECONDS_PER_2H) {
+			if (msReserved + msReservation <= MILLISECONDS_PER_30MIN) {
 
 				if (!adapter.anyRTReservationBetween(telescopes, timeSlot)) {
 					adapter.makeReservation(experiment, telescopes, username,
