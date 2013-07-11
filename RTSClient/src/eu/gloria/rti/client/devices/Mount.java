@@ -41,12 +41,12 @@ public class Mount extends DeviceHandler implements MountInterface {
 	public void setSlewRate(String rate) throws TeleoperationException {
 		rts.setSlewRate(mount, rate);
 	}
-	
+
 	@Override
-	public void setTrackingRate(TrackingRate rate) throws TeleoperationException {
+	public void setTrackingRate(TrackingRate rate)
+			throws TeleoperationException {
 		rts.setTrackingRate(mount, rate);
 	}
-	
 
 	@Override
 	public void setTracking(boolean mode) throws TeleoperationException {
@@ -56,6 +56,12 @@ public class Mount extends DeviceHandler implements MountInterface {
 	@Override
 	public void slewToObject(String object) throws TeleoperationException {
 		rts.slewToObject(mount, object);
+	}
+
+	@Override
+	public void slewToCoordinates(double ra, double dec)
+			throws TeleoperationException {
+		rts.slewToCoordinates(mount, ra, dec);
 	}
 
 	@Override
