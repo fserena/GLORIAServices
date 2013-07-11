@@ -60,7 +60,7 @@ public class DeviceFactory {
 		return (Focuser) rts.getDeviceHandler(name, DeviceType.FOCUS);
 	}
 	
-	public FilterWheel createFilterWeel(ServerKeyData keyData, String name) throws TeleoperationException {
+	public FilterWheel createFilterWheel(ServerKeyData keyData, String name) throws TeleoperationException {
 		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
 
 		return (FilterWheel) rts.getDeviceHandler(name, DeviceType.FW);
