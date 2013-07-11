@@ -183,7 +183,7 @@ public class RTSHandler implements ServerHandler {
 				return new Focuser(this, name);
 			} else if (type.equals(DeviceType.DOME)) {
 				return new Dome(this, name);
-			}else if (type.equals(DeviceType.FW)) {
+			} else if (type.equals(DeviceType.FW)) {
 				return new FilterWheel(this, name);
 			}
 		}
@@ -963,6 +963,23 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
+	public void slewToCoordinates(String mount, double ra, double dec)
+			throws TeleoperationException {
+		String actionMessage = mount + "/slewRaDec?" + ra + "," + dec + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			rtsPort.mntSlewToCoordinates(null, mount, ra, dec);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
 	public ActivityStateMount getMountState(String mount)
 			throws TeleoperationException {
 		String actionMessage = mount + "/getState->";
@@ -1057,15 +1074,15 @@ public class RTSHandler implements ServerHandler {
 				+ "NOT_ABSOLUTE_FOCUSER");
 	}
 
-	public List<String> getAvailableFilters(String filterWheel) throws TeleoperationException {
+	public List<String> getAvailableFilters(String filterWheel)
+			throws TeleoperationException {
 		String actionMessage = filterWheel + "/filters->";
-		
+
 		if (rtsPort == null) {
 			throw new ServerNotAvailableException(actionMessage
 					+ "SERVER_NOT_AVAILABLE");
 		}
 
-		
 		List<String> filters;
 		try {
 			filters = rtsPort.fwGetFilterList(null, filterWheel);
@@ -1087,8 +1104,8 @@ public class RTSHandler implements ServerHandler {
 		}
 
 		try {
-			
-			rtsPort.fwSelectFilterKind(null, filterWheel, filter);			
+
+			rtsPort.fwSelectFilterKind(null, filterWheel, filter);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");
