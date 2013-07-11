@@ -8,7 +8,7 @@ import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
-import eu.gloria.rti.client.devices.Focuser;
+import eu.gloria.rti.client.devices.FilterWheel;
 
 public abstract class FilterWheelOperation extends DeviceOperation {
 
@@ -25,7 +25,7 @@ public abstract class FilterWheelOperation extends DeviceOperation {
 		return this.filterWheel;
 	}
 
-	protected abstract void operateFilterWheel(Focuser fw, OperationReturn returns)
+	protected abstract void operateFilterWheel(FilterWheel fw, OperationReturn returns)
 			throws TeleoperationException;
 
 	@Override
@@ -33,7 +33,7 @@ public abstract class FilterWheelOperation extends DeviceOperation {
 			throws TeleoperationException {
 
 		ServerKeyData keyData = resolver.resolve(this.getServer());
-		return DeviceFactory.getReference().createFocuser(keyData,
+		return DeviceFactory.getReference().createFilterWheel(keyData,
 				this.getFilterWheelName());
 	}
 
@@ -41,7 +41,7 @@ public abstract class FilterWheelOperation extends DeviceOperation {
 	protected void operateHandler(DeviceHandler handler, OperationReturn returns)
 			throws TeleoperationException {
 
-		this.operateFilterWheel((Focuser) handler, returns);
+		this.operateFilterWheel((FilterWheel) handler, returns);
 
 	}
 
