@@ -17,6 +17,7 @@ import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
 import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
 import eu.gloria.gs.services.teleoperation.ccd.ImageTransferFailedException;
 import eu.gloria.gs.services.teleoperation.focuser.NotAbsoluteFocuserException;
+import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
 import eu.gloria.rt.entity.device.ActivityStateDomeOpening;
@@ -103,31 +104,44 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public void startTeleoperation() {
+	public void startTeleoperation() throws GenericTeleoperationException {
 		try {
 			rtsPort.execStopOp(null);
 			teleoperationStarted = false;
 		} catch (RtiError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new GenericTeleoperationException("/start -> PRE_STOP_FAILED");
 		}
 
 		try {
 			rtsPort.execStartOp(null, null, "GLORIA", 0);
 			teleoperationStarted = true;
 		} catch (RtiError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new GenericTeleoperationException("/start?secs=0 -> START_TELEOP_FAILED");
 		}
 	}
 
-	public void stopTeleoperation() {
+	public void stopTeleoperation() throws GenericTeleoperationException {
 		try {
 			rtsPort.execStopOp(null);
 			teleoperationStarted = false;
 		} catch (RtiError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new GenericTeleoperationException("/stop -> STOP_TELEOP_FAILED");
+		}
+	}
+	
+	public void notifyTeleoperation(long seconds) throws GenericTeleoperationException {
+		try {
+			rtsPort.execStopOp(null);
+			teleoperationStarted = false;
+		} catch (RtiError e) {
+			throw new GenericTeleoperationException("/start -> PRE_STOP_FAILED");
+		}
+
+		try {
+			rtsPort.execStartOp(null, null, "GLORIA", seconds);
+			teleoperationStarted = true;
+		} catch (RtiError e) {
+			throw new GenericTeleoperationException("/start?secs=" + seconds + " -> START_TELEOP_FAILED");
 		}
 	}
 	
