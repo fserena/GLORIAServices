@@ -17,6 +17,7 @@ import eu.gloria.gs.services.teleoperation.mount.operations.ParkOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.SetSlewRateOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.SetTrackingOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.SetTrackingRateOperation;
+import eu.gloria.gs.services.teleoperation.mount.operations.SlewToCoordinatesOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.SlewToObjectOperation;
 
 public class MountTeleoperation extends AbstractTeleoperation implements
@@ -257,6 +258,44 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 			this.processSuccess(rt, mount, "slewToObject",
 					new Object[] { object }, null);
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new MountTeleoperationException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void slewToCoordinates(String rt, String mount, double ra, double dec)
+			throws DeviceOperationFailedException, MountTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(mount);
+		args.getArguments().add(ra);
+		args.getArguments().add(dec);
+
+		SlewToCoordinatesOperation operation = null;
+
+		try {
+			operation = new SlewToCoordinatesOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/slewToCoordinates/Bad args", rt);
+
+			throw new MountTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+
+			this.executeOperation(operation);
+
+			this.processSuccess(rt, mount, "slewToCoordinates",
+					new Object[] { ra, dec }, null);
 		} catch (DeviceOperationFailedException e) {
 			this.processException(e.getMessage(), rt);
 			throw e;

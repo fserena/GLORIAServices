@@ -189,7 +189,8 @@ public class ExperimentExecutor extends ServerThread {
 			try {
 
 				alog.registerAction(username, new Date(),
-						"experiments/contexts/error->" + e.getMessage());
+						"experiments/contexts/error->"
+								+ e.getMessage().substring(0, 40));
 			} catch (ActionLogException e1) {
 				e1.printStackTrace();
 			}
@@ -200,7 +201,8 @@ public class ExperimentExecutor extends ServerThread {
 			try {
 
 				alog.registerAction(username, new Date(),
-						"experiments/contexts/error->" + e.getMessage());
+						"experiments/contexts/error->"
+								+ e.getMessage().substring(0, 40));
 			} catch (ActionLogException e1) {
 				e1.printStackTrace();
 			}

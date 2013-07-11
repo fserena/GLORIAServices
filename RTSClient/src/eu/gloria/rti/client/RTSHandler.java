@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
@@ -32,6 +33,7 @@ import eu.gloria.rt.entity.device.TrackingRateType;
 import eu.gloria.rti.GloriaRti;
 import eu.gloria.rti.RtiError;
 import eu.gloria.rti.client.devices.CCD;
+import eu.gloria.rti.client.devices.FilterWheel;
 import eu.gloria.rti.client.devices.Focuser;
 import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
@@ -57,8 +59,8 @@ public class RTSHandler implements ServerHandler {
 
 			port = (String) properties.get("port");
 			serviceName = (String) properties.get("service_name");
-			//user = (String) properties.get("user");
-			//password = (String) properties.get("password");
+			// user = (String) properties.get("user");
+			// password = (String) properties.get("password");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -66,7 +68,8 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public RTSHandler(String host, String user, String password) throws TeleoperationException {
+	public RTSHandler(String host, String user, String password)
+			throws TeleoperationException {
 
 		String actionMessage = "rts/" + host + "?" + host + "->";
 
@@ -88,8 +91,8 @@ public class RTSHandler implements ServerHandler {
 					+ "MALFORMED_SERVER_URL");
 		}
 
-		ProxyFactory proxyFactory = new ProxyFactory();		
-		
+		ProxyFactory proxyFactory = new ProxyFactory();
+
 		try {
 			rtsPort = proxyFactory.getProxy(urlWsdl, urlWs, false, user,
 					password);
@@ -116,7 +119,8 @@ public class RTSHandler implements ServerHandler {
 			rtsPort.execStartOp(null, null, "GLORIA", 0);
 			teleoperationStarted = true;
 		} catch (RtiError e) {
-			throw new GenericTeleoperationException("/start?secs=0 -> START_TELEOP_FAILED");
+			throw new GenericTeleoperationException(
+					"/start?secs=0 -> START_TELEOP_FAILED");
 		}
 	}
 
@@ -125,11 +129,13 @@ public class RTSHandler implements ServerHandler {
 			rtsPort.execStopOp(null);
 			teleoperationStarted = false;
 		} catch (RtiError e) {
-			throw new GenericTeleoperationException("/stop -> STOP_TELEOP_FAILED");
+			throw new GenericTeleoperationException(
+					"/stop -> STOP_TELEOP_FAILED");
 		}
 	}
-	
-	public void notifyTeleoperation(long seconds) throws GenericTeleoperationException {
+
+	public void notifyTeleoperation(long seconds)
+			throws GenericTeleoperationException {
 		try {
 			rtsPort.execStopOp(null);
 			teleoperationStarted = false;
@@ -141,10 +147,11 @@ public class RTSHandler implements ServerHandler {
 			rtsPort.execStartOp(null, null, "GLORIA", seconds);
 			teleoperationStarted = true;
 		} catch (RtiError e) {
-			throw new GenericTeleoperationException("/start?secs=" + seconds + " -> START_TELEOP_FAILED");
+			throw new GenericTeleoperationException("/start?secs=" + seconds
+					+ " -> START_TELEOP_FAILED");
 		}
 	}
-	
+
 	public boolean isTeleoperationStarted() {
 		return teleoperationStarted;
 	}
@@ -176,6 +183,8 @@ public class RTSHandler implements ServerHandler {
 				return new Focuser(this, name);
 			} else if (type.equals(DeviceType.DOME)) {
 				return new Dome(this, name);
+			} else if (type.equals(DeviceType.FW)) {
+				return new FilterWheel(this, name);
 			}
 		}
 
@@ -954,6 +963,23 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
+	public void slewToCoordinates(String mount, double ra, double dec)
+			throws TeleoperationException {
+		String actionMessage = mount + "/slewRaDec?" + ra + "," + dec + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			rtsPort.mntSlewToCoordinates(null, mount, ra, dec);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
 	public ActivityStateMount getMountState(String mount)
 			throws TeleoperationException {
 		String actionMessage = mount + "/getState->";
@@ -1046,5 +1072,43 @@ public class RTSHandler implements ServerHandler {
 
 		throw new NotAbsoluteFocuserException(actionMessage
 				+ "NOT_ABSOLUTE_FOCUSER");
+	}
+
+	public List<String> getAvailableFilters(String filterWheel)
+			throws TeleoperationException {
+		String actionMessage = filterWheel + "/filters->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		List<String> filters;
+		try {
+			filters = rtsPort.fwGetFilterList(null, filterWheel);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+		return filters;
+	}
+
+	public void selectFilter(String filterWheel, String filter)
+			throws TeleoperationException {
+
+		String actionMessage = filterWheel + "/selectFilter?" + filter + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+
+			rtsPort.fwSelectFilterKind(null, filterWheel, filter);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
 	}
 }

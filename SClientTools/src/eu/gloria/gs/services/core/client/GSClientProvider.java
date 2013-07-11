@@ -12,6 +12,7 @@ import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
@@ -26,6 +27,7 @@ public class GSClientProvider {
 	private final static String DOMETELEOPERATION_BEAN_NAME = "domeTeleoperationClientFactory";
 	private final static String MOUNTTELEOPERATION_BEAN_NAME = "mountTeleoperationClientFactory";
 	private final static String FOCUSERTELEOPERATION_BEAN_NAME = "focuserTeleoperationClientFactory";
+	private final static String FWTELEOPERATION_BEAN_NAME = "fwTeleoperationClientFactory";
 	private final static String GENERICTELEOPERATION_BEAN_NAME = "genericTeleoperationClientFactory";
 	private final static String SCAMTELEOPERATION_BEAN_NAME = "scamTeleoperationClientFactory";
 	private final static String ONLINEEXPERIMENT_BEAN_NAME = "onlineExperimentClientFactory";
@@ -109,6 +111,12 @@ public class GSClientProvider {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(SCAMTELEOPERATION_BEAN_NAME);
 		return (SCamTeleoperationInterface) factory.create();
+	}
+	
+	public static FilterWheelTeleoperationInterface getFilterWheelTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(FWTELEOPERATION_BEAN_NAME);
+		return (FilterWheelTeleoperationInterface) factory.create();
 	}
 
 	public static OnlineExperimentInterface getOnlineExperimentClient() {
