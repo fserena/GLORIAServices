@@ -12,6 +12,7 @@ import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
 
@@ -31,6 +32,7 @@ public abstract class ExperimentContextService {
 	private SCamTeleoperationInterface scam;
 	private MountTeleoperationInterface mount;
 	private FocuserTeleoperationInterface focus;
+	private FilterWheelTeleoperationInterface fw;
 	private ImageRepositoryInterface image;
 
 	public ExperimentDBAdapter getAdapter() {
@@ -111,6 +113,14 @@ public abstract class ExperimentContextService {
 
 	public FocuserTeleoperationInterface getFocuserTeleoperation() {
 		return this.focus;
+	}
+
+	public void setFilterWheelTeleoperation(FilterWheelTeleoperationInterface fw) {
+		this.fw = fw;
+	}
+
+	public FilterWheelTeleoperationInterface getFilterWheelTeleoperation() {
+		return this.fw;
 	}
 
 	public ImageRepositoryInterface getImageRepository() {
