@@ -33,6 +33,9 @@ public interface MountTeleoperationInterface {
 	public void slewToObject(String rt, String mount, String object)
 			throws DeviceOperationFailedException, MountTeleoperationException;
 
+	public void slewToCoordinates(String rt, String mount, double ra, double dec)
+			throws DeviceOperationFailedException, MountTeleoperationException;
+
 	public void park(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException;
 }
