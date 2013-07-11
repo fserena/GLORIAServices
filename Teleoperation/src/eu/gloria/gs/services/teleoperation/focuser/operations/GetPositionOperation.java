@@ -16,9 +16,7 @@ public class GetPositionOperation extends FocuserOperation {
 			throws TeleoperationException {
 
 		long position = focuser.getPosition();
-
-		returns.setMessage("Get focuser position operation executed: "
-				+ position + ", " + this.getServer() + ","
-				+ this.getFocuserName());
+		
+		// TODO: it is incomplete!
 	}
 }
