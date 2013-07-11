@@ -50,6 +50,12 @@
 		lazy-init="true" scope="singleton">
 	</bean>
 
+	<bean id="genericTeleoperation"
+		class="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"
+		factory-bean="genericTeleoperationWSClientFactory" factory-method="create"
+		lazy-init="true" scope="singleton">
+	</bean>
+
 	<bean id="onlineExperiment"
 		class="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"
 		factory-bean="onlineExperimentWSClientFactory" factory-method="create"
@@ -114,6 +120,12 @@
 		<property name="portName" value="FocuserTeleoperationPort"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
+	</bean>
+
+	<bean id="genericTeleoperationWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="GenericTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="onlineExperimentWSClientFactory" parent="WSClientFactory">
