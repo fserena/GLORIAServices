@@ -58,6 +58,13 @@
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
 	</bean>
+	
+		<bean id="genericTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
+		lazy-init="true" scope="singleton">
+		<property name="portName" value="GenericTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
+	</bean>
 
 	<bean id="onlineExperimentClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
