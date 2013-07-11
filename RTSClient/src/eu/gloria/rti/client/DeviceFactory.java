@@ -4,6 +4,7 @@ import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rt.entity.device.DeviceType;
 import eu.gloria.rti.client.devices.CCD;
+import eu.gloria.rti.client.devices.FilterWheel;
 import eu.gloria.rti.client.devices.Focuser;
 import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
@@ -57,5 +58,11 @@ public class DeviceFactory {
 		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
 
 		return (Focuser) rts.getDeviceHandler(name, DeviceType.FOCUS);
+	}
+	
+	public FilterWheel createFilterWheel(ServerKeyData keyData, String name) throws TeleoperationException {
+		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
+
+		return (FilterWheel) rts.getDeviceHandler(name, DeviceType.FW);
 	}
 }

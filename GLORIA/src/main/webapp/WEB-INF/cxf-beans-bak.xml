@@ -95,7 +95,7 @@
 			</bean>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
-	
+
 	<jaxws:endpoint xmlns:tns="http://online.experiment.services.gs.gloria.eu/"
 		id="onlineexperiment" endpointName="tns:OnlineExperimentPort"
 		serviceName="tns:OnlineExperimentService" address="/OnlineExperimentPort">
@@ -314,6 +314,31 @@
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperation">
+				<property name="password" value="password"></property>
+				<property name="username" value="user"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://fw.teleoperation.services.gs.gloria.eu/"
+		id="fwteleoperation" endpointName="tns:FilterWheelTeleoperationPort"
+		serviceName="tns:FilterWheelTeleoperationService" address="/FilterWheelTeleoperationPort">
+		<jaxws:implementor>
+			<bean
+				class="eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperation">
 				<property name="password" value="password"></property>
 				<property name="username" value="user"></property>
 				<property name="actionLog" ref="actionLog"></property>

@@ -21,7 +21,9 @@ public interface MountInterface {
 	public void setTracking(boolean mode) throws TeleoperationException;
 
 	public void slewToObject(String object) throws TeleoperationException;
-
+	
+	public void slewToCoordinates(double ra, double dec) throws TeleoperationException;
+	
 	public MountState getState() throws TeleoperationException;
 
 	public void park() throws TeleoperationException;
