@@ -21,6 +21,7 @@ import eu.gloria.gs.services.experiment.online.reservation.NoSuchReservationExce
 import eu.gloria.gs.services.experiment.online.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.log.action.ActionLogInterface;
+import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 
 public class ExperimentExecutor extends ServerThread {
 
@@ -29,6 +30,7 @@ public class ExperimentExecutor extends ServerThread {
 	private ActionLogInterface alog;
 	private String username;
 	private String password;
+	private GenericTeleoperationInterface genericTeleoperation;
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
 		this.adapter = adapter;
@@ -40,6 +42,10 @@ public class ExperimentExecutor extends ServerThread {
 
 	public void setActionLog(ActionLogInterface alog) {
 		this.alog = alog;
+	}
+
+	public void setGenericTeleoperation(GenericTeleoperationInterface gt) {
+		this.genericTeleoperation = gt;
 	}
 
 	public void setUsername(String username) {
@@ -91,6 +97,16 @@ public class ExperimentExecutor extends ServerThread {
 										+ reservation.getUser());
 					} catch (ActionLogException e) {
 						System.out.println(e.getMessage());
+					}
+
+					// Notify all telescopes the teleoperation timeslot
+					List<String> telescopes = reservation.getTelescopes();
+					long duration = (reservation.getTimeSlot().getEnd()
+							.getTime() - reservation.getTimeSlot().getBegin()
+							.getTime()) / 1000;
+
+					for (String rt : telescopes) {
+						genericTeleoperation.notifyTeleoperation(rt, duration);
 					}
 
 					try {
