@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="INTEGER_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.lang.Integer"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DOUBLE_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="operationDependent" value="false"></property>
+		<property name="valueType" value="java.lang.Double"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Double</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="STRING_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.lang.String"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="POINTER_VALUE" parent="STRING_VALUE" scope="singleton">
+		<property name="operationDependent" value="true"></property>
+	</bean>
+
+	<bean id="NAMED_INTEGER" parent="STRING_VALUE" scope="singleton">
+		<property name="valueType" value="java.lang.Integer"></property>
+	</bean>
+
+	<bean id="NAMED_DOUBLE" parent="STRING_VALUE" scope="singleton">
+		<property name="valueType" value="java.lang.Double"></property>
+	</bean>
+
+	<bean id="ORDER_STRING" parent="STRING_VALUE" scope="singleton">
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DEPENDANT_ORDER_STRING" parent="STRING_VALUE" scope="singleton">
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.String</value>
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="INTEGER"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="INTEGER_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOUBLE"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="DOUBLE_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="STRING"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="STRING_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="URL" parent="STRING" scope="singleton">
+		<property name="name" value="URL"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>http://</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="STREAM_URL" parent="SCAM_PROPERTY" scope="singleton">
+		<property name="name" value="STREAM_URL"></property>
+	</bean>
+
+	<bean id="DYNAMIC_URL" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="DYNAMIC_URL"></property>
+	</bean>
+
+	<bean id="STATIC_URL" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="STATIC_URL"></property>
+	</bean>
+
+	<bean id="FORMAT" parent="STRING" scope="singleton">
+		<property name="name" value="FORMAT"></property>
+	</bean>
+
+	<bean id="JPG_FORMAT" parent="FORMAT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>JPG</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FITS_FORMAT" parent="FORMAT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>FITS</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MOVEMENT" parent="STRING" scope="singleton">
+		<property name="name" value="MOVEMENT"></property>
+	</bean>
+
+	<bean id="OPEN_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>OPEN</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CLOSE_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>CLOSE</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LEFT_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>LEFT</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="RIGHT_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>RIGHT</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="UP_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>UP</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOWN_MOVEMENT" parent="MOVEMENT" scope="singleton">
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>DOWN</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="POINTER" parent="STRING" scope="singleton">
+		<property name="type" ref="POINTER_VALUE"></property>
+		<property name="operationDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="ExperimentOperation"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="RT_NAME"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="ORDER_STRING"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="loadRTName">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DEVICE_NAME"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="DEPENDANT_ORDER_STRING"></property>
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="RT_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+		<property name="initOperations">
+			<map>
+				<entry key="loadDeviceName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>deviceType</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCD_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>CCD</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SCAM_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>SURVEILLANCE_CAMERA</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MOUNT_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>MOUNT</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DOME_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>DOME</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FOCUSER_NAME" parent="DEVICE_NAME" scope="singleton">
+		<property name="properties">
+			<map value-type="java.lang.String">
+				<entry key="deviceType">
+					<value>FOCUS</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DEVICE_PROPERTY"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="STRING_VALUE"></property>
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="DEVICE_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCD_PROPERTY" parent="DEVICE_PROPERTY" scope="singleton">
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="CCD_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SCAM_PROPERTY" parent="DEVICE_PROPERTY" scope="singleton">
+		<property name="parameterDependencies">
+			<map>
+				<entry key="0">
+					<ref bean="SCAM_NAME"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CCD_BRIGHTNESS" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_CONTRAST" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_GAIN" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_GAMMA" parent="CCD_PROPERTY" scope="singleton">
+		<property name="type" ref="NAMED_INTEGER"></property>
+	</bean>
+
+	<bean id="CCD_EXPOSURE" parent="CCD_PROPERTY" scope="singleton">
+		<property name="name" value="CCD_EXPOSURE"></property>
+		<property name="type" ref="NAMED_DOUBLE"></property>
+	</bean>
+
+</beans>

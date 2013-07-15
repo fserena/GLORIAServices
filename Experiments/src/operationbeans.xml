@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="ExperimentOperation"
+		class="eu.gloria.gs.services.experiment.base.operations.BeanExperimentOperation"
+		scope="singleton">
+		<property name="type" ref="OPERATION_TYPE"></property>
+	</bean>
+
+	<bean id="OPERATION_TYPE"
+		class="eu.gloria.gs.services.experiment.base.operations.OperationType"
+		scope="singleton">
+	</bean>
+
+	<bean id="SetIntParameter" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="INTEGER"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="setParameter">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToObject" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="STRING"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="pointToObject">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToCoordinates" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="DOUBLE"></ref>
+				<ref bean="DOUBLE"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="pointToCoordinates">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetStream" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="SCAM_NAME"></ref>
+				<ref bean="STREAM_URL"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="getStream">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="STRING"></ref>				
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadImage">
+					<list>
+						<value>arg0</value>						
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="TakeImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="STATIC_URL"></ref>
+				<ref bean="FORMAT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="takeImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadContinuousImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="DYNAMIC_URL"></ref>
+				<ref bean="FORMAT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="getContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="StopContinuousImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="stopContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Park" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="park">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence1" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="POINTER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence2" parent="ExperimentOperation">
+		<property name="type" ref="OPERATION_TYPE"></property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadCCDAttributes" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="CCD_BRIGHTNESS"></ref>
+				<ref bean="CCD_CONTRAST"></ref>
+				<ref bean="CCD_GAIN"></ref>
+				<ref bean="CCD_EXPOSURE"></ref>
+				<ref bean="CCD_GAMMA"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadCCDAttributes">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
+						<value>arg6</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SaveCCDAttributes" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="CCD_NAME"></ref>
+				<ref bean="CCD_BRIGHTNESS"></ref>
+				<ref bean="CCD_CONTRAST"></ref>
+				<ref bean="CCD_GAIN"></ref>
+				<ref bean="CCD_EXPOSURE"></ref>
+				<ref bean="CCD_GAMMA"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="saveCCDAttributes">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
+						<value>arg6</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ConstrainedMountMove" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="MOUNT_NAME"></ref>
+				<ref bean="MOVEMENT"></ref>
+				<ref bean="INTEGER"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="constrainedMountMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DomeMove" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="DOME_NAME"></ref>
+				<ref bean="MOVEMENT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="domeMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ChangeFocusRelative" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="RT_NAME"></ref>
+				<ref bean="FOCUSER_NAME"></ref>
+				<ref bean="INTEGER"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="changeFocusRelative">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>
