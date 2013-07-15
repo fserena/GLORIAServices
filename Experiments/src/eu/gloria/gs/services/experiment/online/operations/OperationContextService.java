@@ -1,16 +1,21 @@
 package eu.gloria.gs.services.experiment.online.operations;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.online.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.online.data.NoSuchExperimentException;
-import eu.gloria.gs.services.experiment.online.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.online.models.ExperimentContextService;
-import eu.gloria.gs.services.experiment.online.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.online.parameters.UndefinedExperimentParameterException;
-import eu.gloria.gs.services.experiment.online.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.online.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextService;
+import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
+import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
+import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
+import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
+import eu.gloria.gs.services.experiment.base.operations.OperationContext;
+import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
+import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
@@ -58,6 +63,8 @@ public class OperationContextService extends ExperimentContextService {
 			this.changeFocusRelative(operationContext, operationArguments);
 		} else if (operation.equals("stopContinuousImage")) {
 			this.stopContinuousImage(operationContext, operationArguments);
+		} else if (operation.equals("loadImage")) {
+			this.loadImageFromRepository(operationContext, operationArguments);
 		}
 	}
 
@@ -85,6 +92,49 @@ public class OperationContextService extends ExperimentContextService {
 				throw new ExperimentOperationException(e.getMessage());
 			}
 			subContext.execute();
+		}
+	}
+
+	private void loadImageFromRepository(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		try {
+			String parameterName = (String) operationArguments[0];
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(new Date());
+			calendar.set(Calendar.DAY_OF_YEAR,
+					calendar.get(Calendar.DAY_OF_YEAR) - 1);
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+
+			Date from = calendar.getTime();
+
+			calendar.set(Calendar.HOUR_OF_DAY, 23);
+			Date to = calendar.getTime();
+
+			List<Integer> imageIds;
+			String url = null;
+			try {
+				imageIds = this.getImageRepository()
+						.getAllImageIdentifiersByDate(from, to);
+
+				int id = imageIds.get((int) (Math.random() * imageIds.size()));
+				url = this.getImageRepository().getImageInformation(id)
+						.getUrl();
+			} catch (ImageRepositoryException e1) {
+
+			}
+
+			try {
+				operationContext.getExperimentContext().setParameterValue(
+						parameterName, url);
+			} catch (NoSuchExperimentException
+					| UndefinedExperimentParameterException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			}
+
+		} catch (ExperimentParameterException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getMessage());
 		}
 	}
 
@@ -140,7 +190,7 @@ public class OperationContextService extends ExperimentContextService {
 			String exposureParameter = (String) operationArguments[5];
 			Double exposure = (Double) operationContext.getExperimentContext()
 					.getParameterValue(exposureParameter);
-			
+
 			String gammaParameter = (String) operationArguments[6];
 			Integer gamma = (Integer) operationContext.getExperimentContext()
 					.getParameterValue(gammaParameter);
@@ -180,7 +230,7 @@ public class OperationContextService extends ExperimentContextService {
 				throw new ExperimentOperationException(e.getMessage());
 			} catch (DeviceOperationFailedException e) {
 			}
-			
+
 			try {
 				this.getCCDTeleoperation().setGamma(rtName, camName, gamma);
 			} catch (CCDTeleoperationException e) {
@@ -258,14 +308,14 @@ public class OperationContextService extends ExperimentContextService {
 			}
 
 			try {
-				gamma = (int) this.getCCDTeleoperation()
-						.getGamma(rtName, camName);
+				gamma = (int) this.getCCDTeleoperation().getGamma(rtName,
+						camName);
 			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
 			} catch (DeviceOperationFailedException e) {
 
 			}
-			
+
 			operationContext.getExperimentContext().setParameterValue(
 					brightnessParameter, brightness);
 			operationContext.getExperimentContext().setParameterValue(
@@ -380,7 +430,7 @@ public class OperationContextService extends ExperimentContextService {
 				this.getCCDTeleoperation().stopContinueMode(rtName, camName);
 			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getMessage());
-			} catch (DeviceOperationFailedException e) {				
+			} catch (DeviceOperationFailedException e) {
 			}
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
@@ -764,8 +814,9 @@ public class OperationContextService extends ExperimentContextService {
 					this.getMountTeleoperation().setTracking(rtName, mountName,
 							true);
 
-					this.getMountTeleoperation().setSlewRate(rtName, mountName, "CENTER");
-					
+					this.getMountTeleoperation().setSlewRate(rtName, mountName,
+							"CENTER");
+
 					this.getMountTeleoperation().slewToObject(rtName,
 							mountName, object);
 

@@ -3,13 +3,16 @@ package eu.gloria.gs.services.experiment.online.parameters;
 import java.util.List;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.online.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.online.data.NoSuchExperimentException;
-import eu.gloria.gs.services.experiment.online.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.online.models.ContextNotReadyException;
-import eu.gloria.gs.services.experiment.online.models.ExperimentContextService;
-import eu.gloria.gs.services.experiment.online.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.online.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
+import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextService;
+import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
+import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
+import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
+import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
+import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
 

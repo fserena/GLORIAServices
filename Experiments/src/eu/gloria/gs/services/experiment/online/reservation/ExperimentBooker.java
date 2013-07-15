@@ -1,9 +1,13 @@
 package eu.gloria.gs.services.experiment.online.reservation;
 
-import eu.gloria.gs.services.experiment.online.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.online.data.ExperimentDBAdapter;
-import eu.gloria.gs.services.experiment.online.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.online.data.TimeSlot;
+import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
+import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
+import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
+import eu.gloria.gs.services.experiment.base.data.TimeSlot;
+import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
+import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
+import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
+import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 
 import java.util.ArrayList;
 import java.util.Calendar;

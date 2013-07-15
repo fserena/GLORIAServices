@@ -5,7 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import eu.gloria.gs.services.experiment.online.data.TimeSlot;
+import eu.gloria.gs.services.experiment.base.data.TimeSlot;
+import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
 import eu.gloria.gs.services.repository.rt.data.RTAvailability;
