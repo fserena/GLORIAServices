@@ -6,32 +6,86 @@ import eu.gloria.gs.services.repository.user.data.dbservices.UserRepositoryAdapt
 
 public class UserRepositoryAdapter {
 
-	final private String ADMIN_ROLE = "ADM";
-	final private String REGULAR_ROLE = "REG";
-	final private String OWNER_ROLE = "OWN";
-	final private String WS_ROLE = "WS";
-	final String ADMIN_NAME = "dummy";
-	final String ADMIN_PWD = "dummy";
-	final String USER_REPOSITORY_NAME = "dummy";
-	final String USER_REPOSITORY_PWD = "dummy";
-	final String RT_REPOSITORY_NAME = "dummy";
-	final String RT_REPOSITORY_PWD = "dummy";
-	final String ACTION_LOG_NAME = "dummy";
-	final String ACTION_LOG_PWD = "dummy";
-	final String TELEOPERATION_NAME = "dummy";
-	final String TELEOPERATION_PWD = "dummy";
-	final String EXPERIMENT_NAME = "dummy";
-	final String EXPERIMENT_PWD = "dummy";
-	final String LIFERAY_NAME = "dummy";
-	final String LIFERAY_PWD = "dummy";
-	final String IMAGE_REPOSITORY_NAME = "dummy";
-	final String IMAGE_REPOSITORY_PWD = "dummy";
+	private String ADMIN_ROLE = "ADM";
+	private String REGULAR_ROLE = "REG";
+	private String OWNER_ROLE = "OWN";
+	private String WS_ROLE = "WS";
+	private String IMAGE_REPOSITORY_NAME;
+	private String IMAGE_REPOSITORY_PWD;
+	private String ADMIN_NAME;
+	private String ADMIN_PWD;
+	private String USER_REPOSITORY_NAME;
+	private String USER_REPOSITORY_PWD;
+	private String RT_REPOSITORY_NAME;
+	private String RT_REPOSITORY_PWD;
+	private String ACTION_LOG_NAME;
+	private String ACTION_LOG_PWD;
+	private String TELEOPERATION_NAME;
+	private String TELEOPERATION_PWD;
+	private String EXPERIMENT_NAME;
+	private String EXPERIMENT_PWD;
 	private UserDBService userService;
 
 	public UserRepositoryAdapter() {
 
 	}
-
+	
+	public void setImageRepositoryUsername(String user) {
+		this.IMAGE_REPOSITORY_NAME = user;
+	}
+	
+	public void setImageRepositoryPassword(String pass) {
+		this.IMAGE_REPOSITORY_PWD = pass;
+	}
+	
+	public void setRTRepositoryUsername(String user) {
+		this.RT_REPOSITORY_NAME = user;
+	}
+	
+	public void setRTRepositoryPassword(String pass) {
+		this.RT_REPOSITORY_PWD = pass;
+	}
+	
+	public void setUserRepositoryUsername(String user) {
+		this.USER_REPOSITORY_NAME = user;
+	}
+	
+	public void setUserRepositoryPassword(String pass) {
+		this.USER_REPOSITORY_PWD = pass;
+	}
+	
+	public void setExperimentUsername(String user) {
+		this.EXPERIMENT_NAME = user;
+	}
+	
+	public void setExperimentPassword(String pass) {
+		this.EXPERIMENT_PWD = pass;
+	}
+	
+	public void setTeleoperationUsername(String user) {
+		this.TELEOPERATION_NAME = user;
+	}
+	
+	public void setTeleoperationPassword(String pass) {
+		this.TELEOPERATION_PWD = pass;
+	}
+	
+	public void setActionLogUsername(String user) {
+		this.ACTION_LOG_NAME = user;
+	}
+	
+	public void setActionLogPassword(String pass) {
+		this.ACTION_LOG_PWD = pass;
+	}
+	
+	public void setAdminUsername(String user) {
+		this.ADMIN_NAME = user;
+	}
+	
+	public void setAdminPassword(String pass) {
+		this.ADMIN_PWD = pass;
+	}
+	
 	public void setUserDBService(UserDBService service) {
 		this.userService = service;
 	}
@@ -70,7 +124,6 @@ public class UserRepositoryAdapter {
 		this.createUser(EXPERIMENT_NAME, EXPERIMENT_PWD, UserRole.WEB_SERVICE);
 		this.createUser(IMAGE_REPOSITORY_NAME, IMAGE_REPOSITORY_PWD,
 				UserRole.WEB_SERVICE);
-		this.createUser(LIFERAY_NAME, LIFERAY_PWD, UserRole.ADMIN);
 	}
 
 	public void create(String name) throws UserRepositoryAdapterException {
