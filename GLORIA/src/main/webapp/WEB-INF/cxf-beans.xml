@@ -11,6 +11,7 @@
 	<import resource="classpath*:actionlogbeans.xml" />
 	<import resource="classpath*:imagebeans.xml" />
 	<import resource="classpath*:wsclientbeans.xml" />
+	<import resource="classpath*:credentialbeans.xml" />
 
 	<jaxws:endpoint xmlns:tns="http://action.log.services.gs.gloria.eu/"
 		id="actionlog" endpointName="tns:ActionLogPort" serviceName="tns:ActionLogService"
@@ -18,8 +19,8 @@
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.log.action.ActionLog">
 				<property name="adapter" ref="actionLogAdapter"></property>
-				<property name="username" value="user"></property>
-				<property name="password" value="password"></property>
+				<property name="username" ref="actionLogUsername"></property>
+				<property name="password" ref="actionLogPassword"></property>
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
@@ -41,8 +42,8 @@
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.user.UserRepository">
 				<property name="adapter" ref="userAdapter"></property>
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="userRepositoryUsername"></property>
+				<property name="password" ref="userRepositoryPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 			</bean>
 		</jaxws:implementor>
@@ -78,8 +79,8 @@
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.rt.RTRepository">
 				<property name="adapter" ref="rtAdapter"></property>
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="rtRepositoryUsername"></property>
+				<property name="password" ref="rtRepositoryPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 			</bean>
 		</jaxws:implementor>
@@ -102,8 +103,8 @@
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.image.ImageRepository">
 				<property name="adapter" ref="imageAdapter"></property>
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="imageRepositoryUsername"></property>
+				<property name="password" ref="imageRepositoryPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 			</bean>
 		</jaxws:implementor>
@@ -126,8 +127,8 @@
 		<property name="adapter" ref="imageAdapter"></property>
 		<property name="CCDTeleoperation" ref="ccdTeleoperation"></property>
 		<property name="actionLog" ref="actionLog"></property>
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="imageRepositoryUsername"></property>
+		<property name="password" ref="imageRepositoryPassword"></property>
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://online.experiment.services.gs.gloria.eu/"
@@ -139,9 +140,10 @@
 				<property name="booker" ref="experimentBooker"></property>
 				<property name="contextManager" ref="contextManager"></property>
 				<property name="modelManager" ref="modelManager"></property>
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="experimentUsername"></property>
+				<property name="password" ref="experimentPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
+				<property name="userRepository" ref="userRepository"></property>
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
@@ -159,12 +161,13 @@
 
 	<bean id="experimentExecutor"
 		class="eu.gloria.gs.services.experiment.online.ExperimentExecutor"
-		scope="singleton">
+		scope="singleton" lazy-init="true">
 		<property name="adapter" ref="experimentAdapter"></property>
 		<property name="contextManager" ref="contextManager"></property>
 		<property name="actionLog" ref="actionLog"></property>
-		<property name="username" value="password"></property>
-		<property name="password" value="user"></property>
+		<property name="genericTeleoperation" ref="genericTeleoperation"></property>
+		<property name="username" ref="experimentUsername"></property>
+		<property name="password" ref="experimentPassword"></property>
 	</bean>
 
 	<bean id="serverResolver" class="eu.gloria.gs.services.teleoperation.rts.RTSResolver"
@@ -177,8 +180,8 @@
 		serviceName="tns:SCamTeleoperationService" address="/SCamTeleoperationPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperation">
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 				<property name="serverResolver" ref="serverResolver"></property>
 			</bean>
@@ -201,8 +204,8 @@
 		serviceName="tns:MountTeleoperationService" address="/MountTeleoperationPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.mount.MountTeleoperation">
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 				<property name="serverResolver" ref="serverResolver"></property>
 			</bean>
@@ -225,8 +228,8 @@
 		serviceName="tns:DomeTeleoperationService" address="/DomeTeleoperationPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperation">
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 				<property name="serverResolver" ref="serverResolver"></property>
 			</bean>
@@ -250,8 +253,8 @@
 	</bean>
 
 	<bean id="teleoperationPasswordHandler" parent="userDependantPasswordHandler">
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="teleoperationUsername"></property>
+		<property name="password" ref="teleoperationPassword"></property>
 		<property name="grantedRoles">
 			<list value-type="eu.gloria.gs.services.repository.user.data.UserRole">
 				<value>ADMIN</value>
@@ -261,13 +264,13 @@
 	</bean>
 
 	<bean id="experimentPasswordHandler" parent="userDependantPasswordHandler">
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="experimentUsername"></property>
+		<property name="password" ref="experimentPassword"></property>
 	</bean>
 
 	<bean id="actionLogPasswordHandler" parent="userDependantPasswordHandler">
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="actionLogUsername"></property>
+		<property name="password" ref="actionLogPassword"></property>
 		<property name="grantedRoles">
 			<list value-type="eu.gloria.gs.services.repository.user.data.UserRole">
 				<value>ADMIN</value>
@@ -277,8 +280,8 @@
 	</bean>
 
 	<bean id="rtRepositoryPasswordHandler" parent="userDependantPasswordHandler">
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="rtRepositoryUsername"></property>
+		<property name="password" ref="rtRepositoryPassword"></property>
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://ccd.teleoperation.services.gs.gloria.eu/"
@@ -286,8 +289,8 @@
 		serviceName="tns:CCDTeleoperationService" address="/CCDTeleoperationPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperation">
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 				<property name="serverResolver" ref="serverResolver"></property>
 				<property name="imageRepository" ref="imageRepository"></property>
@@ -312,8 +315,33 @@
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperation">
-				<property name="password" value="password"></property>
-				<property name="username" value="user"></property>
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
+				<property name="actionLog" ref="actionLog"></property>
+				<property name="serverResolver" ref="serverResolver"></property>
+			</bean>
+		</jaxws:implementor>
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean
+				class="eu.gloria.gs.services.core.security.server.user.UserServerInterceptor">
+				<property name="passwordHandler">
+					<ref bean="teleoperationPasswordHandler"></ref>
+				</property>
+			</bean>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint xmlns:tns="http://generic.teleoperation.services.gs.gloria.eu/"
+		id="genericteleoperation" endpointName="tns:CCDTeleoperationPort"
+		serviceName="tns:GenericTeleoperationService" address="/GenericTeleoperationPort">
+		<jaxws:implementor>
+			<bean
+				class="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperation">
+				<property name="username" ref="teleoperationUsername"></property>
+				<property name="password" ref="teleoperationPassword"></property>
 				<property name="actionLog" ref="actionLog"></property>
 				<property name="serverResolver" ref="serverResolver"></property>
 			</bean>
