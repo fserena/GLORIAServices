@@ -7,11 +7,13 @@
 	<import resource="classpath*:parameterbeans.xml" />
 	<import resource="classpath*:operationbeans.xml" />
 	<import resource="classpath*:featurebeans.xml" />
+	<import resource="classpath*:credentialbeans.xml" />
+	
 
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:comp/env/jdbc/gloriaDB" />
 	</bean>
-
+	
 	<bean id="sqlExperimentSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
@@ -95,8 +97,8 @@
 		class="eu.gloria.gs.services.experiment.base.models.ExperimentContextService"
 		abstract="true">
 		<property name="adapter" ref="experimentAdapter"></property>
-		<property name="username" value="user"></property>
-		<property name="password" value="password"></property>
+		<property name="username" ref="experimentUsername"></property>
+		<property name="password" ref="experimentPassword"></property>
 		<property name="RTRepository" ref="rtRepository"></property>
 		<property name="userRepository" ref="userRepository"></property>
 		<property name="CCDTeleoperation" ref="ccdTeleoperation"></property>
