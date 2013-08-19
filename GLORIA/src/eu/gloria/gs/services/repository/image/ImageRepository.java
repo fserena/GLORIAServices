@@ -7,9 +7,9 @@ import javax.jws.WebParam;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.log.action.ActionLogException;
+import eu.gloria.gs.services.repository.image.data.ImageDatabaseException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter;
-import eu.gloria.gs.services.repository.image.data.dbservices.ImageRepositoryAdapterException;
 
 public class ImageRepository extends GSLogProducerService implements
 		ImageRepositoryInterface {
@@ -40,7 +40,7 @@ public class ImageRepository extends GSLogProducerService implements
 				e.printStackTrace();
 			}
 
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -64,7 +64,7 @@ public class ImageRepository extends GSLogProducerService implements
 				e.printStackTrace();
 			}
 
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -90,7 +90,7 @@ public class ImageRepository extends GSLogProducerService implements
 				e.printStackTrace();
 			}
 
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -106,7 +106,7 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		try {
 			return this.adapter.getImageInformation(id);
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -178,7 +178,7 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		try {
 			this.adapter.setExperimentReservationByUrl(url, rid);
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -196,7 +196,7 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		try {
 			this.adapter.setUserByUrl(url, user);
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -213,7 +213,7 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "url") String url) throws ImageRepositoryException {
 		try {
 			this.adapter.setUrlByRT(rt, localid, url);
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -238,7 +238,7 @@ public class ImageRepository extends GSLogProducerService implements
 				e.printStackTrace();
 			}
 
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}
@@ -255,7 +255,7 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		try {
 			return this.adapter.getImageInformationByRTLocalId(rt, lid);
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getMessage());
 		}
 	}

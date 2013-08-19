@@ -9,9 +9,9 @@ import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.core.tasks.ServerThread;
 import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.log.action.ActionLogInterface;
+import eu.gloria.gs.services.repository.image.data.ImageDatabaseException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter;
-import eu.gloria.gs.services.repository.image.data.dbservices.ImageRepositoryAdapterException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
@@ -81,7 +81,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				}
 			}
 
-		} catch (ImageRepositoryAdapterException e) {
+		} catch (ImageDatabaseException e) {
 			try {
 				alog.registerAction(username, new Date(), e.getMessage());
 			} catch (ActionLogException ei) {
@@ -132,7 +132,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 								System.out.println(el.getMessage());
 							}
 
-						} catch (ImageRepositoryAdapterException e1) {
+						} catch (ImageDatabaseException e1) {
 							e1.printStackTrace();
 						}
 						
@@ -170,7 +170,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 						System.out.println(el.getMessage());
 					}
 
-				} catch (ImageRepositoryAdapterException e1) {
+				} catch (ImageDatabaseException e1) {
 					e1.printStackTrace();
 				}
 
@@ -192,7 +192,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 						System.out.println(el.getMessage());
 					}
 
-				} catch (ImageRepositoryAdapterException e1) {
+				} catch (ImageDatabaseException e1) {
 					e1.printStackTrace();
 				}
 			}
