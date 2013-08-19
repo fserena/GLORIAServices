@@ -3,6 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+	<import resource="classpath*:credentialbeans.xml" />
+
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:comp/env/jdbc/gloriaDB" />
 	</bean>
@@ -20,6 +22,19 @@
 	<bean id="userAdapter"
 		class="eu.gloria.gs.services.repository.user.data.UserRepositoryAdapter">
 		<property name="userDBService" ref="userMapper"></property>
+		<property name="ImageRepositoryUsername" ref="imageRepositoryUsername"></property>
+		<property name="ImageRepositoryPassword" ref="imageRepositoryPassword"></property>
+		<property name="RTRepositoryUsername" ref="rtRepositoryUsername"></property>
+		<property name="rtRepositoryPassword" ref="rtRepositoryPassword"></property>
+		<property name="UserRepositoryUsername" ref="userRepositoryUsername"></property>
+		<property name="UserRepositoryPassword" ref="userRepositoryPassword"></property>
+		<property name="ActionLogUsername" ref="actionLogUsername"></property>
+		<property name="ActionLogPassword" ref="actionLogPassword"></property>
+		<property name="ExperimentUsername" ref="experimentUsername"></property>
+		<property name="ExperimentPassword" ref="experimentPassword"></property>
+		<property name="TeleoperationUsername" ref="teleoperationUsername"></property>
+		<property name="TeleoperationPassword" ref="teleoperationPassword"></property>
+		<property name="AdminUsername" ref="adminUsername"></property>
+		<property name="AdminPassword" ref="adminPassword"></property>
 	</bean>
-
 </beans>
