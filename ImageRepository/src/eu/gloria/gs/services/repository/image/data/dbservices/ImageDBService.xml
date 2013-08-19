@@ -6,7 +6,7 @@
 	namespace="eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService">
 
 	<update id="create">
-		CREATE TABLE IF NOT EXISTS `gloria_services`.`image`
+		CREATE TABLE IF NOT EXISTS `image`
 		(
 		`idimage` int(11) NOT NULL AUTO_INCREMENT,
 		`rt` varchar(50) NOT NULL,
@@ -26,14 +26,14 @@
 		(`rid`),
 		KEY `fk_image_ccd` (`ccd`),
 		CONSTRAINT `fk_image_rid` FOREIGN
-		KEY (`rid`) REFERENCES `gloria_services`.`reservation`
+		KEY (`rid`) REFERENCES `reservation`
 		(`idreservation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 		CONSTRAINT
-		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `gloria_services`.`rt`
+		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `rt`
 		(`name`) ON DELETE
 		CASCADE ON UPDATE CASCADE,
 		CONSTRAINT `fk_image_user`
-		FOREIGN KEY (`user`) REFERENCES `gloria_services`.`user` (`name`) ON
+		FOREIGN KEY (`user`) REFERENCES `user` (`name`) ON
 		DELETE NO ACTION ON UPDATE NO ACTION
 		) ENGINE=InnoDB DEFAULT
 		CHARSET=utf8
@@ -42,7 +42,7 @@
 	<select id="get"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		idimage=#{id_}
 	</select>
@@ -50,7 +50,7 @@
 	<select id="getByUser"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		user=#{user_}
 	</select>
@@ -58,7 +58,7 @@
 	<select id="getByUrl"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		url=#{url_}
 	</select>
@@ -66,7 +66,7 @@
 	<select id="getByRT"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		rt=#{rt_}
 	</select>
@@ -74,7 +74,7 @@
 	<select id="getByRTLocalId"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		rt=#{rt_} AND
 		local_id=#{lid_}
@@ -83,7 +83,7 @@
 	<select id="getByReservation"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		rid=#{rid_}
 	</select>
@@ -91,7 +91,7 @@
 	<select id="getAllBetweenDates"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE date &gt;=
 		#{from_}
 		AND date &lt;=#{to_}
@@ -100,26 +100,26 @@
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		INSERT INTO
-		`gloria_services`.`image`
+		`image`
 		(rt, user, date,
 		local_id, ccd)
 		VALUE ( #{rt}, #{user}, #{date}, #{local_id}, #{ccd})
 	</insert>
 	
 	<delete id="remove">
-		DELETE FROM `gloria_services`.`image`
+		DELETE FROM `image`
 		WHERE
 		idimage=#{id_}
 	</delete>
 
 	<!-- <delete id="removeByUser">
-		DELETE FROM `gloria_services`.`image`
+		DELETE FROM `image`
 		WHERE
 		user=#{user_}
 	</delete>-->
 
 	<update id="setUser">
-		UPDATE `gloria_services`.`image`
+		UPDATE `image`
 		SET
 		user=#{user_}
 		WHERE idimage
@@ -127,7 +127,7 @@
 	</update>
 
 	<update id="setReservation">
-		UPDATE `gloria_services`.`image`
+		UPDATE `image`
 		SET
 		rid=#{rid_}
 		WHERE
@@ -136,7 +136,7 @@
 	</update>
 
 	<update id="setUrl">
-		UPDATE `gloria_services`.`image`
+		UPDATE `image`
 		SET
 		url=#{url_}
 		WHERE
@@ -145,7 +145,7 @@
 	</update>
 
 	<update id="setUrlByRTLocalId">
-		UPDATE `gloria_services`.`image`
+		UPDATE `image`
 		SET
 		url=#{url_}
 		WHERE
@@ -154,21 +154,21 @@
 
 	<select id="contains" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		idimage=#{id_}
 	</select>
 
 	<select id="containsUrl" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		url=#{url_}
 	</select>
 
 	<select id="containsRTLocalId" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		rt=#{rt_} AND local_id=#{lid_}
 	</select>
@@ -176,7 +176,7 @@
 	<select id="getAllWithoutUrl"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
-		`gloria_services`.`image`
+		`image`
 		WHERE
 		url IS NULL
 	</select>

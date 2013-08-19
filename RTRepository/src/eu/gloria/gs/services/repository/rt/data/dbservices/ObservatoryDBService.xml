@@ -7,7 +7,7 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`observatory` (
+		`observatory` (
 		`oid`
 		int(11) NOT NULL AUTO_INCREMENT,
 		`city` varchar(50) CHARACTER SET
@@ -26,7 +26,7 @@
 	<select id="getByName"
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
 		SELECT * FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
@@ -34,14 +34,14 @@
 	<select id="getById"
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
 		SELECT * FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		oid=#{oid_}
 	</select>
 
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryEntry">
-		INSERT INTO `gloria_services`.`observatory`
+		INSERT INTO `observatory`
 		(name,
 		city,
 		country)
@@ -50,28 +50,28 @@
 
 	<delete id="remove" parameterType="string">
 		DELETE FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</delete>
 
 	<select id="getCity" resultType="string">
 		SELECT city FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getCountry" resultType="string">
 		SELECT country FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getVisibilityRatio" resultType="double">
 		SELECT ratio FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
@@ -79,13 +79,13 @@
 	<select id="getLightPollution" resultType="double">
 		SELECT light_pollution
 		FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setCity">
-		UPDATE `gloria_services`.`observatory`
+		UPDATE `observatory`
 		SET city=
 		#{city_}
 		WHERE name
@@ -93,7 +93,7 @@
 	</update>
 
 	<update id="setCountry">
-		UPDATE `gloria_services`.`observatory`
+		UPDATE `observatory`
 		SET country=
 		#{country_}
 		WHERE
@@ -102,7 +102,7 @@
 	</update>
 
 	<update id="setVisibilityRatio">
-		UPDATE `gloria_services`.`observatory`
+		UPDATE `observatory`
 		SET ratio=
 		#{ratio_}
 		WHERE name
@@ -110,7 +110,7 @@
 	</update>
 
 	<update id="setLightPollution">
-		UPDATE `gloria_services`.`observatory`
+		UPDATE `observatory`
 		SET
 		light_pollution= #{light_}
 		WHERE name
@@ -119,7 +119,7 @@
 
 	<select id="contains" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`observatory`
+		`observatory`
 		WHERE
 		name=#{name_}
 	</select>
@@ -127,7 +127,7 @@
 	<select id="getAllNames" resultType="string">
 		SELECT name
 		FROM
-		`gloria_services`.`observatory`
+		`observatory`
 	</select>
 
 </mapper>

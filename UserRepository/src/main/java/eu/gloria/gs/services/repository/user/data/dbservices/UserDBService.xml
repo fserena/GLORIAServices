@@ -6,7 +6,7 @@
 	namespace="eu.gloria.gs.services.repository.user.data.dbservices.UserDBService">
 
 	<update id="create">
-		CREATE TABLE IF NOT EXISTS `gloria_services`.`user` (
+		CREATE TABLE IF NOT EXISTS `user` (
 		`name` varchar(40) NOT NULL,
 		`password` varchar(45) DEFAULT NULL,
 		`roles` varchar(20) NOT NULL,
@@ -20,7 +20,7 @@
 	<select id="get"
 		resultType="eu.gloria.gs.services.repository.user.data.dbservices.UserEntry">
 		SELECT * FROM
-		`gloria_services`.`user`
+		`user`
 		WHERE
 		name=#{name_}
 	</select>
@@ -28,7 +28,7 @@
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.user.data.dbservices.UserEntry">
 		INSERT INTO
-		`gloria_services`.`user`
+		`user`
 		(name,
 		password,
 		roles)
@@ -37,27 +37,27 @@
 	</insert>
 
 	<delete id="remove">
-		DELETE FROM `gloria_services`.`user`
+		DELETE FROM `user`
 		WHERE
 		name=#{name_}
 	</delete>
 
 	<select id="contains" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`user`
+		`user`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getPassword" resultType="string">
 		SELECT password FROM
-		`gloria_services`.`user`
+		`user`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setPassword">
-		UPDATE `gloria_services`.`user`
+		UPDATE `user`
 		SET password=
 		#{password_}
 		WHERE name
@@ -66,13 +66,13 @@
 
 	<select id="getRoles" resultType="string">
 		SELECT roles FROM
-		`gloria_services`.`user`
+		`user`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setRoles">
-		UPDATE `gloria_services`.`user`
+		UPDATE `user`
 		SET roles= #{roles_}
 		WHERE name
 		=#{name_}

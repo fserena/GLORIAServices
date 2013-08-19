@@ -6,7 +6,7 @@
 	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.RTDBService">
 
 	<update id="create">
-		CREATE TABLE IF NOT EXISTS `gloria_services`.`rt` (
+		CREATE TABLE IF NOT EXISTS `rt` (
 		`name`
 		varchar(50) NOT NULL,
 		`description` varchar(100) DEFAULT NULL,
@@ -27,7 +27,7 @@
 		PRIMARY KEY (`name`),
 		KEY `oid` (`oid`),
 		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES
-		`gloria_services`.`observatory` (`oid`) ON DELETE
+		`observatory` (`oid`) ON DELETE
 		CASCADE ON UPDATE
 		CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED
@@ -36,7 +36,7 @@
 	<select id="get"
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTEntry">
 		SELECT * FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
@@ -44,7 +44,7 @@
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.RTEntry">
 		INSERT INTO
-		`gloria_services`.`rt`
+		`rt`
 		(name,
 		owner, url, user,
 		password)
@@ -54,27 +54,27 @@
 	</insert>
 
 	<delete id="remove">
-		DELETE FROM `gloria_services`.`rt`
+		DELETE FROM `rt`
 		WHERE
 		name=#{name_}
 	</delete>
 
 	<select id="contains" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getOwner" resultType="string">
 		SELECT owner FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setDescription">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET description=
 		#{description_}
 		WHERE name
@@ -83,13 +83,13 @@
 
 	<select id="getDescription" resultType="string">
 		SELECT description FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setPublicKey">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET public_key= #{pk_}
 		WHERE name
 		=#{name_}
@@ -97,13 +97,13 @@
 
 	<select id="getPublicKey" resultType="string">
 		SELECT public_key FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setCoordinates">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET latitude= #{lat_},
 		longitude= #{long_}
 		WHERE name
@@ -112,7 +112,7 @@
 
 	<select id="getLatitude" resultType="double">
 		SELECT latitude FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
@@ -121,20 +121,20 @@
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.RTAvailabilityEntry">
 		SELECT
 		starting_avl,ending_avl FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setStartingAvailability">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET starting_avl=
 		#{starting_}
 		WHERE name=#{name_}
 	</update>
 
 	<update id="setEndingAvailability">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET ending_avl=
 		#{ending_}
 		WHERE name=#{name_}
@@ -142,20 +142,20 @@
 
 	<select id="getLongitude" resultType="double">
 		SELECT longitude FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getObservatory" resultType="int">
 		SELECT oid FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<update id="setObservatory">
-		UPDATE `gloria_services`.`rt`
+		UPDATE `rt`
 		SET oid= #{oid_}
 		WHERE
 		name
@@ -164,7 +164,7 @@
 
 	<select id="getByObservatoryId" resultType="string">
 		SELECT name FROM
-		`gloria_services`.`rt`
+		`rt`
 		WHERE
 		oid=#{oid_}
 	</select>

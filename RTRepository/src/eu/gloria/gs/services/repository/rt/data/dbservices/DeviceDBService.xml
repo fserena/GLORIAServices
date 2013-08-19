@@ -6,7 +6,7 @@
 	namespace="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceDBService">
 
 	<update id="create">
-		CREATE TABLE IF NOT EXISTS `gloria_services`.`device`
+		CREATE TABLE IF NOT EXISTS `device`
 		(
 		`did` int(11)
 		NOT NULL AUTO_INCREMENT,
@@ -21,7 +21,7 @@
 
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
-		INSERT INTO `gloria_services`.`device`
+		INSERT INTO `device`
 		(type,
 		model)
 		VALUE
@@ -30,7 +30,7 @@
 
 	<select id="get"
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
-		SELECT * FROM `gloria_services`.`device`
+		SELECT * FROM `device`
 		WHERE
 		type=#{type_}
 		AND model=#{model_}
@@ -38,20 +38,20 @@
 
 	<select id="getById"
 		resultType="eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry">
-		SELECT * FROM `gloria_services`.`device`
+		SELECT * FROM `device`
 		WHERE
 		did=#{did_}
 	</select>
 
 	<select id="contains" resultType="boolean">
 		SELECT count(*)>0 FROM
-		`gloria_services`.`device`
+		`device`
 		WHERE
 		type=#{type_} AND model=#{model_}
 	</select>
 
 	<delete id="remove">
-		DELETE FROM `gloria_services`.`device`
+		DELETE FROM `device`
 		WHERE
 		type=#{type_} AND
 		model=#{model_}
@@ -59,25 +59,25 @@
 
 	<select id="getModels" resultType="string">
 		SELECT model FROM
-		`gloria_services`.`device`
+		`device`
 		WHERE
 		type=#{type_}
 	</select>
 
 	<select id="getTypes" resultType="string">
 		SELECT type FROM
-		`gloria_services`.`device`
+		`device`
 	</select>
 
 	<select id="getDescription" resultType="string">
 		SELECT description FROM
-		`gloria_services`.`device`
+		`device`
 		WHERE
 		type=#{type_} AND model=#{model_}
 	</select>
 
 	<update id="setDescription">
-		UPDATE `gloria_services`.`device`
+		UPDATE `device`
 		SET description=
 		#{desc_}
 		WHERE

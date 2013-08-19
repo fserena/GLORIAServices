@@ -7,7 +7,7 @@
 
 	<update id="createExperimentTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment` (
+		`experiment` (
 		`idexperiment` int(11) NOT NULL
 		AUTO_INCREMENT,
 		`name` varchar(100) NOT
@@ -25,7 +25,7 @@
 		CONSTRAINT
 		`author_fk` FOREIGN KEY
 		(`author`) REFERENCES
-		`gloria_services`.`user` (`name`) ON
+		`user` (`name`) ON
 		DELETE NO
 		ACTION ON UPDATE NO
 		ACTION
@@ -34,7 +34,7 @@
 
 	<update id="createReservationTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`reservation` (
+		`reservation` (
 		`idreservation` int(11) NOT NULL
 		AUTO_INCREMENT,
 		`user` varchar(40) NOT NULL,
@@ -50,10 +50,10 @@
 		KEY `experiment_res_fk` (`experiment`),
 		CONSTRAINT
 		`experiment_res_fk` FOREIGN KEY (`experiment`) REFERENCES
-		`gloria_services`.`experiment` (`idexperiment`) ON DELETE CASCADE ON
+		`experiment` (`idexperiment`) ON DELETE CASCADE ON
 		UPDATE CASCADE,
 		CONSTRAINT `user_res_fk` FOREIGN KEY (`user`)
-		REFERENCES `gloria_services`.`user`
+		REFERENCES `user`
 		(`name`) ON DELETE CASCADE ON
 		UPDATE CASCADE
 		) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8
@@ -61,7 +61,7 @@
 
 	<update id="createRTReservationTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`rt_reservation` (
+		`rt_reservation` (
 		`reservation_id` int(11) NOT NULL,
 		`rt_name` varchar(50) NOT NULL,
 		PRIMARY KEY
@@ -70,12 +70,12 @@
 		(`reservation_id`),
 		KEY `rt_id_fk` (`rt_name`),
 		CONSTRAINT `rt_id_fk`
-		FOREIGN KEY (`rt_name`) REFERENCES `gloria_services`.`rt` (`name`) ON
+		FOREIGN KEY (`rt_name`) REFERENCES `rt` (`name`) ON
 		DELETE
 		CASCADE ON UPDATE CASCADE,
 		CONSTRAINT `reservation_id_fk` FOREIGN
 		KEY (`reservation_id`) REFERENCES
-		`gloria_services`.`reservation`
+		`reservation`
 		(`idreservation`) ON DELETE CASCADE ON UPDATE CASCADE
 		) ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
@@ -83,7 +83,7 @@
 
 	<update id="createExperimentParameterTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_parameter` (
+		`experiment_parameter` (
 		`experiment` int(11) NOT
 		NULL,
 		`parameter` varchar(45) CHARACTER SET utf8 NOT NULL,
@@ -100,7 +100,7 @@
 		`param_experiment_fk`
 		FOREIGN KEY
 		(`experiment`) REFERENCES
-		`gloria_services`.`experiment`
+		`experiment`
 		(`idexperiment`) ON DELETE CASCADE ON
 		UPDATE CASCADE
 		) ENGINE=InnoDB
@@ -109,7 +109,7 @@
 
 	<update id="createExperimentOperationTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_operation` (
+		`experiment_operation` (
 		`experiment` int(11) NOT
 		NULL,
 		`operation` varchar(45) NOT NULL,
@@ -124,7 +124,7 @@
 		CONSTRAINT
 		`op_experiment_fk` FOREIGN KEY
 		(`experiment`) REFERENCES
-		`gloria_services`.`experiment`
+		`experiment`
 		(`idexperiment`) ON DELETE
 		CASCADE ON
 		UPDATE CASCADE
@@ -134,7 +134,7 @@
 
 	<update id="createExperimentArgumentTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_argument` (
+		`experiment_argument` (
 		`operation` int(11) NOT NULL,
 		`parameter` int(11) NOT NULL,
 		`number` int(11) NOT NULL,
@@ -145,12 +145,12 @@
 		KEY `args_operation_fk` (`operation`),
 		CONSTRAINT
 		`args_operation_fk` FOREIGN KEY (`operation`) REFERENCES
-		`gloria_services`.`experiment_operation` (`idoperation`) ON DELETE
+		`experiment_operation` (`idoperation`) ON DELETE
 		CASCADE ON UPDATE
 		CASCADE,
 		CONSTRAINT `args_parameter_fk` FOREIGN KEY
 		(`parameter`) REFERENCES
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		(`idparameter`) ON DELETE CASCADE ON UPDATE
 		CASCADE
 		) ENGINE=InnoDB
@@ -159,7 +159,7 @@
 
 	<update id="createExperimentContextTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_context` (
+		`experiment_context` (
 		`pid` int(11) NOT NULL,
 		`rid`
 		int(11) NOT NULL,
@@ -174,14 +174,14 @@
 		CONSTRAINT `context_parameter_fk`
 		FOREIGN KEY
 		(`pid`) REFERENCES
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		(`idparameter`) ON DELETE
 		CASCADE ON UPDATE
 		CASCADE,
 		CONSTRAINT
 		`context_reservation_fk` FOREIGN
 		KEY (`rid`) REFERENCES
-		`gloria_services`.`reservation`
+		`reservation`
 		(`idreservation`) ON DELETE CASCADE ON
 		UPDATE CASCADE
 		) ENGINE=InnoDB
@@ -190,7 +190,7 @@
 
 	<update id="createExperimentResultsTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_results` (
+		`experiment_results` (
 		`idresult` int(11) NOT NULL
 		AUTO_INCREMENT,
 		`value` varchar(200) NOT NULL,
@@ -201,7 +201,7 @@
 
 	<update id="createExperimentResultsRelationTable">
 		CREATE TABLE IF NOT EXISTS
-		`gloria_services`.`experiment_result_relation` (
+		`experiment_result_relation` (
 		`experiment` int(11)
 		NOT NULL,
 		`user` varchar(45) NOT NULL,
@@ -219,20 +219,20 @@
 		KEY `result_result_fk_idx` (`result`),
 		CONSTRAINT
 		`result_result_fk` FOREIGN KEY (`result`) REFERENCES
-		`gloria_services`.`experiment_results` (`idresult`) ON DELETE CASCADE
+		`experiment_results` (`idresult`) ON DELETE CASCADE
 		ON UPDATE CASCADE,
 		CONSTRAINT `experiment_result_fk` FOREIGN KEY
 		(`experiment`)
-		REFERENCES `gloria_services`.`experiment`
+		REFERENCES `experiment`
 		(`idexperiment`) ON DELETE CASCADE ON UPDATE
 		CASCADE,
 		CONSTRAINT
 		`reservation_result_fk` FOREIGN KEY (`reservation`) REFERENCES
-		`gloria_services`.`reservation` (`idreservation`) ON DELETE CASCADE ON
+		`reservation` (`idreservation`) ON DELETE CASCADE ON
 		UPDATE CASCADE,
 		CONSTRAINT `user_result_fk` FOREIGN KEY (`user`)
 		REFERENCES
-		`gloria_services`.`reservation` (`user`) ON DELETE CASCADE
+		`reservation` (`user`) ON DELETE CASCADE
 		ON UPDATE CASCADE
 		)
 		ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -241,7 +241,7 @@
 	<select id="getExperimentParameter"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		WHERE
 		experiment=#{experiment_} AND parameter=#{parameter_}
 	</select>
@@ -249,7 +249,7 @@
 	<select id="getParameterById"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		WHERE
 		idparameter=#{pid_}
 	</select>
@@ -257,7 +257,7 @@
 	<insert id="saveExperimentParameter"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
 		INSERT INTO
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		(experiment, parameter, type)
 		VALUE (
 		#{experiment}, #{parameter},
@@ -267,7 +267,7 @@
 	<select id="getAllExperimentParameters"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		WHERE
 		experiment=#{experiment_}
 	</select>
@@ -275,7 +275,7 @@
 	<select id="getExperimentOperation"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.OperationEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_operation`
+		`experiment_operation`
 		WHERE
 		experiment=#{experiment_} AND operation=#{operation_}
 	</select>
@@ -283,7 +283,7 @@
 	<insert id="saveExperimentOperation"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.OperationEntry">
 		INSERT INTO
-		`gloria_services`.`experiment_operation`
+		`experiment_operation`
 		(experiment, operation,
 		type)
 		VALUE (
@@ -294,7 +294,7 @@
 	<select id="getAllExperimentOperations"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.OperationEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_operation`
+		`experiment_operation`
 		WHERE
 		experiment=#{experiment_}
 	</select>
@@ -302,7 +302,7 @@
 	<select id="getParameterContext"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ContextEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment_context`
+		`experiment_context`
 		WHERE
 		pid=#{pid_} AND
 		rid=#{rid_}
@@ -311,7 +311,7 @@
 	<insert id="saveParameterContext"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ContextEntry">
 		INSERT INTO
-		`gloria_services`.`experiment_context`
+		`experiment_context`
 		(pid,
 		rid, value)
 		VALUE (
@@ -320,7 +320,7 @@
 	</insert>
 
 	<update id="setParameterContextValue">
-		UPDATE `gloria_services`.`experiment_context`
+		UPDATE `experiment_context`
 		SET
 		value=#{value_}
 		WHERE pid=#{pid_} AND rid=#{rid_}
@@ -328,7 +328,7 @@
 
 	<select id="getParameterContextValue" resultType="string">
 		SELECT value
-		FROM `gloria_services`.`experiment_context`
+		FROM `experiment_context`
 		WHERE pid=#{pid_} AND
 		rid=#{rid_}
 	</select>
@@ -337,9 +337,9 @@
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ContextEntry">
 		SELECT
 		pid,rid,value FROM
-		`gloria_services`.`experiment_parameter`
+		`experiment_parameter`
 		LEFT JOIN
-		`gloria_services`.`experiment_context`
+		`experiment_context`
 		ON
 		(experiment_context.pid =
 		experiment_parameter.idparameter)
@@ -351,7 +351,7 @@
 		SELECT
 		count(*) > 0
 		FROM
-		`gloria_services`.`experiment_context`
+		`experiment_context`
 		WHERE
 		rid=#{rid_}
 	</select>
@@ -360,7 +360,7 @@
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry">
 		SELECT *
 		FROM
-		`gloria_services`.`experiment_argument`
+		`experiment_argument`
 		WHERE
 		operation=#{opid_}
 	</select>
@@ -368,7 +368,7 @@
 	<insert id="saveOperationArgument"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry">
 		INSERT INTO
-		`gloria_services`.`experiment_argument`
+		`experiment_argument`
 		(operation, parameter, number)
 		VALUE (
 		#{operation}, #{parameter},
@@ -378,14 +378,14 @@
 	<select id="getExperiment"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment`
+		`experiment`
 		WHERE
 		name=#{name_}
 	</select>
 
 	<select id="getExperimentId" resultType="int">
 		SELECT idexperiment FROM
-		`gloria_services`.`experiment`
+		`experiment`
 		WHERE
 		name=#{name_}
 	</select>
@@ -393,21 +393,21 @@
 	<select id="getExperimentById"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentEntry">
 		SELECT * FROM
-		`gloria_services`.`experiment`
+		`experiment`
 		WHERE
 		idexperiment=#{idexperiment_}
 	</select>
 
 	<select id="getAllTypeExperiments" resultType="string">
 		SELECT name FROM
-		`gloria_services`.`experiment`
+		`experiment`
 		WHERE type=#{type_}
 	</select>
 
 	<insert id="saveExperiment"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentEntry">
 		INSERT INTO
-		`gloria_services`.`experiment`
+		`experiment`
 		(name, author,
 		description, type)
 		VALUE (
@@ -415,7 +415,7 @@
 	</insert>
 
 	<update id="setExperimentDescription">
-		UPDATE `gloria_services`.`experiment`
+		UPDATE `experiment`
 		SET
 		description=#{description_}
 		WHERE name
@@ -423,7 +423,7 @@
 	</update>
 
 	<delete id="removeExperiment">
-		DELETE FROM `gloria_services`.`experiment`
+		DELETE FROM `experiment`
 		WHERE
 		name=#{name_}
 	</delete>
@@ -431,7 +431,7 @@
 	<select id="containsExperiment" resultType="boolean">
 		SELECT count(*)>0
 		FROM
-		`gloria_services`.`experiment`
+		`experiment`
 		WHERE
 		name=#{name_}
 	</select>
@@ -439,7 +439,7 @@
 	<select id="getUserReservations"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} ORDER BY begin
 	</select>
@@ -447,7 +447,7 @@
 	<select id="getUserReservationById"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND
 		idreservation=#{rid_} ORDER BY begin
@@ -456,7 +456,7 @@
 	<select id="getAllReservationsFrom"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE begin
 		&gt;=#{from_} OR end &gt; #{from_} ORDER BY begin
 	</select>
@@ -464,7 +464,7 @@
 	<select id="getUserReservationsFrom"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND (begin
 		&gt;=#{from_} OR end &gt; #{from_}) ORDER BY
@@ -474,7 +474,7 @@
 	<select id="getReservation"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND
 		experiment=#{experiment_} AND begin=#{begin_} AND
@@ -484,7 +484,7 @@
 	<select id="getReservationById"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		idreservation=#{rid_}
 	</select>
@@ -492,7 +492,7 @@
 	<select id="containsReservation" resultType="boolean">
 		SELECT count(*)>0
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND
 		experiment=#{experiment_} AND begin=#{begin_} AND end=#{end_}
@@ -501,7 +501,7 @@
 	<select id="anyReservationAt" resultType="boolean">
 		SELECT count(*)>0
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE begin &lt;=
 		#{when_} AND end &gt;=
 		#{when_}
@@ -510,7 +510,7 @@
 	<select id="anyUserReservationAt" resultType="boolean">
 		SELECT count(*)>0
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND begin &lt;=
 		#{when_} AND end &gt;= #{when_}
@@ -520,7 +520,7 @@
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT *
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		user=#{user_} AND begin &lt;=
 		#{when_} AND end &gt;= #{when_}
@@ -530,7 +530,7 @@
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT *
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		begin &lt;=
 		#{when_} AND end &gt;=
@@ -541,7 +541,7 @@
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT *
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		WHERE
 		begin &lt;=
 		#{when_} AND end &lt;=
@@ -551,9 +551,9 @@
 	<select id="anyRTReservationBetween" resultType="boolean">
 		SELECT
 		count(*)>0
-		FROM `gloria_services`.`reservation`
+		FROM `reservation`
 		LEFT JOIN
-		`gloria_services`.`rt_reservation`
+		`rt_reservation`
 		ON (rt_reservation.reservation_id =
 		reservation.idreservation)
 		WHERE
@@ -569,9 +569,9 @@
 		SELECT
 		idreservation,user,experiment,begin,end
 		FROM
-		`gloria_services`.`reservation`
+		`reservation`
 		LEFT JOIN
-		`gloria_services`.`rt_reservation`
+		`rt_reservation`
 		ON (rt_reservation.reservation_id =
 		reservation.idreservation)
 		WHERE
@@ -583,7 +583,7 @@
 	<insert id="saveReservation"
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		INSERT INTO
-		`gloria_services`.`reservation`
+		`reservation`
 		(user,
 		experiment, begin, end)
 		VALUE (
@@ -593,7 +593,7 @@
 
 	<insert id="saveRTReservation">
 		INSERT INTO
-		`gloria_services`.`rt_reservation`
+		`rt_reservation`
 		(reservation_id, rt_name)
 		VALUE (
 		#{reservation_id_}, #{rt_name_})
@@ -602,19 +602,19 @@
 	<select id="getAllRTOfReservation" resultType="string">
 		SELECT rt_name
 		FROM
-		`gloria_services`.`rt_reservation`
+		`rt_reservation`
 		WHERE
 		reservation_id =#{rid_}
 	</select>
 
 	<delete id="removeReservation">
-		DELETE FROM `gloria_services`.`reservation`
+		DELETE FROM `reservation`
 		WHERE
 		idreservation=#{rid_}
 	</delete>
 
 	<delete id="removeReservationContext">
-		DELETE FROM `gloria_services`.`experiment_context`
+		DELETE FROM `experiment_context`
 		WHERE
 		rid=#{rid_}
 	</delete>
