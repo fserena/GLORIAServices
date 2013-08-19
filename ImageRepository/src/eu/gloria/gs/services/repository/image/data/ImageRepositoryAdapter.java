@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import eu.gloria.gs.services.repository.image.data.dbservices.ImageRepositoryAdapterException;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry;
 
@@ -32,7 +31,7 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void saveImage(String rt, String ccd, String user, Date when,
-			String lid) throws ImageRepositoryAdapterException {
+			String lid) throws ImageDatabaseException {
 
 		ImageEntry entry = new ImageEntry();
 		entry.setUser(user);
@@ -44,9 +43,9 @@ public class ImageRepositoryAdapter {
 		imageService.save(entry);
 	}
 
-	public void removeImage(int id) throws ImageRepositoryAdapterException {
+	public void removeImage(int id) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageRepositoryAdapterException("The image '" + id
+			throw new ImageDatabaseException("The image '" + id
 					+ "' does not exist");
 		}
 
@@ -54,9 +53,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setExperimentReservation(int id, int rid)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageRepositoryAdapterException("The image '" + id
+			throw new ImageDatabaseException("The image '" + id
 					+ "' does not exist");
 		}
 
@@ -64,9 +63,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setExperimentReservationByUrl(String url, int rid)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.containsUrl(url)) {
-			throw new ImageRepositoryAdapterException("The image with URL= '"
+			throw new ImageDatabaseException("The image with URL= '"
 					+ url + "' does not exist");
 		}
 
@@ -75,9 +74,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setUrl(int id, String url)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageRepositoryAdapterException("The image with URL= '"
+			throw new ImageDatabaseException("The image with URL= '"
 					+ url + "' does not exist");
 		}
 
@@ -85,9 +84,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setUrlByRT(String rt, String lid, String url)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageRepositoryAdapterException("The image with URL= '"
+			throw new ImageDatabaseException("The image with URL= '"
 					+ url + "' does not exist");
 		}
 
@@ -95,9 +94,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setUser(int id, String user)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageRepositoryAdapterException("The image '" + id
+			throw new ImageDatabaseException("The image '" + id
 					+ "' does not exist");
 		}
 
@@ -105,9 +104,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void setUserByUrl(String url, String user)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.containsUrl(url)) {
-			throw new ImageRepositoryAdapterException("The image with URL= '"
+			throw new ImageDatabaseException("The image with URL= '"
 					+ url + "' does not exist");
 		}
 
@@ -116,9 +115,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public ImageInformation getImageInformation(int id)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageRepositoryAdapterException("The image '" + id
+			throw new ImageDatabaseException("The image '" + id
 					+ "' does not exist");
 		}
 
@@ -139,9 +138,9 @@ public class ImageRepositoryAdapter {
 	}
 
 	public ImageInformation getImageInformationByRTLocalId(String rt, String lid)
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageRepositoryAdapterException("The image '" + lid
+			throw new ImageDatabaseException("The image '" + lid
 					+ "' does not exist");
 		}
 
@@ -162,7 +161,7 @@ public class ImageRepositoryAdapter {
 	}
 
 	public List<ImageInformation> getAllWithoutUrl()
-			throws ImageRepositoryAdapterException {
+			throws ImageDatabaseException {
 
 		List<ImageInformation> imageInfos = new ArrayList<ImageInformation>();
 		List<ImageEntry> entries = imageService.getAllWithoutUrl();
