@@ -26,7 +26,8 @@
 		`author_fk` FOREIGN KEY
 		(`author`) REFERENCES
 		`user` (`name`) ON
-		DELETE NO
+		DELETE
+		NO
 		ACTION ON UPDATE NO
 		ACTION
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -37,26 +38,33 @@
 		`reservation` (
 		`idreservation` int(11) NOT NULL
 		AUTO_INCREMENT,
-		`user` varchar(40) NOT NULL,
+		`user` varchar(40) NOT
+		NULL,
 		`experiment` int(11) NOT
 		NULL,
 		`begin` datetime NOT NULL,
-		`end` datetime DEFAULT NULL,
+		`end`
+		datetime DEFAULT NULL,
 		PRIMARY KEY
 		(`idreservation`),
-		KEY `experiment_fk` (`experiment`),
+		KEY `experiment_fk`
+		(`experiment`),
 		KEY `user_res_fk`
 		(`user`),
-		KEY `experiment_res_fk` (`experiment`),
+		KEY `experiment_res_fk`
+		(`experiment`),
 		CONSTRAINT
-		`experiment_res_fk` FOREIGN KEY (`experiment`) REFERENCES
-		`experiment` (`idexperiment`) ON DELETE CASCADE ON
+		`experiment_res_fk` FOREIGN KEY
+		(`experiment`) REFERENCES
+		`experiment` (`idexperiment`) ON DELETE
+		CASCADE ON
 		UPDATE CASCADE,
 		CONSTRAINT `user_res_fk` FOREIGN KEY (`user`)
 		REFERENCES `user`
 		(`name`) ON DELETE CASCADE ON
 		UPDATE CASCADE
-		) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8
+		)
+		ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8
 	</update>
 
 	<update id="createRTReservationTable">
@@ -72,11 +80,14 @@
 		CONSTRAINT `rt_id_fk`
 		FOREIGN KEY (`rt_name`) REFERENCES `rt` (`name`) ON
 		DELETE
-		CASCADE ON UPDATE CASCADE,
+		CASCADE ON
+		UPDATE CASCADE,
 		CONSTRAINT `reservation_id_fk` FOREIGN
-		KEY (`reservation_id`) REFERENCES
+		KEY
+		(`reservation_id`) REFERENCES
 		`reservation`
-		(`idreservation`) ON DELETE CASCADE ON UPDATE CASCADE
+		(`idreservation`) ON DELETE
+		CASCADE ON UPDATE CASCADE
 		) ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
 	</update>
@@ -86,13 +97,15 @@
 		`experiment_parameter` (
 		`experiment` int(11) NOT
 		NULL,
-		`parameter` varchar(45) CHARACTER SET utf8 NOT NULL,
+		`parameter` varchar(45) CHARACTER SET
+		utf8 NOT NULL,
 		`type`
 		varchar(45) CHARACTER SET utf8 NOT NULL,
 		`idparameter` int(11) NOT
 		NULL
 		AUTO_INCREMENT,
-		PRIMARY KEY (`idparameter`,`experiment`,`parameter`),
+		PRIMARY KEY
+		(`idparameter`,`experiment`,`parameter`),
 		KEY
 		`param_experiment_fk`
 		(`experiment`),
@@ -101,7 +114,8 @@
 		FOREIGN KEY
 		(`experiment`) REFERENCES
 		`experiment`
-		(`idexperiment`) ON DELETE CASCADE ON
+		(`idexperiment`) ON DELETE
+		CASCADE ON
 		UPDATE CASCADE
 		) ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
@@ -113,7 +127,8 @@
 		`experiment` int(11) NOT
 		NULL,
 		`operation` varchar(45) NOT NULL,
-		`type` varchar(45) NOT
+		`type`
+		varchar(45) NOT
 		NULL,
 		`idoperation` int(11) NOT NULL
 		AUTO_INCREMENT,
@@ -128,7 +143,8 @@
 		(`idexperiment`) ON DELETE
 		CASCADE ON
 		UPDATE CASCADE
-		) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT
+		)
+		ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT
 		CHARSET=utf8
 	</update>
 
@@ -137,21 +153,28 @@
 		`experiment_argument` (
 		`operation` int(11) NOT NULL,
 		`parameter` int(11) NOT NULL,
-		`number` int(11) NOT NULL,
+		`number`
+		int(11) NOT NULL,
 		PRIMARY KEY
 		(`operation`,`parameter`,`number`),
-		KEY `args_parameter_fk`
+		KEY
+		`args_parameter_fk`
 		(`parameter`),
-		KEY `args_operation_fk` (`operation`),
+		KEY `args_operation_fk`
+		(`operation`),
 		CONSTRAINT
-		`args_operation_fk` FOREIGN KEY (`operation`) REFERENCES
+		`args_operation_fk` FOREIGN KEY (`operation`)
+		REFERENCES
 		`experiment_operation` (`idoperation`) ON DELETE
-		CASCADE ON UPDATE
+		CASCADE ON
+		UPDATE
 		CASCADE,
 		CONSTRAINT `args_parameter_fk` FOREIGN KEY
-		(`parameter`) REFERENCES
+		(`parameter`)
+		REFERENCES
 		`experiment_parameter`
-		(`idparameter`) ON DELETE CASCADE ON UPDATE
+		(`idparameter`) ON DELETE CASCADE ON
+		UPDATE
 		CASCADE
 		) ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
@@ -163,15 +186,18 @@
 		`pid` int(11) NOT NULL,
 		`rid`
 		int(11) NOT NULL,
-		`value` varchar(128) DEFAULT NULL,
+		`value` varchar(128)
+		DEFAULT NULL,
 		PRIMARY KEY
 		(`pid`,`rid`),
 		KEY
-		`context_parameter_fk` (`pid`),
+		`context_parameter_fk`
+		(`pid`),
 		KEY
 		`context_reservation_fk`
 		(`rid`),
-		CONSTRAINT `context_parameter_fk`
+		CONSTRAINT
+		`context_parameter_fk`
 		FOREIGN KEY
 		(`pid`) REFERENCES
 		`experiment_parameter`
@@ -180,63 +206,44 @@
 		CASCADE,
 		CONSTRAINT
 		`context_reservation_fk` FOREIGN
-		KEY (`rid`) REFERENCES
+		KEY (`rid`)
+		REFERENCES
 		`reservation`
 		(`idreservation`) ON DELETE CASCADE ON
-		UPDATE CASCADE
+		UPDATE
+		CASCADE
 		) ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
 	</update>
 
 	<update id="createExperimentResultsTable">
-		CREATE TABLE IF NOT EXISTS
-		`experiment_results` (
-		`idresult` int(11) NOT NULL
-		AUTO_INCREMENT,
-		`value` varchar(200) NOT NULL,
+		CREATE TABLE IF NOT EXISTS `experiment_results` (
+		`idresult` int(11) NOT NULL AUTO_INCREMENT,
+		`value` varchar(200) NOT
+		NULL,
 		`date` datetime NOT NULL,
-		PRIMARY KEY (`idresult`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8
-	</update>
-
-	<update id="createExperimentResultsRelationTable">
-		CREATE TABLE IF NOT EXISTS
-		`experiment_result_relation` (
-		`experiment` int(11)
-		NOT NULL,
-		`user` varchar(45) NOT NULL,
-		`reservation` int(11) NOT NULL,
-		`result` int(11) NOT NULL,
-		`tag` varchar(45) NOT NULL,
-		PRIMARY KEY
-		(`experiment`,`user`,`reservation`,`result`,`tag`),
-		KEY
-		`experiment_result_fk_idx` (`experiment`),
-		KEY
-		`reservation_result_fk_idx` (`reservation`),
-		KEY `user_result_fk_idx`
-		(`user`),
-		KEY `result_result_fk_idx` (`result`),
-		CONSTRAINT
-		`result_result_fk` FOREIGN KEY (`result`) REFERENCES
-		`experiment_results` (`idresult`) ON DELETE CASCADE
-		ON UPDATE CASCADE,
-		CONSTRAINT `experiment_result_fk` FOREIGN KEY
-		(`experiment`)
-		REFERENCES `experiment`
-		(`idexperiment`) ON DELETE CASCADE ON UPDATE
+		`context` int(11) NOT NULL,
+		`user`
+		varchar(45) NOT NULL,
+		`tag` int(11) NOT NULL,
+		PRIMARY KEY (`idresult`),
+		KEY `context_results_fk` (`context`),
+		KEY `user_results_fk` (`user`),
+		KEY `tag_results_fk` (`tag`),
+		CONSTRAINT `tag_results_fk` FOREIGN KEY
+		(`tag`) REFERENCES
+		`experiment_parameter` (`idparameter`) ON DELETE
+		CASCADE ON UPDATE
 		CASCADE,
-		CONSTRAINT
-		`reservation_result_fk` FOREIGN KEY (`reservation`) REFERENCES
-		`reservation` (`idreservation`) ON DELETE CASCADE ON
-		UPDATE CASCADE,
-		CONSTRAINT `user_result_fk` FOREIGN KEY (`user`)
-		REFERENCES
-		`reservation` (`user`) ON DELETE CASCADE
-		ON UPDATE CASCADE
-		)
-		ENGINE=InnoDB DEFAULT CHARSET=utf8
-	</update>
+		CONSTRAINT `context_results_fk` FOREIGN KEY
+		(`context`) REFERENCES `reservation`
+		(`idreservation`) ON DELETE
+		CASCADE ON UPDATE CASCADE,
+		CONSTRAINT `user_results_fk` FOREIGN KEY
+		(`user`) REFERENCES `user` (`name`) ON
+		DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
+	</update>	
 
 	<select id="getExperimentParameter"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
@@ -258,7 +265,8 @@
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
 		INSERT INTO
 		`experiment_parameter`
-		(experiment, parameter, type)
+		(experiment, parameter,
+		type)
 		VALUE (
 		#{experiment}, #{parameter},
 		#{type} )
@@ -323,7 +331,8 @@
 		UPDATE `experiment_context`
 		SET
 		value=#{value_}
-		WHERE pid=#{pid_} AND rid=#{rid_}
+		WHERE
+		pid=#{pid_} AND rid=#{rid_}
 	</update>
 
 	<select id="getParameterContextValue" resultType="string">
@@ -369,7 +378,8 @@
 		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry">
 		INSERT INTO
 		`experiment_argument`
-		(operation, parameter, number)
+		(operation, parameter,
+		number)
 		VALUE (
 		#{operation}, #{parameter},
 		#{number})
@@ -458,7 +468,8 @@
 		SELECT * FROM
 		`reservation`
 		WHERE begin
-		&gt;=#{from_} OR end &gt; #{from_} ORDER BY begin
+		&gt;=#{from_} OR end
+		&gt; #{from_} ORDER BY begin
 	</select>
 
 	<select id="getUserReservationsFrom"
@@ -495,7 +506,8 @@
 		`reservation`
 		WHERE
 		user=#{user_} AND
-		experiment=#{experiment_} AND begin=#{begin_} AND end=#{end_}
+		experiment=#{experiment_} AND
+		begin=#{begin_} AND end=#{end_}
 	</select>
 
 	<select id="anyReservationAt" resultType="boolean">
@@ -513,7 +525,8 @@
 		`reservation`
 		WHERE
 		user=#{user_} AND begin &lt;=
-		#{when_} AND end &gt;= #{when_}
+		#{when_} AND end
+		&gt;= #{when_}
 	</select>
 
 	<select id="getUserReservationAt"
@@ -533,7 +546,8 @@
 		`reservation`
 		WHERE
 		begin &lt;=
-		#{when_} AND end &gt;=
+		#{when_} AND end
+		&gt;=
 		#{when_}
 	</select>
 
@@ -544,7 +558,8 @@
 		`reservation`
 		WHERE
 		begin &lt;=
-		#{when_} AND end &lt;=
+		#{when_} AND end
+		&lt;=
 		#{when_}
 	</select>
 
@@ -554,13 +569,15 @@
 		FROM `reservation`
 		LEFT JOIN
 		`rt_reservation`
-		ON (rt_reservation.reservation_id =
+		ON
+		(rt_reservation.reservation_id =
 		reservation.idreservation)
 		WHERE
 		rt_name=#{rt_} AND ((begin &lt;
 		#{from_} AND end &gt; #{from_}) OR
 		(begin &gt; #{from_} AND begin &lt;
-		#{to_}) OR (begin &lt;= #{from_} AND end
+		#{to_}) OR (begin &lt;= #{from_}
+		AND end
 		&gt;= #{to_}))
 	</select>
 
@@ -572,7 +589,8 @@
 		`reservation`
 		LEFT JOIN
 		`rt_reservation`
-		ON (rt_reservation.reservation_id =
+		ON
+		(rt_reservation.reservation_id =
 		reservation.idreservation)
 		WHERE
 		rt_name=#{rt_} AND (begin &lt;=
@@ -618,6 +636,16 @@
 		WHERE
 		rid=#{rid_}
 	</delete>
+
+	<insert id="saveResult"
+		parameterType="eu.gloria.gs.services.experiment.base.data.dbservices.ResultEntry">
+		INSERT INTO
+		`experiment_results`
+		(value,
+		date, context, user, tag)
+		VALUE (
+		#{value}, #{date}, #{context}, #{user}, #{tag})
+	</insert>
 
 
 </mapper>

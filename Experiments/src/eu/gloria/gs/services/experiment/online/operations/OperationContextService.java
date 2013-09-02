@@ -65,6 +65,8 @@ public class OperationContextService extends ExperimentContextService {
 			this.stopContinuousImage(operationContext, operationArguments);
 		} else if (operation.equals("loadImage")) {
 			this.loadImageFromRepository(operationContext, operationArguments);
+		} else if (operation.equals("saveResult")) {
+			this.saveResult(operationContext, operationArguments);
 		}
 	}
 
@@ -136,6 +138,38 @@ public class OperationContextService extends ExperimentContextService {
 				| ExperimentNotInstantiatedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
+	}
+
+	private void saveResult(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		String parameterName = (String) operationArguments[0];
+
+		try {
+			Object value = operationContext.getExperimentContext()
+					.getParameterValue(parameterName);
+			
+			try {
+				
+
+				this.getAdapter().saveResult(
+						operationContext.getExperimentContext().getReservation(), parameterName, "gloria-admin", value);
+			} catch (ExperimentDatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} catch (ExperimentParameterException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NoSuchExperimentException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExperimentNotInstantiatedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		
 	}
 
 	private void setParameter(OperationContext operationContext,

@@ -98,14 +98,31 @@
 	<bean id="LoadImage" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="STRING"></ref>				
+				<ref bean="STRING"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
 				<entry key="loadImage">
 					<list>
-						<value>arg0</value>						
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SaveResult" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="STRING"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="saveResult">
+					<list>
+						<value>arg0</value>
 					</list>
 				</entry>
 			</map>

@@ -17,6 +17,9 @@ public class ResultEntry implements Serializable {
 	private int idresult;
 	private String value;
 	private Date date;
+	private String user;
+	private int context;
+	private int tag;
 
 	public int getIdresult() {
 		return idresult;
@@ -42,4 +45,29 @@ public class ResultEntry implements Serializable {
 		this.date = date;
 	}
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public int getContext() {
+		return context;
+	}
+
+	public void setContext(int context) {
+		this.context = context;
+	}
+
+	public int getTag() {
+		return tag;
+	}
+
+	public void setTag(int tag) {
+		this.tag = tag;
+	}
+
+	
 }

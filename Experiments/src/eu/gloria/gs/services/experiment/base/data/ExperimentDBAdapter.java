@@ -23,6 +23,7 @@ import eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.OperationEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry;
+import eu.gloria.gs.services.experiment.base.data.dbservices.ResultEntry;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationFactory;
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
@@ -916,13 +917,6 @@ public class ExperimentDBAdapter {
 	 * @param timeSlot
 	 * @throws ExperimentDatabaseException
 	 */
-	/**
-	 * @param experiment
-	 * @param telescopes
-	 * @param username
-	 * @param timeSlot
-	 * @throws ExperimentDatabaseException
-	 */
 	public void makeReservation(String experiment, List<String> telescopes,
 			String username, TimeSlot timeSlot)
 			throws ExperimentDatabaseException {
@@ -1009,7 +1003,6 @@ public class ExperimentDBAdapter {
 			service.createExperimentArgumentTable();
 			service.createExperimentContextTable();
 			service.createExperimentResultsTable();
-			service.createExperimentResultsRelationTable();
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
@@ -1151,5 +1144,28 @@ public class ExperimentDBAdapter {
 	 */
 	public void setParameterFactory(ExperimentParameterFactory factory) {
 		this.parameterFactory = factory;
+	}
+	
+
+	public void saveResult(int reservationId, String tag, String user,
+			Object value)
+			throws ExperimentDatabaseException {
+
+		try {			
+			
+			int experimentId = service.getReservationById(reservationId).getExperiment();
+			int tagId = service.getExperimentParameter(experimentId, tag).getIdparameter();
+			
+			ResultEntry entry = new ResultEntry();
+			entry.setDate(new Date());
+			entry.setValue((String) value);
+			entry.setUser(user);
+			entry.setTag(tagId);
+			entry.setContext(reservationId);
+			service.saveResult(entry);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
 	}
 }

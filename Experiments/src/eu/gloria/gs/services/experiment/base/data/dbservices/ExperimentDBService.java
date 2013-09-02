@@ -52,11 +52,6 @@ public interface ExperimentDBService {
 	public void createExperimentResultsTable();
 
 	/**
-	 * 
-	 */
-	public void createExperimentResultsRelationTable();
-
-	/**
 	 * @param name
 	 * @return
 	 */
@@ -361,7 +356,7 @@ public interface ExperimentDBService {
 			@Param(value = "rid_") int idreservation);
 	
 	
-	
+	public void saveResult(ResultEntry entry);
 	
 	
 }
