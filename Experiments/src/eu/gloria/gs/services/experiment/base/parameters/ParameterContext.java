@@ -1,6 +1,10 @@
 package eu.gloria.gs.services.experiment.base.parameters;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import eu.gloria.gs.services.experiment.base.contexts.Context;
@@ -8,6 +12,7 @@ import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
+import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
@@ -22,7 +27,7 @@ public class ParameterContext extends Context {
 	private String name;
 	private ExperimentContext context;
 	private ParameterContextService contextService;
-	private String[] contextArguments;
+	private Object[] contextArguments;
 
 	public ParameterContext() {
 	}
@@ -98,21 +103,19 @@ public class ParameterContext extends Context {
 						Class<?> argumentType = argumentTypes
 								.get(contextArgOrder);
 
-						String contextArgument = contextArguments[contextArgOrder];
-						Object serviceArgument = null;
-
-						if (argumentType.equals(Integer.class)) {
-							serviceArgument = Integer.parseInt(contextArgument);
-						} else if (argumentType.equals(Double.class)) {
-							serviceArgument = Double
-									.parseDouble(contextArgument);
-						} else {
-							if (contextArgument.equals("null")
-									|| contextArgument.equals("NULL")) {
-								serviceArgument = null;
+						Object contextArgument = contextArguments[contextArgOrder];
+						Object serviceArgument;
+						try {
+							if (argumentType.equals(String.class)) {
+								serviceArgument = (String) contextArgument;
 							} else {
-								serviceArgument = contextArgument;
+								serviceArgument = JSONConverter.fromJSON(
+										(String) contextArgument, argumentType,
+										null);
 							}
+						} catch (IOException e) {
+							throw new ExperimentParameterException(
+									e.getMessage());
 						}
 
 						serviceOperationArguments[order] = serviceArgument;
@@ -145,31 +148,34 @@ public class ParameterContext extends Context {
 			ContextNotReadyException {
 	}
 
-	public Object parseValue(String valueStr) {
+	public Object parseValue(String valueStr, String[] tree) throws IOException {
 
 		Class<?> valueType = this.getExperimentParameter().getType()
 				.getValueType();
+		Class<?> elementType = this.getExperimentParameter().getType()
+				.getElementType();
 
-		if (valueType.equals(Integer.class)) {
-			return Integer.parseInt(valueStr);
-		} else if (valueType.equals(Double.class)) {
-			return Double.parseDouble(valueStr);
-		} else {
-			return valueStr;
+		Object value = JSONConverter.fromJSON(valueStr, valueType, elementType);
+
+		if (tree != null && tree.length > 1) {
+			for (int i = 1; i < tree.length; i++) {
+				if (value instanceof Map) {
+					value = ((Map<?, ?>) value).get(tree[i]);
+				} else {
+					throw new IOException("Cannot access object property");
+				}
+			}
 		}
+
+		return value;
 	}
 
-	public String serializeValue(Object value) {
-		Class<?> valueType = this.getExperimentParameter().getType()
-				.getValueType();
+	public String serializeValue(Object value) throws IOException {
 
-		if (value == null)
-			return null;
-
-		return String.valueOf(valueType.cast(value));
+		return JSONConverter.toJSON(value);
 	}
 
-	public Object getValue() throws ExperimentParameterException,
+	public Object getValue(String[] tree) throws ExperimentParameterException,
 			NoSuchExperimentException, ExperimentNotInstantiatedException {
 
 		try {
@@ -177,27 +183,82 @@ public class ParameterContext extends Context {
 					this.context.getExperimentName(), name,
 					this.context.getReservation());
 
+			value = this.parseValue((String) value, tree);
+
 			if (value == null)
 				return null;
 
-			return this.parseValue((String) value);
-
-		} catch (ExperimentDatabaseException e) {
+			return value;
+		} catch (ExperimentDatabaseException | IOException e) {
 			throw new ExperimentParameterException(e.getMessage());
 		}
 	}
 
-	public void setValue(Object value)
+	@SuppressWarnings("unchecked")
+	public void setValue(String[] tree, Object value)
 			throws UndefinedExperimentParameterException,
 			NoSuchExperimentException, ExperimentParameterException,
 			ExperimentNotInstantiatedException {
 
-		String valueStr = this.serializeValue(value);
+		Object actualValue = null;
 
 		try {
+
+			if (tree != null && tree.length > 1) {
+				actualValue = this.getValue(null);
+				Object currentNode = actualValue;
+				for (int i = 1; i < tree.length; i++) {
+					if (currentNode instanceof Map) {
+						if (i < tree.length - 1) {
+							if (!((Map<?, ?>) currentNode).containsKey(tree[i])) {
+								((Map<String, Object>) currentNode).put(
+										tree[i], new LinkedHashMap<>());
+							} else {
+								currentNode = ((Map<?, ?>) currentNode)
+										.get(tree[i]);
+							}
+						} else {
+							((Map<String, Object>) currentNode).put(tree[i],
+									value);
+						}
+					} else if (currentNode instanceof List) {
+						// if (i == tree.length - 1) {
+						if (tree[i].startsWith("$")) {
+							String listOrder = tree[i].substring(1);
+							if (listOrder.equals("add")) {
+								if (i == tree.length - 1) {
+									((List<Object>) currentNode).add(value);
+								} else {
+									throw new IOException(
+											"A list can only be modified at leaf level");
+								}
+							} else {
+								int paramIndex = (Integer) this
+										.getExperimentContext()
+										.getParameterValue(listOrder);
+								
+								if (((List<Object>) currentNode).size() < paramIndex + 1) {
+									for (int j = ((List<Object>) currentNode).size(); j < paramIndex + 1; j++) {
+										((List<Object>) currentNode).add(null);
+									}
+								}
+								
+								currentNode = ((List<Object>) currentNode).get(paramIndex);
+							}
+						}
+					} else {
+						throw new IOException("Cannot access object property");
+					}
+				}
+			} else {
+				actualValue = value;
+			}
+
+			String valueStr = this.serializeValue(actualValue);
+
 			adapter.setParameterContextValue(this.context.getExperimentName(),
 					name, this.context.getReservation(), valueStr);
-		} catch (ExperimentDatabaseException e) {
+		} catch (ExperimentDatabaseException | IOException e) {
 			throw new ExperimentParameterException(e.getMessage());
 		}
 	}
@@ -210,11 +271,11 @@ public class ParameterContext extends Context {
 		this.contextService = contextService;
 	}
 
-	public String[] getContextArguments() {
+	public Object[] getContextArguments() {
 		return contextArguments;
 	}
 
-	public void setContextArguments(String[] contextArguments) {
+	public void setContextArguments(Object[] contextArguments) {
 		this.contextArguments = contextArguments;
 	}
 }

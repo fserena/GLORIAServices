@@ -8,6 +8,8 @@ import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.mount.operations.GetDECOperation;
+import eu.gloria.gs.services.teleoperation.mount.operations.GetRAOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.GetStateOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.MoveEastOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.MoveNorthOperation;
@@ -52,7 +54,6 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
 			this.processException(e.getMessage(), rt);
 			throw e;
 		} catch (TeleoperationException e) {
@@ -402,6 +403,86 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 
 			this.processSuccess(rt, mount, "setTracking",
 					new Object[] { mode }, null);
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new MountTeleoperationException(e.getMessage());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface#getRA(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public double getRA(String rt, String mount)
+			throws DeviceOperationFailedException, MountTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(mount);
+
+		GetRAOperation operation = null;
+
+		try {
+			operation = new GetRAOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getRA/Bad args", rt);
+
+			throw new MountTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			double ra = (Double) returns.getReturns().get(0);
+			this.processSuccess(rt, mount, "getRA", null, ra);
+
+			return ra;
+
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new MountTeleoperationException(e.getMessage());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface#getDEC(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public double getDEC(String rt, String mount)
+			throws DeviceOperationFailedException, MountTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(mount);
+
+		GetDECOperation operation = null;
+
+		try {
+			operation = new GetDECOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getDEC/Bad args", rt);
+
+			throw new MountTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			double dec = (Double) returns.getReturns().get(0);
+			this.processSuccess(rt, mount, "getDEC", null, dec);
+
+			return dec;
+
 		} catch (DeviceOperationFailedException e) {
 			this.processException(e.getMessage(), rt);
 			throw e;

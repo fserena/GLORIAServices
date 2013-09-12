@@ -63,6 +63,19 @@ public class Mount extends DeviceHandler implements MountInterface {
 			throws TeleoperationException {
 		rts.slewToCoordinates(mount, ra, dec);
 	}
+	
+	@Override
+	public double getRA()
+			throws TeleoperationException {
+		return rts.getRA(mount);
+	}
+	
+	@Override
+	public double getDEC()
+			throws TeleoperationException {
+		return rts.getDEC(mount);
+	}
+
 
 	@Override
 	public MountState getState() throws TeleoperationException {

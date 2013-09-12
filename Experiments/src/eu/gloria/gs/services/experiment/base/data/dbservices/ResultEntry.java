@@ -15,7 +15,7 @@ public class ResultEntry implements Serializable {
 	private static final long serialVersionUID = 8784408047690730988L;
 
 	private int idresult;
-	private String value;
+	private Object value;
 	private Date date;
 	private String user;
 	private int context;
@@ -29,11 +29,11 @@ public class ResultEntry implements Serializable {
 		this.idresult = idresult;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 

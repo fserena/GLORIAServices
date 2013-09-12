@@ -1,11 +1,16 @@
 package eu.gloria.gs.services.experiment.base.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
@@ -104,17 +109,38 @@ public class ExperimentDBAdapter {
 				entry.setParameter(parameterInfo.getModelName());
 
 				String type = parameterInfo.getParameterName();
-				type += "[";
-				int i = 0;
-				for (String argument : parameterInfo.getArguments()) {
-					type += argument;
-					if (i < parameterInfo.getArguments().length - 1) {
-						type += ",";
-					}
-					i++;
-				}
 
-				type += "]";
+				ArrayList<Class<?>> argumentTypes = parameterInfo
+						.getParameter().getType().getArgumentTypes();
+
+				type += JSONConverter.toJSON(parameterInfo.getArguments());
+
+				// int i = 0;
+				// Object[] concreteArguments = new Object[parameterInfo
+				// .getArguments().length];
+
+				/*
+				 * for (Object argStr : parameterInfo.getArguments()) {
+				 * 
+				 * //if (argumentTypes.get(0).equals(String.class)) { //
+				 * concreteArguments[i] = argStr; //} else {
+				 * concreteArguments[i] = JSONConverter.fromJSON((String)argStr,
+				 * argumentTypes.get(0), null); //}
+				 * 
+				 * i++; }
+				 */
+
+				// type += JSONConverter.toJSON(parameterInfo.getArguments());
+
+				/*
+				 * type += "["; int i = 0; for (String argument :
+				 * parameterInfo.getArguments()) { type += argument; if (i <
+				 * parameterInfo.getArguments().length - 1) { type += ","; }
+				 * i++; }
+				 * 
+				 * type += "]";
+				 */
+
 				entry.setType(type);
 				service.saveExperimentParameter(entry);
 
@@ -122,7 +148,7 @@ public class ExperimentDBAdapter {
 				throw new NoSuchExperimentException("The experiment '"
 						+ experiment + "' does not exist");
 
-		} catch (PersistenceException e) {
+		} catch (PersistenceException | IOException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
 	}
@@ -502,8 +528,14 @@ public class ExperimentDBAdapter {
 									.getParameterById(argumentEntry
 											.getParameter());
 
+							String actualArgument = paramEntry.getParameter();
+							String subArg = argumentEntry.getSubarg();
+							if (subArg != null && !subArg.equals("")) {
+								actualArgument = actualArgument + "." + subArg;
+							}
+
 							arguments.set(argumentEntry.getNumber(),
-									paramEntry.getParameter());
+									actualArgument);
 						}
 					}
 
@@ -523,16 +555,29 @@ public class ExperimentDBAdapter {
 					paramInfo.setModelName(parameterEntry.getParameter());
 
 					String typePattern = parameterEntry.getType();
-
-					String[] parts = typePattern.split("\\[");
 					String parameterType = null;
+					String argStr = null;
+					Object[] objectArgs = null;
 					String[] arguments = null;
-					if (parts.length == 2) {
-						parameterType = parts[0];
-						arguments = parts[1].replace("]", "").split(",");
 
-						if (arguments.length == 1 && arguments[0].equals(""))
-							arguments = null;
+					int headerEndIndex = typePattern.indexOf("[");
+					if (headerEndIndex >= 0) {
+						parameterType = typePattern.substring(0, Math.min(
+								headerEndIndex, typePattern.length() - 1));
+						argStr = typePattern.substring(headerEndIndex);
+						objectArgs = (Object[]) JSONConverter.fromJSON(argStr,
+								Object[].class, null);
+
+						arguments = new String[objectArgs.length];
+						int i = 0;
+						for (Object arg : objectArgs) {
+							if (arg instanceof String) {
+								arguments[i] = (String) arg;
+							} else {
+								arguments[i] = JSONConverter.toJSON(arg);
+							}
+							i++;
+						}
 
 					} else {
 						throw new ParameterTypeNotAvailableException(
@@ -543,7 +588,7 @@ public class ExperimentDBAdapter {
 					paramInfo.setParameter(parameterFactory
 							.createParameter(parameterType));
 
-					paramInfo.setArguments(arguments);
+					paramInfo.setArguments((String[]) arguments);
 					parameters.add(paramInfo);
 				}
 
@@ -551,7 +596,7 @@ public class ExperimentDBAdapter {
 			}
 		} catch (PersistenceException | ParameterTypeNotAvailableException
 				| ExperimentParameterException
-				| OperationTypeNotAvailableException e) {
+				| OperationTypeNotAvailableException | IOException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
 
@@ -649,9 +694,9 @@ public class ExperimentDBAdapter {
 					experimentId, parameter);
 
 			if (parameterEntry != null) {
-
 				return service.getParameterContextValue(
 						parameterEntry.getIdparameter(), rid);
+
 			} else {
 				throw new ExperimentDatabaseException("The experiment '"
 						+ experiment + "' does not contain a parameter named '"
@@ -1040,20 +1085,33 @@ public class ExperimentDBAdapter {
 
 					for (String argument : arguments) {
 
+						String actualArgument = argument;
+
+						if (argument.contains(".")) {
+							actualArgument = argument.substring(0,
+									argument.indexOf("."));
+						}
+
 						ParameterEntry parameterEntry = service
-								.getExperimentParameter(experimentId, argument);
+								.getExperimentParameter(experimentId,
+										actualArgument);
 
 						if (parameterEntry == null) {
 							throw new ExperimentDatabaseException(
 									"The experiment '"
 											+ experiment
 											+ "' does not contain a parameter named '"
-											+ argument + "'");
+											+ actualArgument + "'");
 						}
 
 						ArgumentEntry entry = new ArgumentEntry();
 						entry.setOperation(operationEntry.getIdoperation());
 						entry.setParameter(parameterEntry.getIdparameter());
+						if (argument.contains(".")) {
+							entry.setSubarg(argument.substring(
+									argument.indexOf(".") + 1,
+									argument.length()));
+						}
 						entry.setNumber(order);
 
 						service.saveOperationArgument(entry);
@@ -1145,20 +1203,20 @@ public class ExperimentDBAdapter {
 	public void setParameterFactory(ExperimentParameterFactory factory) {
 		this.parameterFactory = factory;
 	}
-	
 
 	public void saveResult(int reservationId, String tag, String user,
-			Object value)
-			throws ExperimentDatabaseException {
+			Object value) throws ExperimentDatabaseException {
 
-		try {			
-			
-			int experimentId = service.getReservationById(reservationId).getExperiment();
-			int tagId = service.getExperimentParameter(experimentId, tag).getIdparameter();
-			
+		try {
+
+			int experimentId = service.getReservationById(reservationId)
+					.getExperiment();
+			int tagId = service.getExperimentParameter(experimentId, tag)
+					.getIdparameter();
+
 			ResultEntry entry = new ResultEntry();
 			entry.setDate(new Date());
-			entry.setValue((String) value);
+			entry.setValue(value);
 			entry.setUser(user);
 			entry.setTag(tagId);
 			entry.setContext(reservationId);

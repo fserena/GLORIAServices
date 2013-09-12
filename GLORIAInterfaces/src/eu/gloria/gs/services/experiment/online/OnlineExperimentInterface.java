@@ -22,6 +22,7 @@ import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationExcep
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ObjectResponse;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
@@ -120,11 +121,11 @@ public interface OnlineExperimentInterface {
 	public void setExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter,
-			@WebParam(name = "value") Object value)
+			@WebParam(name = "value") ObjectResponse value)
 			throws OnlineExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException;
 
-	public Object getExperimentParameterValue(
+	public ObjectResponse getExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter)
 			throws OnlineExperimentException,

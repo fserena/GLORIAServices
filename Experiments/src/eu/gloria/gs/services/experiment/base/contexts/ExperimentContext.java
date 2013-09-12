@@ -1,9 +1,14 @@
 package eu.gloria.gs.services.experiment.base.contexts;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+
+import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
@@ -142,18 +147,65 @@ public class ExperimentContext extends Context {
 	}
 
 	public Object getParameterValue(String parameterName)
-			throws ExperimentParameterException, NoSuchExperimentException,
-			ExperimentNotInstantiatedException {
+			throws ExperimentParameterException,
+			ExperimentNotInstantiatedException, NoSuchExperimentException {
 
-		if (this.parameterContexts.containsKey(parameterName)) {
-			ParameterContext parameterContext = this.parameterContexts
-					.get(parameterName);
+		String[] parameterNodes = parameterName.split("\\.");
 
-			return parameterContext.getValue();
+		if (this.parameterContexts.containsKey(parameterNodes[0])) {
+
+			if (parameterNodes.length > 0) {
+
+				ParameterContext parameterContext = this.parameterContexts
+						.get(parameterNodes[0]);
+
+				return parameterContext.getValue(parameterNodes);
+
+				/*
+				 * String parentType = parameterContext.getExperimentParameter()
+				 * .getConcreteName();
+				 * 
+				 * if (!parentType.equals("OBJECT")) { throw new
+				 * ExperimentParameterException(
+				 * "Cannot get an attribute of a non-object parameter"); } else
+				 * { return parameterContext.getValue(parameterNodes); }
+				 */
+			}
 		}
 
-		throw new NoSuchExperimentException(""); // TODO: Verify and Complete
+		throw new ExperimentParameterException(""); // TODO: Verify and Complete
 													// this
+	}
+
+	public void setParameterValueFromJSON(String parameterName, String value)
+			throws UndefinedExperimentParameterException,
+			NoSuchExperimentException, ExperimentParameterException,
+			ExperimentNotInstantiatedException {
+
+		String[] parameterNodes = parameterName.split("\\.");
+
+		if (this.parameterContexts.containsKey(parameterNodes[0])) {
+
+			/*Class<?> valueType = this.getParameterContext(parameterNodes[0])
+					.getExperimentParameter().getType().getValueType();
+			Class<?> elementType = this.getParameterContext(parameterNodes[0])
+					.getExperimentParameter().getType().getElementType();*/
+
+			ParameterContext parameterContext = this.parameterContexts
+					.get(parameterNodes[0]);
+
+			try {
+				parameterContext.setValue(parameterNodes,
+						JSONConverter.fromJSON(value, Object.class, null));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			throw new NoSuchExperimentException(""); // TODO: Verify and
+														// Complete
+														// this
+		}
 	}
 
 	public void setParameterValue(String parameterName, Object value)
@@ -161,11 +213,13 @@ public class ExperimentContext extends Context {
 			NoSuchExperimentException, ExperimentParameterException,
 			ExperimentNotInstantiatedException {
 
-		if (this.parameterContexts.containsKey(parameterName)) {
-			ParameterContext parameterContext = this.parameterContexts
-					.get(parameterName);
+		String[] parameterNodes = parameterName.split("\\.");
 
-			parameterContext.setValue(value);
+		if (this.parameterContexts.containsKey(parameterNodes[0])) {
+			ParameterContext parameterContext = this.parameterContexts
+					.get(parameterNodes[0]);
+
+			parameterContext.setValue(parameterNodes, value);
 		} else {
 			throw new NoSuchExperimentException(""); // TODO: Verify and
 														// Complete

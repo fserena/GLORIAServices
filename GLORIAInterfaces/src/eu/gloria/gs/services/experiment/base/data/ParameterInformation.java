@@ -1,13 +1,18 @@
 package eu.gloria.gs.services.experiment.base.data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 
+@XmlRootElement
+@XmlSeeAlso(Object[].class)
 public class ParameterInformation {
 
 	private String modelName;
 	private String parameterName;
 	protected ExperimentParameter parameter;
-	private String[] arguments;
+	private Object[] arguments;
 
 	public String getModelName() {
 		return modelName;
@@ -25,11 +30,11 @@ public class ParameterInformation {
 		this.parameter = parameter;
 	}
 
-	public String[] getArguments() {
+	public Object[] getArguments() {
 		return arguments;
 	}
 
-	public void setArguments(String[] arguments) {
+	public void setArguments(Object[] arguments) {
 		this.arguments = arguments;
 	}
 

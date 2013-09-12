@@ -38,4 +38,10 @@ public interface MountTeleoperationInterface {
 
 	public void park(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException;
+	
+	public double getRA(String rt, String mount)
+			throws DeviceOperationFailedException, MountTeleoperationException;
+	
+	public double getDEC(String rt, String mount)
+			throws DeviceOperationFailedException, MountTeleoperationException;
 }

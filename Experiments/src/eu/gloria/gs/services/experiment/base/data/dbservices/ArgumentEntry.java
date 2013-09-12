@@ -16,6 +16,7 @@ public class ArgumentEntry implements Serializable {
 	private int operation;
 	private int parameter;
 	private int number;
+	private String subarg;
 
 	/**
 	 * @return
@@ -59,5 +60,12 @@ public class ArgumentEntry implements Serializable {
 		this.number = number;
 	}
 
+	public String getSubarg() {
+		return subarg;
+	}
+
+	public void setSubarg(String subarg) {
+		this.subarg = subarg;
+	}
 
 }

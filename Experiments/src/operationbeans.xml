@@ -95,9 +95,69 @@
 		</property>
 	</bean>
 
+	<bean id="LoadRTName" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="INTEGER"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadRTName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="LoadDeviceName" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="INTEGER"></ref>
+				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadDeviceName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadRTNames" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadRTNames">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 	<bean id="LoadImage" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
+				<ref bean="DATE"></ref>
 				<ref bean="STRING"></ref>
 			</list>
 		</property>
@@ -106,6 +166,7 @@
 				<entry key="loadImage">
 					<list>
 						<value>arg0</value>
+						<value>arg1</value>
 					</list>
 				</entry>
 			</map>
@@ -115,7 +176,24 @@
 	<bean id="SaveResult" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="saveResult">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SaveTuple" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="TUPLE"></ref>
 			</list>
 		</property>
 		<property name="behaviour">

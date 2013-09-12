@@ -4,6 +4,17 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+	<bean id="OBJECT_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.lang.Object"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.lang.Object</value>
+			</list>
+		</property>
+	</bean>
+
 	<bean id="INTEGER_VALUE"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
@@ -11,6 +22,17 @@
 		<property name="argumentTypes">
 			<list>
 				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DATE_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.util.Date"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.util.Date</value>
 			</list>
 		</property>
 	</bean>
@@ -34,6 +56,44 @@
 		<property name="argumentTypes">
 			<list>
 				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="TUPLE_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType"
+			value="eu.gloria.gs.services.experiment.base.parameters.Tuple"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>eu.gloria.gs.services.experiment.base.parameters.Tuple
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="LIST_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.util.List"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.util.List</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="LIST_TUPLE_VALUE"
+		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
+		scope="singleton">
+		<property name="valueType" value="java.util.List"></property>
+		<property name="elementType"
+			value="eu.gloria.gs.services.experiment.base.parameters.Tuple"></property>
+		<property name="argumentTypes">
+			<list>
+				<value>java.util.List
+				</value>
 			</list>
 		</property>
 	</bean>
@@ -64,6 +124,21 @@
 				<value>java.lang.String</value>
 				<value>java.lang.Integer</value>
 			</list>
+		</property>
+	</bean>
+
+	<bean id="OBJECT"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="OBJECT_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
 		</property>
 	</bean>
 
@@ -101,6 +176,66 @@
 		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
 		scope="singleton">
 		<property name="type" ref="STRING_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="TUPLE"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="TUPLE_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LIST"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="LIST_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LIST_TUPLE"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="LIST_TUPLE_VALUE"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="DATE"
+		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
+		scope="singleton">
+		<property name="type" ref="DATE_VALUE"></property>
 		<property name="initOperations">
 			<map>
 				<entry key="setValue">

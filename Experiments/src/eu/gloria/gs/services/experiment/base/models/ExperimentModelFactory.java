@@ -114,7 +114,7 @@ public class ExperimentModelFactory {
 			Map<Integer, ExperimentOperation> operationDependencies = expParameter
 					.getOperationDependencies();
 
-			String[] paramArgs = parameterInfo.getArguments();
+			String[] paramArgs = (String[])parameterInfo.getArguments();
 
 			for (Integer order : operationDependencies.keySet()) {
 

@@ -1,10 +1,13 @@
 package eu.gloria.gs.services.experiment.online.operations;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
+import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextService;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
@@ -16,6 +19,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.experiment.base.results.ExperimentResult;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
@@ -67,7 +71,142 @@ public class OperationContextService extends ExperimentContextService {
 			this.loadImageFromRepository(operationContext, operationArguments);
 		} else if (operation.equals("saveResult")) {
 			this.saveResult(operationContext, operationArguments);
+		} else if (operation.equals("getRADEC")) {
+			this.getRADEC(operationContext, operationArguments);
+		} else if (operation.equals("loadRTName")) {
+			this.loadRTName(operationContext, operationArguments);
+		} else if (operation.equals("loadRTNames")) {
+			this.loadAllRTNames(operationContext, operationArguments);
+		} else if (operation.equals("loadDeviceName")) {
+			this.loadDeviceName(operationContext, operationArguments);
 		}
+	}
+
+	private void loadRTName(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		int rid = operationContext.getExperimentContext().getReservation();
+
+		ReservationInformation resInfo = null;
+
+		String rtOrderParameter = (String) operationArguments[0];
+		String rtNameParameter = (String) operationArguments[1];
+		String telescopeName = null;
+
+		try {
+			resInfo = this.getAdapter().getReservationInformation(rid);
+			int rtOrder = (Integer) operationContext.getExperimentContext()
+					.getParameterValue(rtOrderParameter);
+
+			List<String> telescopes = resInfo.getTelescopes();
+			telescopeName = telescopes.get(rtOrder);
+		} catch (ExperimentDatabaseException | NoSuchReservationException
+				| ExperimentParameterException
+				| ExperimentNotInstantiatedException
+				| NoSuchExperimentException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		try {
+			operationContext.getExperimentContext().setParameterValue(
+					rtNameParameter, telescopeName);
+		} catch (UndefinedExperimentParameterException
+				| NoSuchExperimentException
+				| ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+
+	private void loadDeviceName(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+
+		String rtParameter = (String) operationArguments[0];
+		String deviceOrderParameter = (String) operationArguments[1];
+		String deviceTypeParameter = (String) operationArguments[2];
+
+		String rtName;
+		try {
+			rtName = (String) operationContext.getExperimentContext()
+					.getParameterValue(rtParameter);
+		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		int deviceOrder;
+		try {
+			deviceOrder = (Integer) operationContext.getExperimentContext()
+					.getParameterValue(deviceOrderParameter);
+		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		DeviceType deviceType;
+		try {
+			String deviceTypeStr = (String) operationContext
+					.getExperimentContext().getParameterValue(
+							deviceTypeParameter);
+
+			deviceType = DeviceType.valueOf(deviceTypeStr);
+		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		List<String> deviceNames = null;
+
+		try {
+			deviceNames = this.getRTRepository().getRTDeviceNames(rtName,
+					deviceType);
+		} catch (RTRepositoryException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		String deviceName = deviceNames.get(deviceOrder);
+
+		try {
+			
+			LinkedHashMap<String, Object> result = new LinkedHashMap<>();
+			result.put("name", deviceName);
+			
+			operationContext.getExperimentContext().setParameterValue(
+					(String) operationArguments[3], result);
+		} catch (UndefinedExperimentParameterException
+				| NoSuchExperimentException
+				| ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+
+	private void loadAllRTNames(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		int rid = operationContext.getExperimentContext().getReservation();
+
+		ReservationInformation resInfo = null;
+
+		String rtNameListParameter = (String) operationArguments[0];
+		List<String> telescopes = null;
+
+		try {
+			resInfo = this.getAdapter().getReservationInformation(rid);
+
+			telescopes = resInfo.getTelescopes();
+		} catch (ExperimentDatabaseException | NoSuchReservationException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		try {
+			operationContext.getExperimentContext().setParameterValue(
+					rtNameListParameter, telescopes);
+		} catch (UndefinedExperimentParameterException
+				| NoSuchExperimentException
+				| ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
 	}
 
 	private void executeSequence(OperationContext operationContext,
@@ -100,17 +239,29 @@ public class OperationContextService extends ExperimentContextService {
 	private void loadImageFromRepository(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 		try {
-			String parameterName = (String) operationArguments[0];
+			String dateParameter = (String) operationArguments[0];
+			String urlParameter = (String) operationArguments[1];
+
+			Date day = null;
+
+			try {
+				day = (Date) operationContext.getExperimentContext()
+						.getParameterValue(dateParameter);
+			} catch (NoSuchExperimentException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			}
 
 			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(new Date());
-			calendar.set(Calendar.DAY_OF_YEAR,
-					calendar.get(Calendar.DAY_OF_YEAR) - 1);
+			calendar.setTime(day);
 			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
 
 			Date from = calendar.getTime();
 
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
+			calendar.set(Calendar.MINUTE, 59);
+			calendar.set(Calendar.SECOND, 59);
 			Date to = calendar.getTime();
 
 			List<Integer> imageIds;
@@ -119,16 +270,19 @@ public class OperationContextService extends ExperimentContextService {
 				imageIds = this.getImageRepository()
 						.getAllImageIdentifiersByDate(from, to);
 
-				int id = imageIds.get((int) (Math.random() * imageIds.size()));
-				url = this.getImageRepository().getImageInformation(id)
-						.getUrl();
+				if (imageIds != null) {
+					int id = imageIds.get((int) (Math.random() * imageIds
+							.size()));
+					url = this.getImageRepository().getImageInformation(id)
+							.getUrl();
+				}
 			} catch (ImageRepositoryException e1) {
 
 			}
 
 			try {
 				operationContext.getExperimentContext().setParameterValue(
-						parameterName, url);
+						urlParameter, url);
 			} catch (NoSuchExperimentException
 					| UndefinedExperimentParameterException e) {
 				throw new ExperimentOperationException(e.getMessage());
@@ -147,17 +301,25 @@ public class OperationContextService extends ExperimentContextService {
 		try {
 			Object value = operationContext.getExperimentContext()
 					.getParameterValue(parameterName);
-			
-			try {
-				
 
-				this.getAdapter().saveResult(
-						operationContext.getExperimentContext().getReservation(), parameterName, "gloria-admin", value);
-			} catch (ExperimentDatabaseException e) {
+			try {
+
+				ExperimentResult result = new ExperimentResult();
+				result.setAdapter(this.getAdapter());
+				result.setDate(new Date());
+				result.setUser("gloria-admin");
+				result.setContext(operationContext.getExperimentContext()
+						.getReservation());
+				result.setTag(parameterName);
+				result.setValue(value);
+
+				result.save();
+
+			} catch (ExperimentDatabaseException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} catch (ExperimentParameterException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -169,7 +331,6 @@ public class OperationContextService extends ExperimentContextService {
 			e1.printStackTrace();
 		}
 
-		
 	}
 
 	private void setParameter(OperationContext operationContext,
@@ -867,6 +1028,37 @@ public class OperationContextService extends ExperimentContextService {
 
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+
+	private void getRADEC(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+		try {
+
+			String rtNameParameter = (String) operationArguments[0];
+			String rtName = (String) operationContext.getExperimentContext()
+					.getParameterValue(rtNameParameter);
+
+			String mountNameParameter = (String) operationArguments[1];
+			String mountName = (String) operationContext.getExperimentContext()
+					.getParameterValue(mountNameParameter);
+
+			String resultParameter = (String) operationArguments[2];
+
+			GSClientProvider.setCredentials(this.getUsername(),
+					this.getPassword());
+
+			double ra = this.getMountTeleoperation().getRA(rtName, mountName);
+			double dec = this.getMountTeleoperation().getDEC(rtName, mountName);
+
+			operationContext.getExperimentContext().setParameterValue(
+					resultParameter, ra);
+
+		} catch (ExperimentParameterException | NoSuchExperimentException
+				| ExperimentNotInstantiatedException
+				| UndefinedExperimentParameterException
+				| MountTeleoperationException | DeviceOperationFailedException e) {
 			throw new ExperimentOperationException(e.getMessage());
 		}
 	}

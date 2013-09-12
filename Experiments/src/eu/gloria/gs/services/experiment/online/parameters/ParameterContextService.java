@@ -23,7 +23,7 @@ public class ParameterContextService extends ExperimentContextService {
 
 		try {
 
-			parameterContext.setValue(operationArguments[0]);
+			parameterContext.setValue(null, operationArguments[0]);
 		} catch (UndefinedExperimentParameterException
 				| NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
@@ -80,7 +80,7 @@ public class ParameterContextService extends ExperimentContextService {
 		String deviceName = deviceNames.get(deviceOrder);
 
 		try {
-			parameterContext.setValue(deviceName);
+			parameterContext.setValue(null, deviceName);
 		} catch (UndefinedExperimentParameterException
 				| NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
@@ -105,7 +105,7 @@ public class ParameterContextService extends ExperimentContextService {
 		String telescopeName = telescopes.get((Integer) operationArguments[0]);
 
 		try {
-			parameterContext.setValue(telescopeName);
+			parameterContext.setValue(null, telescopeName);
 		} catch (UndefinedExperimentParameterException
 				| NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {

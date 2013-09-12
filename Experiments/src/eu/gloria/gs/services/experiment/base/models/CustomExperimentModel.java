@@ -101,6 +101,8 @@ public class CustomExperimentModel extends ExperimentModel {
 			throw new CustomExperimentException(e.getMessage());
 		}
 
+		parameterInfo.setParameter(parameter);
+		
 		this.addParameter(parameterInfo.getModelName(), parameter,
 				parameterInfo.getArguments());
 

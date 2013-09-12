@@ -25,6 +25,10 @@ public interface MountInterface {
 	public void slewToCoordinates(double ra, double dec) throws TeleoperationException;
 	
 	public MountState getState() throws TeleoperationException;
+	
+	public double getRA() throws TeleoperationException;
+	
+	public double getDEC() throws TeleoperationException;
 
 	public void park() throws TeleoperationException;
 }

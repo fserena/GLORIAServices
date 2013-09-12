@@ -1,10 +1,17 @@
 package eu.gloria.gs.services.experiment.online;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jws.WebParam;
+import javax.xml.bind.annotation.XmlSeeAlso;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
@@ -16,6 +23,7 @@ import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
+import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
@@ -34,7 +42,9 @@ import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ObjectResponse;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
+import eu.gloria.gs.services.experiment.base.parameters.Tuple;
 import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
@@ -690,10 +700,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 		CustomExperimentModel model;
 		try {
 			model = modelManager.getModel(experiment);
+			
+			Object[] argsArray = (Object[])JSONConverter.fromJSON(Arrays.toString(parameter.getArguments()), Object[].class, null);
+			parameter.setArguments(argsArray);
 			model.buildParameter(parameter);
 		} catch (CustomExperimentException | ParameterTypeNotAvailableException
 				| InvalidExperimentModelException | ExperimentDatabaseException
-				| ExperimentParameterException e) {
+				| ExperimentParameterException | IOException e) {
 			throw new OnlineExperimentException(e.getMessage());
 		}
 
@@ -708,7 +721,8 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public void setExperimentParameterValue(int reservationId,
-			String parameter, Object value) throws OnlineExperimentException,
+			String parameter, ObjectResponse input)
+			throws OnlineExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
 		try {
@@ -717,7 +731,8 @@ public class OnlineExperiment extends GSLogProducerService implements
 					this.logAction(this.getClientUsername(),
 							"experiments/contexts/" + reservationId
 									+ "/parameters/set?" + parameter + "&"
-									+ String.valueOf(value) + "->INACTIVE");
+									+ String.valueOf(input.content)
+									+ "->INACTIVE");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
 				}
@@ -730,7 +745,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 					this.logAction(this.getClientUsername(),
 							"experiments/contexts/" + reservationId
 									+ "/parameters/set?" + parameter + "&"
-									+ String.valueOf(value)
+									+ String.valueOf(input.content)
 									+ "->NOT_INSTANTIATED");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
@@ -742,14 +757,14 @@ public class OnlineExperiment extends GSLogProducerService implements
 			ExperimentContext context = contextManager.getContext(
 					this.getClientUsername(), reservationId);
 
-			context.setParameterValue(parameter, value);
+			context.setParameterValue(parameter, JSONConverter.fromJSON((String)input.content, Object.class, null));
 
 			try {
 				this.logAction(
 						this.getClientUsername(),
 						"experiments/contexts/" + reservationId
 								+ "/parameters/set?" + parameter + "&"
-								+ String.valueOf(value));
+								+ String.valueOf(input.content));
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
@@ -757,13 +772,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
 				| InvalidUserContextException | ExperimentParameterException
 				| UndefinedExperimentParameterException
-				| NoSuchExperimentException e) {
+				| NoSuchExperimentException | IOException e) {
 			try {
 				this.logAction(
 						this.getClientUsername(),
 						"experiments/contexts/" + reservationId
 								+ "/parameters/set?" + parameter + "&"
-								+ String.valueOf(value) + "->"
+								+ String.valueOf(input.content) + "->"
 								+ e.getClass().getSimpleName());
 			} catch (ActionLogException el) {
 				el.printStackTrace();
@@ -773,7 +788,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
-	public Object getExperimentParameterValue(int reservationId,
+	public ObjectResponse getExperimentParameterValue(int reservationId,
 			String parameter) throws OnlineExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
@@ -844,11 +859,11 @@ public class OnlineExperiment extends GSLogProducerService implements
 				el.printStackTrace();
 			}
 
-			return value;
+			return new ObjectResponse(JSONConverter.toJSON(value));
 
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
 				| InvalidUserContextException | ExperimentParameterException
-				| NoSuchExperimentException e) {
+				| NoSuchExperimentException | IOException e) {
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/contexts/" + reservationId

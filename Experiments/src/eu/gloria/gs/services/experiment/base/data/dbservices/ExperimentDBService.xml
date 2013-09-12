@@ -100,8 +100,9 @@
 		`parameter` varchar(45) CHARACTER SET
 		utf8 NOT NULL,
 		`type`
-		varchar(45) CHARACTER SET utf8 NOT NULL,
-		`idparameter` int(11) NOT
+		text CHARACTER SET utf8 NOT NULL,
+		`idparameter`
+		int(11) NOT
 		NULL
 		AUTO_INCREMENT,
 		PRIMARY KEY
@@ -149,35 +150,27 @@
 	</update>
 
 	<update id="createExperimentArgumentTable">
-		CREATE TABLE IF NOT EXISTS
-		`experiment_argument` (
+		CREATE TABLE IF NOT EXISTS `experiment_argument` (
 		`operation` int(11) NOT NULL,
 		`parameter` int(11) NOT NULL,
 		`number`
 		int(11) NOT NULL,
+		`subarg` varchar(100) DEFAULT NULL,
 		PRIMARY KEY
 		(`operation`,`parameter`,`number`),
-		KEY
-		`args_parameter_fk`
+		KEY `args_parameter_fk`
 		(`parameter`),
-		KEY `args_operation_fk`
-		(`operation`),
+		KEY `args_operation_fk` (`operation`),
 		CONSTRAINT
-		`args_operation_fk` FOREIGN KEY (`operation`)
-		REFERENCES
-		`experiment_operation` (`idoperation`) ON DELETE
-		CASCADE ON
-		UPDATE
+		`args_operation_fk` FOREIGN KEY (`operation`) REFERENCES
+		`experiment_operation` (`idoperation`) ON DELETE CASCADE ON UPDATE
 		CASCADE,
-		CONSTRAINT `args_parameter_fk` FOREIGN KEY
-		(`parameter`)
+		CONSTRAINT `args_parameter_fk` FOREIGN KEY (`parameter`)
 		REFERENCES
-		`experiment_parameter`
-		(`idparameter`) ON DELETE CASCADE ON
+		`experiment_parameter` (`idparameter`) ON DELETE CASCADE ON
 		UPDATE
 		CASCADE
-		) ENGINE=InnoDB
-		DEFAULT CHARSET=utf8
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
 	</update>
 
 	<update id="createExperimentContextTable">
@@ -186,7 +179,7 @@
 		`pid` int(11) NOT NULL,
 		`rid`
 		int(11) NOT NULL,
-		`value` varchar(128)
+		`value` text
 		DEFAULT NULL,
 		PRIMARY KEY
 		(`pid`,`rid`),
@@ -201,15 +194,18 @@
 		FOREIGN KEY
 		(`pid`) REFERENCES
 		`experiment_parameter`
-		(`idparameter`) ON DELETE
+		(`idparameter`) ON
+		DELETE
 		CASCADE ON UPDATE
 		CASCADE,
 		CONSTRAINT
-		`context_reservation_fk` FOREIGN
+		`context_reservation_fk`
+		FOREIGN
 		KEY (`rid`)
 		REFERENCES
 		`reservation`
-		(`idreservation`) ON DELETE CASCADE ON
+		(`idreservation`) ON DELETE
+		CASCADE ON
 		UPDATE
 		CASCADE
 		) ENGINE=InnoDB
@@ -219,17 +215,20 @@
 	<update id="createExperimentResultsTable">
 		CREATE TABLE IF NOT EXISTS `experiment_results` (
 		`idresult` int(11) NOT NULL AUTO_INCREMENT,
-		`value` varchar(200) NOT
+		`value` text NOT
 		NULL,
 		`date` datetime NOT NULL,
 		`context` int(11) NOT NULL,
 		`user`
-		varchar(45) NOT NULL,
+		varchar(45)
+		NOT NULL,
 		`tag` int(11) NOT NULL,
 		PRIMARY KEY (`idresult`),
-		KEY `context_results_fk` (`context`),
+		KEY
+		`context_results_fk` (`context`),
 		KEY `user_results_fk` (`user`),
-		KEY `tag_results_fk` (`tag`),
+		KEY
+		`tag_results_fk` (`tag`),
 		CONSTRAINT `tag_results_fk` FOREIGN KEY
 		(`tag`) REFERENCES
 		`experiment_parameter` (`idparameter`) ON DELETE
@@ -243,7 +242,7 @@
 		(`user`) REFERENCES `user` (`name`) ON
 		DELETE CASCADE ON UPDATE CASCADE
 		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
-	</update>	
+	</update>
 
 	<select id="getExperimentParameter"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ParameterEntry">
@@ -379,10 +378,10 @@
 		INSERT INTO
 		`experiment_argument`
 		(operation, parameter,
-		number)
+		number, subarg)
 		VALUE (
 		#{operation}, #{parameter},
-		#{number})
+		#{number}, #{subarg})
 	</insert>
 
 	<select id="getExperiment"
@@ -642,7 +641,8 @@
 		INSERT INTO
 		`experiment_results`
 		(value,
-		date, context, user, tag)
+		date, context,
+		user, tag)
 		VALUE (
 		#{value}, #{date}, #{context}, #{user}, #{tag})
 	</insert>

@@ -974,6 +974,43 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntSlewToCoordinates(null, mount, ra, dec);
+			
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public double getRA(String mount)
+			throws TeleoperationException {
+		String actionMessage = mount + "/getRA->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			double ra = rtsPort.mntGetPosAxis1(null, mount);
+			return ra;
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public double getDEC(String mount)
+			throws TeleoperationException {
+		String actionMessage = mount + "/getDEC->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			double dec = rtsPort.mntGetPosAxis2(null, mount);
+			return dec;
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");

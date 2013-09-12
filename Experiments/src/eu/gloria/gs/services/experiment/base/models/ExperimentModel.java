@@ -49,7 +49,7 @@ public abstract class ExperimentModel {
 	}
 
 	public void addParameter(String name, ExperimentParameter parameter,
-			String[] arguments) throws ExperimentParameterException {
+			Object[] arguments) throws ExperimentParameterException {
 
 		if (parameters.containsKey(name)) {
 			throw new ExperimentParameterException("The parameter '" + name
@@ -63,23 +63,23 @@ public abstract class ExperimentModel {
 			ArrayList<Class<?>> parameterValueTypes = parameter.getType()
 					.getArgumentTypes();
 
-			for (String argument : arguments) {
+			for (Object argument : arguments) {
 				try {
 
 					if (parameter.argumentIsOperation(order)) {
-						if (!this.containsOperation(argument)) {
+						if (!this.containsOperation((String) argument)) {
 							throw new ExperimentParameterArgumentException(
 									"The operation referenced is not contained on the current model");
 						}
 					} else {
 						if (parameter.argumentIsParameter(order)) {
-							if (!this.containsParameter(argument)) {
+							if (!this.containsParameter((String) argument)) {
 								throw new ExperimentParameterArgumentException(
 										"The parameter referenced is not contained on the current model");
 							}
 
 							ExperimentParameter experimentParameter = this
-									.getParameter(argument);
+									.getParameter((String) argument);
 
 							if (!parameter.getParameterDependencies()
 									.get(order).getName()
@@ -89,26 +89,22 @@ public abstract class ExperimentModel {
 										"The type of the referenced parameter is not valid");
 							}
 
-						} else {
-
-							if (parameterValueTypes.get(order).equals(
-									Double.class)) {
-								try {
-									Double.parseDouble(argument);
-								} catch (NumberFormatException e) {
-									throw new ExperimentParameterArgumentException(
-											e.getMessage());
-								}
-							} else if (parameterValueTypes.get(order).equals(
-									Integer.class)) {
-								try {
-									Integer.parseInt(argument);
-								} catch (NumberFormatException e) {
-									throw new ExperimentParameterArgumentException(
-											e.getMessage());
-								}
-							}
-						}
+						} /*
+						 * else {
+						 * 
+						 * 
+						 * 
+						 * if (parameterValueTypes.get(order).equals(
+						 * Double.class)) { try { Double.parseDouble(argument);
+						 * } catch (NumberFormatException e) { throw new
+						 * ExperimentParameterArgumentException(
+						 * e.getMessage()); } } else if
+						 * (parameterValueTypes.get(order).equals(
+						 * Integer.class)) { try { Integer.parseInt(argument); }
+						 * catch (NumberFormatException e) { throw new
+						 * ExperimentParameterArgumentException(
+						 * e.getMessage()); } } }
+						 */
 					}
 
 				} catch (UndefinedExperimentParameterException e) {
@@ -134,15 +130,26 @@ public abstract class ExperimentModel {
 		ExperimentParameter[] parameterTypes = operation.getParameterTypes();
 
 		for (String argument : arguments) {
+
+			String actualArgument = argument;
+
+			if (argument.contains(".")) {
+				actualArgument = argument.substring(0, argument.indexOf("."));
+			}
+
 			try {
 				ExperimentParameter experimentParameter = this
-						.getParameter(argument);
+						.getParameter(actualArgument);
 
-				if (!experimentParameter.getName().equals(
-						parameterTypes[order].getName())) {
+				if (!parameterTypes[order].getName().equals("OBJECT")
+						&& (!experimentParameter.getName().equals(
+								parameterTypes[order].getName()) || !argument
+								.equals(actualArgument))) {
+
 					throw new ExperimentOperationArgumentException("Argument "
-							+ order + " (" + argument + ") of operation '"
-							+ operation.getName() + "' is incorrect");
+							+ order + " (" + actualArgument
+							+ ") of operation '" + operation.getName()
+							+ "' is incorrect");
 				}
 
 			} catch (UndefinedExperimentParameterException e) {
