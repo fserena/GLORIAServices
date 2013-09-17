@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online;
+package eu.gloria.gs.services.experiment;
 
 import java.util.Date;
 import java.util.List;

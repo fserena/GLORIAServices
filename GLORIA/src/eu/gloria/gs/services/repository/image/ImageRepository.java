@@ -144,10 +144,14 @@ public class ImageRepository extends GSLogProducerService implements
 	 * getAllReservationImageIdentifiers(java.lang.String)
 	 */
 	@Override
-	public List<Integer> getAllReservationImageIdentifiers(
-			@WebParam(name = "rid") String rid) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ImageInformation> getAllReservationImages(
+			@WebParam(name = "rid") int rid) throws ImageRepositoryException {
+		
+		try {
+			return this.adapter.getImagesByReservation(rid, 100);
+		} catch (ImageDatabaseException e) {
+			throw new ImageRepositoryException(e.getMessage());
+		}
 	}
 
 	/*
@@ -161,9 +165,7 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "dateFrom") Date from,
 			@WebParam(name = "dateTo") Date to) {
 	
-		System.out.println("Getting images by date ----------------------------->>>>>>");
-
-		return this.adapter.getAllImagesBetween(from, to);
+		return this.adapter.getAllImagesBetween(from, to, 100);
 	}
 
 	/*

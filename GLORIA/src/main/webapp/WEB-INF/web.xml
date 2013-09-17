@@ -40,7 +40,7 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eu.gloria.gs.services.experiment.online.ExperimentExecutorTask</listener-class>
+		<listener-class>eu.gloria.gs.services.experiment.ExperimentExecutorTask</listener-class>
 	</listener>
 	<listener>
 		<listener-class>eu.gloria.gs.services.repository.image.ImageExecutorTask</listener-class>

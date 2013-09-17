@@ -7,7 +7,7 @@ import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
-import eu.gloria.gs.services.experiment.online.operations.OperationContextService;
+import eu.gloria.gs.services.experiment.operations.OperationContextService;
 
 public class OperationContext extends Context {
 

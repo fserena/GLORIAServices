@@ -2,15 +2,11 @@ package eu.gloria.gs.services.experiment.base.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
@@ -74,8 +70,8 @@ public class ExperimentDBAdapter {
 
 				OperationEntry entry = new OperationEntry();
 				entry.setExperiment(experimentId);
-				entry.setType(operationInfo.getOperationName());
-				entry.setOperation(operationInfo.getModelName());
+				entry.setType(operationInfo.getType());
+				entry.setOperation(operationInfo.getName());
 
 				service.saveExperimentOperation(entry);
 
@@ -106,9 +102,9 @@ public class ExperimentDBAdapter {
 
 				ParameterEntry entry = new ParameterEntry();
 				entry.setExperiment(experimentId);
-				entry.setParameter(parameterInfo.getModelName());
+				entry.setParameter(parameterInfo.getName());
 
-				String type = parameterInfo.getParameterName();
+				String type = parameterInfo.getType();
 
 				ArrayList<Class<?>> argumentTypes = parameterInfo
 						.getParameter().getType().getArgumentTypes();
@@ -321,11 +317,27 @@ public class ExperimentDBAdapter {
 
 	/**
 	 * @param experiment
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public String getExperimentType(String experiment)
+			throws ExperimentDatabaseException {
+
+		try {
+			ExperimentEntry expEntry = service.getExperiment(experiment);
+			return expEntry.getType();
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param experiment
 	 * @param author
 	 * @throws ExperimentDatabaseException
 	 * @throws DuplicateExperimentException
 	 */
-	public void createExperiment(String experiment, String author)
+	public void createExperiment(String experiment, String author, String type)
 			throws ExperimentDatabaseException, DuplicateExperimentException {
 
 		boolean alreadyContained = true;
@@ -338,7 +350,7 @@ public class ExperimentDBAdapter {
 				ExperimentEntry entry = new ExperimentEntry();
 				entry.setAuthor(author);
 				entry.setName(experiment);
-				entry.setType("ONLINE");
+				entry.setType(type);
 				service.saveExperiment(entry);
 			}
 
@@ -408,13 +420,13 @@ public class ExperimentDBAdapter {
 	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public List<String> getAllOnlineExperiments()
+	public List<String> getAllExperiments(String type)
 			throws ExperimentDatabaseException {
 
 		List<String> experiments = null;
 
 		try {
-			experiments = service.getAllTypeExperiments("ONLINE");
+			experiments = service.getAllTypeExperiments(type);
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
@@ -504,10 +516,10 @@ public class ExperimentDBAdapter {
 				for (OperationEntry operationEntry : opEntries) {
 
 					OperationInformation opInfo = new OperationInformation();
-					opInfo.setModelName(operationEntry.getOperation());
+					opInfo.setName(operationEntry.getOperation());
 					opInfo.setOperation(operationFactory
 							.createOperation(operationEntry.getType()));
-					opInfo.setOperationName(operationEntry.getType());
+					opInfo.setType(operationEntry.getType());
 
 					List<ArgumentEntry> argumentEntries = service
 							.getOperationArguments(operationEntry
@@ -552,7 +564,7 @@ public class ExperimentDBAdapter {
 				for (ParameterEntry parameterEntry : paramEntries) {
 
 					ParameterInformation paramInfo = new ParameterInformation();
-					paramInfo.setModelName(parameterEntry.getParameter());
+					paramInfo.setName(parameterEntry.getParameter());
 
 					String typePattern = parameterEntry.getType();
 					String parameterType = null;
@@ -584,7 +596,7 @@ public class ExperimentDBAdapter {
 								"The type pattern is incorrect: " + typePattern);
 					}
 
-					paramInfo.setParameterName(parameterType);
+					paramInfo.setType(parameterType);
 					paramInfo.setParameter(parameterFactory
 							.createParameter(parameterType));
 
@@ -981,10 +993,13 @@ public class ExperimentDBAdapter {
 			reservationEntry = service.getReservation(username, experimentId,
 					timeSlot.getBegin(), timeSlot.getEnd());
 
-			for (String rt : telescopes) {
+			if (telescopes != null) {
 
-				service.saveRTReservation(reservationEntry.getIdreservation(),
-						rt);
+				for (String rt : telescopes) {
+
+					service.saveRTReservation(
+							reservationEntry.getIdreservation(), rt);
+				}
 			}
 
 		} catch (PersistenceException e) {
@@ -1035,7 +1050,7 @@ public class ExperimentDBAdapter {
 	 * @param service
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setOnlineExperimentDBService(ExperimentDBService service)
+	public void setExperimentDBService(ExperimentDBService service)
 			throws ExperimentDatabaseException {
 		this.service = service;
 

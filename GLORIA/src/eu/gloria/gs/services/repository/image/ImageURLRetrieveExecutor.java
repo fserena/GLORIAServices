@@ -70,7 +70,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		List<ImageInformation> notUrlCompleted = null;
 
 		try {
-			notUrlCompleted = this.adapter.getAllWithoutUrl();
+			notUrlCompleted = this.adapter.getAllWithoutUrl(100);
 
 			if (notUrlCompleted.size() > 0) {
 				try {

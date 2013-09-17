@@ -57,14 +57,14 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 			ParameterContext parameterContext = null;
 
 			parameterContext = this.createParameterContext(paramInfo, context);
-			context.addParameter(paramInfo.getModelName(), parameterContext);
+			context.addParameter(paramInfo.getName(), parameterContext);
 		}
 
 		for (OperationInformation opInfo : experimentInfo.getOperations()) {
 			OperationContext operationContext = null;
 
 			operationContext = this.createOperationContext(opInfo, context);
-			context.addOperation(opInfo.getModelName(), operationContext);
+			context.addOperation(opInfo.getName(), operationContext);
 
 		}
 
@@ -80,7 +80,7 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 
 		parameterContext.setExperimentParameter(paramInfo.getParameter());
 		parameterContext.setExperimentContext(context);
-		parameterContext.setName(paramInfo.getModelName());
+		parameterContext.setName(paramInfo.getName());
 		parameterContext.setContextArguments(paramInfo.getArguments());
 
 		return parameterContext;
@@ -96,7 +96,7 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 
 		operationContext.setExperimentOperation(opInfo.getOperation());
 		operationContext.setExperimentContext(context);
-		operationContext.setName(opInfo.getModelName());
+		operationContext.setName(opInfo.getName());
 		operationContext.setContextArguments(opInfo.getArguments());
 
 		return operationContext;

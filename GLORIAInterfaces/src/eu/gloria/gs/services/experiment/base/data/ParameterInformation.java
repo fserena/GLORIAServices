@@ -9,17 +9,17 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 @XmlSeeAlso(Object[].class)
 public class ParameterInformation {
 
-	private String modelName;
-	private String parameterName;
+	private String name;
+	private String type;
 	protected ExperimentParameter parameter;
 	private Object[] arguments;
 
-	public String getModelName() {
-		return modelName;
+	public String getName() {
+		return name;
 	}
 
-	public void setModelName(String name) {
-		this.modelName = name;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public ExperimentParameter getParameter() {
@@ -38,12 +38,12 @@ public class ParameterInformation {
 		this.arguments = arguments;
 	}
 
-	public String getParameterName() {
-		return parameterName;
+	public String getType() {
+		return type;
 	}
 
-	public void setParameterName(String parameterName) {
-		this.parameterName = parameterName;
+	public void setType(String parameterName) {
+		this.type = parameterName;
 	}
 
 }

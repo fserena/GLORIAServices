@@ -1,7 +1,8 @@
-package eu.gloria.gs.services.experiment.online.reservation;
+package eu.gloria.gs.services.experiment.reservation;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
+import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
@@ -182,6 +183,54 @@ public class ExperimentBooker {
 			}
 		} catch (ExperimentDatabaseException e) {
 			throw e;
+		}
+	}
+
+	public void applyFor(String experiment, String username)
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException, NoSuchExperimentException {
+
+		if (adapter.containsExperiment(experiment)) {
+			String type = adapter.getExperimentType(experiment);
+
+			if (type.equals("OFFLINE")) {
+
+				List<ReservationInformation> reservations = null;
+				try {
+					reservations = adapter
+							.getUserReservationActiveNow(username);
+
+				} catch (NoReservationsAvailableException e) {
+
+				}
+
+				if (reservations != null) {
+					for (ReservationInformation resInfo : reservations) {
+						if (resInfo.getExperiment().equals(experiment)) {
+							throw new NoReservationsAvailableException(
+									"You already have a context of "
+											+ experiment);
+						}
+					}
+				}
+
+				Calendar calendar = Calendar.getInstance();
+				Date date = new Date();
+				calendar.setTime(date);
+
+				calendar.set(Calendar.HOUR_OF_DAY, 0);
+				calendar.set(Calendar.MINUTE, 0);
+
+				TimeSlot timeSlot = new TimeSlot();
+				timeSlot.setBegin(calendar.getTime());
+
+				calendar.set(Calendar.DAY_OF_YEAR,
+						calendar.get(Calendar.DAY_OF_YEAR) + 30);
+				timeSlot.setEnd(calendar.getTime());
+				adapter.makeReservation(experiment, null, username, timeSlot);
+			} else {
+				throw new NoSuchExperimentException("The experiment " + experiment + " cannot be applied");
+			}
 		}
 	}
 

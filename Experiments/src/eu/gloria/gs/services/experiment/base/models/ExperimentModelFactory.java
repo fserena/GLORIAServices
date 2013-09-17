@@ -80,14 +80,14 @@ public class ExperimentModelFactory {
 
 				try {
 					expParameter = this.parameterFactory
-							.createParameter(parameterInfo.getParameterName());
+							.createParameter(parameterInfo.getType());
 				} catch (ParameterTypeNotAvailableException
 						| ExperimentParameterException e) {
 					throw new InvalidExperimentModelException(e.getMessage());
 				}
 
 				try {
-					model.addParameter(parameterInfo.getModelName(),
+					model.addParameter(parameterInfo.getName(),
 							expParameter, parameterInfo.getArguments());
 				} catch (ExperimentParameterException e) {
 					throw new InvalidExperimentModelException(e.getMessage());
@@ -105,7 +105,7 @@ public class ExperimentModelFactory {
 
 			try {
 				expParameter = (ExperimentParameter) this.parameterFactory
-						.createParameter(parameterInfo.getParameterName());
+						.createParameter(parameterInfo.getType());
 			} catch (ParameterTypeNotAvailableException
 					| ExperimentParameterException e) {
 				throw new InvalidExperimentModelException(e.getMessage());
@@ -132,12 +132,12 @@ public class ExperimentModelFactory {
 				) {
 					throw new InvalidExperimentModelException(
 							"The operation dependent parameter '"
-									+ parameterInfo.getModelName()
+									+ parameterInfo.getName()
 									+ "' is not well-defined");
 				}
 
 				try {
-					model.addOperation(actualOperationInfo.getModelName(),
+					model.addOperation(actualOperationInfo.getName(),
 							actualOperationInfo.getOperation(),
 							actualOperationInfo.getArguments());
 					preCreatedOperations.add(actualOperationInfo);
@@ -148,7 +148,7 @@ public class ExperimentModelFactory {
 			}
 
 			try {
-				model.addParameter(parameterInfo.getModelName(), expParameter,
+				model.addParameter(parameterInfo.getName(), expParameter,
 						parameterInfo.getArguments());
 			} catch (ExperimentParameterException e) {
 				throw new InvalidExperimentModelException(e.getMessage());
@@ -163,14 +163,14 @@ public class ExperimentModelFactory {
 				ExperimentOperation expOperation = null;
 				try {
 					expOperation = operationFactory.createOperation(operation
-							.getOperationName());
+							.getType());
 				} catch (OperationTypeNotAvailableException e) {
 					throw new InvalidExperimentModelException(e.getMessage());
 
 				}
 
 				try {
-					model.addOperation(operation.getModelName(), expOperation,
+					model.addOperation(operation.getName(), expOperation,
 							operation.getArguments());
 				} catch (ExperimentOperationException e) {
 					throw new InvalidExperimentModelException(e.getMessage());
@@ -184,7 +184,7 @@ public class ExperimentModelFactory {
 		return model;
 	}
 
-	public void createCustomExperiment(String experiment, String author)
+	public void createCustomExperiment(String experiment, String author, String type)
 			throws DuplicateExperimentException, ExperimentDatabaseException {
 		try {
 			if (adapter.containsExperiment(experiment)) {
@@ -196,7 +196,7 @@ public class ExperimentModelFactory {
 		}
 
 		try {
-			adapter.createExperiment(experiment, author);
+			adapter.createExperiment(experiment, author, type);
 		} catch (ExperimentDatabaseException e) {
 			throw e;
 		}

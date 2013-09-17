@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online;
+package eu.gloria.gs.services.experiment;
 
 import java.util.List;
 import java.util.Set;
@@ -29,132 +29,138 @@ import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeExcep
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 
-@WebService(name = "OnlineExperimentInterface", targetNamespace = "http://online.experiment.services.gs.gloria.eu/")
-public interface OnlineExperimentInterface {
+@WebService(name = "ExperimentInterface", targetNamespace = "http://experiment.services.gs.gloria.eu/")
+public interface ExperimentInterface {
 
-	public void createExperiment(
+	public void createOnlineExperiment(
 			@WebParam(name = "experiment") String experiment)
-			throws OnlineExperimentException, DuplicateExperimentException;
+			throws ExperimentException, DuplicateExperimentException;
+
+	public void createOfflineExperiment(
+			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, DuplicateExperimentException;
 
 	public void removeExperiment(
 			@WebParam(name = "experiment") String experiment)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public void addExperimentOperation(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "operation") OperationInformation operation)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public void addExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public boolean testExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public FeatureCompliantInformation getFeatureCompliantInformation(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public void addExperimentParameter(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "operation") ParameterInformation parameter)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public ExperimentInformation getExperimentInformation(
 			@WebParam(name = "experiment") String experiment)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
 	public void setExperimentDescription(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "description") String description)
-			throws OnlineExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException;
 
-	public List<String> getAllOnlineExperiments()
-			throws OnlineExperimentException;
+	public List<String> getAllOnlineExperiments() throws ExperimentException;
+
+	public List<String> getAllOfflineExperiments() throws ExperimentException;
 
 	public boolean containsExperiment(
 			@WebParam(name = "experiment") String experiment)
-			throws OnlineExperimentException;
+			throws ExperimentException;
 
 	public List<ReservationInformation> getMyPendingReservations()
-			throws OnlineExperimentException, NoReservationsAvailableException;
+			throws ExperimentException, NoReservationsAvailableException;
 
-	public boolean anyReservationActiveNow() throws OnlineExperimentException;
+	public boolean anyReservationActiveNow() throws ExperimentException;
 
 	public List<ReservationInformation> getMyCurrentReservations()
-			throws OnlineExperimentException, NoReservationsAvailableException;
+			throws ExperimentException, NoReservationsAvailableException;
 
 	public void reserveExperiment(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "telescopes") List<String> telescopes,
 			@WebParam(name = "timeslot") TimeSlot timeSlot)
-			throws OnlineExperimentException, NoReservationsAvailableException,
+			throws ExperimentException, NoReservationsAvailableException,
 			ExperimentReservationArgumentException, MaxReservationTimeException;
+
+	public void applyForExperiment(
+			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, NoReservationsAvailableException,
+			NoSuchExperimentException;
 
 	public List<TimeSlot> getAvailableReservations(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "telescopes") List<String> telescopes)
-			throws OnlineExperimentException,
-			ExperimentReservationArgumentException;
+			throws ExperimentException, ExperimentReservationArgumentException;
 
 	public void cancelExperimentReservation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws OnlineExperimentException, NoSuchReservationException;
+			throws ExperimentException, NoSuchReservationException;
 
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws OnlineExperimentException;
+			throws ExperimentException;
 
 	public void executeExperimentOperation(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "operation") String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
 			ExperimentParameterException, ExperimentNotInstantiatedException,
-			OnlineExperimentException, NoSuchReservationException,
+			ExperimentException, NoSuchReservationException,
 			NoSuchExperimentException;
 
 	public void setExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter,
 			@WebParam(name = "value") ObjectResponse value)
-			throws OnlineExperimentException,
-			ExperimentNotInstantiatedException, NoSuchReservationException;
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
 
 	public ObjectResponse getExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter)
-			throws OnlineExperimentException,
-			ExperimentNotInstantiatedException, NoSuchReservationException;
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
 
 	public ExperimentRuntimeInformation getExperimentRuntimeInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws OnlineExperimentException,
-			ExperimentNotInstantiatedException, NoSuchReservationException;
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
 
-	public Set<String> getAllExperimentParameters()
-			throws OnlineExperimentException;
+	public Set<String> getAllExperimentParameters() throws ExperimentException;
 
-	public Set<String> getAllExperimentOperations()
-			throws OnlineExperimentException;
+	public Set<String> getAllExperimentOperations() throws ExperimentException;
 
-	public Set<String> getAllExperimentFeatures()
-			throws OnlineExperimentException;
+	public Set<String> getAllExperimentFeatures() throws ExperimentException;
 
 	public ExperimentParameter getExperimentParameter(
 			@WebParam(name = "parameterName") String name)
-			throws OnlineExperimentException;
+			throws ExperimentException;
 
 	public ExperimentOperation getExperimentOperation(
 			@WebParam(name = "operationName") String name)
-			throws OnlineExperimentException;
+			throws ExperimentException;
 
 	public ExperimentFeature getExperimentFeature(
 			@WebParam(name = "featureName") String name)
-			throws OnlineExperimentException;
+			throws ExperimentException;
 
 }

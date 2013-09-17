@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online.reservation;
+package eu.gloria.gs.services.experiment.reservation;
 
 import java.util.Calendar;
 import java.util.Date;

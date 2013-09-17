@@ -2,7 +2,6 @@ package eu.gloria.gs.services.experiment.base.parameters;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.online.parameters.ParameterContextService;
+import eu.gloria.gs.services.experiment.parameters.ParameterContextService;
 
 public class ParameterContext extends Context {
 
@@ -148,7 +147,9 @@ public class ParameterContext extends Context {
 			ContextNotReadyException {
 	}
 
-	public Object parseValue(String valueStr, String[] tree) throws IOException {
+	public Object parseValue(String valueStr, String[] tree)
+			throws IOException, ExperimentParameterException,
+			ExperimentNotInstantiatedException, NoSuchExperimentException {
 
 		Class<?> valueType = this.getExperimentParameter().getType()
 				.getValueType();
@@ -157,10 +158,56 @@ public class ParameterContext extends Context {
 
 		Object value = JSONConverter.fromJSON(valueStr, valueType, elementType);
 
+		boolean listIndexing = false;
+		String indexArg = "";
+
 		if (tree != null && tree.length > 1) {
 			for (int i = 1; i < tree.length; i++) {
 				if (value instanceof Map) {
 					value = ((Map<?, ?>) value).get(tree[i]);
+				} else if (value instanceof List) {
+					if (!listIndexing && tree[i].startsWith("[")) {
+						listIndexing = true;
+						indexArg = "";
+						String listOrder = tree[i].substring(1);
+
+						if (listOrder.endsWith("]")) {
+							indexArg += listOrder.substring(0,
+									listOrder.length() - 1);
+							listIndexing = false;
+						} else {
+							indexArg += listOrder;
+						}
+					} else if (listIndexing) {
+						if (tree[i].endsWith("]")) {
+							indexArg += "."
+									+ tree[i]
+											.substring(0, tree[i].length() - 1);
+							listIndexing = false;
+						} else {
+							indexArg += "." + tree[i];
+						}
+					}
+
+					if (!listIndexing && !indexArg.equals("")) {
+						int index = 0;
+
+						if (indexArg.equals("length")) {
+							value = ((List<?>) value).size();
+						} else {
+							try {
+								index = Integer.valueOf(indexArg);
+							} catch (NumberFormatException e) {
+								index = (Integer) this.getExperimentContext()
+										.getParameterValue(indexArg);
+							}
+
+							value = ((List<?>) value).get(index);
+						}
+					} else {
+						throw new IOException(
+								"The parameter is a list, cannot access object-style");
+					}
 				} else {
 					throw new IOException("Cannot access object property");
 				}
@@ -207,6 +254,10 @@ public class ParameterContext extends Context {
 			if (tree != null && tree.length > 1) {
 				actualValue = this.getValue(null);
 				Object currentNode = actualValue;
+
+				boolean listIndexing = false;
+				String indexArg = "";
+
 				for (int i = 1; i < tree.length; i++) {
 					if (currentNode instanceof Map) {
 						if (i < tree.length - 1) {
@@ -222,10 +273,32 @@ public class ParameterContext extends Context {
 									value);
 						}
 					} else if (currentNode instanceof List) {
-						// if (i == tree.length - 1) {
-						if (tree[i].startsWith("$")) {
+						if (!listIndexing && tree[i].startsWith("[")) {
+							listIndexing = true;
+							indexArg = "";
+
 							String listOrder = tree[i].substring(1);
-							if (listOrder.equals("add")) {
+
+							if (listOrder.endsWith("]")) {
+								indexArg += listOrder.substring(0,
+										listOrder.length() - 1);
+								listIndexing = false;
+							} else {
+								indexArg += listOrder;
+							}
+						} else if (listIndexing) {
+							if (tree[i].endsWith("]")) {
+								indexArg += "."
+										+ tree[i].substring(0,
+												tree[i].length() - 1);
+								listIndexing = false;
+							} else {
+								indexArg += "." + tree[i];
+							}
+						}
+
+						if (!listIndexing && !indexArg.equals("")) {
+							if (indexArg.equals("add")) {
 								if (i == tree.length - 1) {
 									((List<Object>) currentNode).add(value);
 								} else {
@@ -233,17 +306,43 @@ public class ParameterContext extends Context {
 											"A list can only be modified at leaf level");
 								}
 							} else {
-								int paramIndex = (Integer) this
-										.getExperimentContext()
-										.getParameterValue(listOrder);
-								
+								int paramIndex = 0;
+
+								try {
+									paramIndex = Integer.valueOf(indexArg);
+								} catch (NumberFormatException e) {
+									paramIndex = (Integer) this
+											.getExperimentContext()
+											.getParameterValue(indexArg);
+								}
+
 								if (((List<Object>) currentNode).size() < paramIndex + 1) {
-									for (int j = ((List<Object>) currentNode).size(); j < paramIndex + 1; j++) {
-										((List<Object>) currentNode).add(null);
+									int size = ((List<Object>) currentNode)
+											.size();
+									for (int j = size; j < paramIndex + 1; j++) {
+
+										if (tree.length > i + 1) {
+											if (tree[i + 1].startsWith("[")) {
+												((List<Object>) currentNode)
+														.add(new ArrayList<>());
+											} else {
+												((List<Object>) currentNode)
+														.add(new LinkedHashMap<>());
+											}
+										} else {
+											if (j == paramIndex) {
+												((List<Object>) currentNode)
+														.add(value);
+											}else {
+												((List<Object>) currentNode)
+												.add(null);
+											}
+										}
 									}
 								}
-								
-								currentNode = ((List<Object>) currentNode).get(paramIndex);
+
+								currentNode = ((List<Object>) currentNode)
+										.get(paramIndex);
 							}
 						}
 					} else {

@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online.parameters;
+package eu.gloria.gs.services.experiment.parameters;
 
 import java.util.List;
 

@@ -31,13 +31,13 @@ public class ExperimentParameter {
 		return null;
 	}
 
-	public OperationType getOperationArgumentType(int order) {
+/*	public OperationType getOperationArgumentType(int order) {
 		if (this.argumentIsParameter(order)) {
 			return operationDependencies.get(order).getType();
 		}
 
 		return null;
-	}
+	}*/
 
 	public Class<?> getValueArgumentType(int order) {
 		return this.type.getArgumentTypes().get(order);

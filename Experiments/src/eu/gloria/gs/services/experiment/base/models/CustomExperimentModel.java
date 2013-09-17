@@ -62,12 +62,12 @@ public class CustomExperimentModel extends ExperimentModel {
 
 		try {
 			operation = operationFactory.createOperation(operationInfo
-					.getOperationName());
+					.getType());
 		} catch (OperationTypeNotAvailableException e) {
 			throw e;
 		}
 
-		this.addOperation(operationInfo.getModelName(), operation,
+		this.addOperation(operationInfo.getName(), operation,
 				operationInfo.getArguments());
 
 		try {
@@ -80,7 +80,7 @@ public class CustomExperimentModel extends ExperimentModel {
 
 		try {
 			adapter.setOperationArguments(this.getName(),
-					operationInfo.getModelName(), operationInfo.getArguments());
+					operationInfo.getName(), operationInfo.getArguments());
 		} catch (ExperimentDatabaseException e) {
 			throw new CustomExperimentException(e.getMessage());
 		}
@@ -95,7 +95,7 @@ public class CustomExperimentModel extends ExperimentModel {
 
 		try {
 			parameter = parameterFactory.createParameter(parameterInfo
-					.getParameterName());
+					.getType());
 		} catch (ParameterTypeNotAvailableException
 				| ExperimentParameterException e) {
 			throw new CustomExperimentException(e.getMessage());
@@ -103,7 +103,7 @@ public class CustomExperimentModel extends ExperimentModel {
 
 		parameterInfo.setParameter(parameter);
 		
-		this.addParameter(parameterInfo.getModelName(), parameter,
+		this.addParameter(parameterInfo.getName(), parameter,
 				parameterInfo.getArguments());
 
 		try {
@@ -220,11 +220,11 @@ public class CustomExperimentModel extends ExperimentModel {
 
 					if (allowCreate) {
 						ParameterInformation paramInfo = new ParameterInformation();
-						paramInfo.setModelName(concreteParamNames
+						paramInfo.setName(concreteParamNames
 								.get(paramName));
 						paramInfo.setParameter(parameterFeature.getParameter());
 
-						paramInfo.setParameterName(parameterFeature
+						paramInfo.setType(parameterFeature
 								.getParameter().getConcreteName());
 
 						String[] parameterArguments = parameterFeature
@@ -330,10 +330,10 @@ public class CustomExperimentModel extends ExperimentModel {
 
 					if (allowCreate) {
 						OperationInformation operationInfo = new OperationInformation();
-						operationInfo.setModelName(concreteOpNames.get(opName));
+						operationInfo.setName(concreteOpNames.get(opName));
 						operationInfo.setOperation(operationFeature
 								.getOperation());
-						operationInfo.setOperationName(operationFeature
+						operationInfo.setType(operationFeature
 								.getOperation().getConcreteName());
 
 						String[] argumentRelations = new String[0];
@@ -529,7 +529,7 @@ public class CustomExperimentModel extends ExperimentModel {
 					}
 
 					System.out
-							.println("---> " + paramInfo.getModelName() + ":");
+							.println("---> " + paramInfo.getName() + ":");
 
 					List<String> featureParameterDepOps = this
 							.getParameterDependentOperations(feature,
@@ -537,7 +537,7 @@ public class CustomExperimentModel extends ExperimentModel {
 
 					List<String> modelParameterDepOps = this
 							.getParameterDependentOperations(expInfo,
-									paramInfo.getModelName());
+									paramInfo.getName());
 
 					for (String featureParameterDepOp : featureParameterDepOps) {
 						if (!modelParameterDepOps
@@ -551,7 +551,7 @@ public class CustomExperimentModel extends ExperimentModel {
 						System.out.println(modelParameterDepOps);
 						parameterMatch = true;
 						returnFeatureParameters.put(featureParamName,
-								paramInfo.getModelName());
+								paramInfo.getName());
 						break;
 					}
 				}
@@ -606,7 +606,7 @@ public class CustomExperimentModel extends ExperimentModel {
 					if (allMatch) {
 						operationMatch = true;
 						returnFeatureOperations.put(featureOpName,
-								opInfo.getModelName());
+								opInfo.getName());
 						break;
 					}
 				}

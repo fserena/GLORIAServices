@@ -4,17 +4,17 @@ import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 
 public class OperationInformation {
 
-	private String modelName;
-	private String operationName;
+	private String name;
+	private String type;
 	private ExperimentOperation operation;
 	private String[] arguments;
 
-	public String getModelName() {
-		return modelName;
+	public String getName() {
+		return name;
 	}
 
-	public void setModelName(String name) {
-		this.modelName = name;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public ExperimentOperation getOperation() {
@@ -33,11 +33,11 @@ public class OperationInformation {
 		this.arguments = arguments;
 	}
 
-	public String getOperationName() {
-		return operationName;
+	public String getType() {
+		return type;
 	}
 
-	public void setOperationName(String operationName) {
-		this.operationName = operationName;
+	public void setType(String type) {
+		this.type = type;
 	}
 }

@@ -61,7 +61,7 @@ public class ExperimentInformation {
 
 	public boolean containsOperation(String name) {
 		for (OperationInformation opInfo : operations) {
-			if (opInfo.getModelName().equals(name)) {
+			if (opInfo.getName().equals(name)) {
 				return true;
 			}
 		}
@@ -71,7 +71,7 @@ public class ExperimentInformation {
 
 	public OperationInformation getOperation(String name) {
 		for (OperationInformation opInfo : operations) {
-			if (opInfo.getModelName().equals(name)) {
+			if (opInfo.getName().equals(name)) {
 				return opInfo;
 			}
 		}
@@ -81,7 +81,7 @@ public class ExperimentInformation {
 
 	public boolean containsParameter(String name) {
 		for (ParameterInformation paramInfo : parameters) {
-			if (paramInfo.getModelName().equals(name)) {
+			if (paramInfo.getName().equals(name)) {
 				return true;
 			}
 		}
@@ -91,7 +91,7 @@ public class ExperimentInformation {
 
 	public ParameterInformation getParameter(String name) {
 		for (ParameterInformation paramInfo : parameters) {
-			if (paramInfo.getModelName().equals(name)) {
+			if (paramInfo.getName().equals(name)) {
 				return paramInfo;
 			}
 		}

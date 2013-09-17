@@ -14,10 +14,10 @@ public class ExperimentOperationFactory implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	public OperationType getParameterType(String name) {
+	/*public OperationType getParameterType(String name) {
 
 		return (OperationType) applicationContext.getBean(name);
-	}
+	}*/
 
 	public ExperimentOperation createOperation(String operationName)
 			throws OperationTypeNotAvailableException {

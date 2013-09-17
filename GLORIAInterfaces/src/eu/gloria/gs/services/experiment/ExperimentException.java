@@ -1,11 +1,11 @@
-package eu.gloria.gs.services.experiment.online;
+package eu.gloria.gs.services.experiment;
 
-public class OnlineExperimentException extends Exception {
+public class ExperimentException extends Exception {
 
 	/**
 	 * 
 	 */
-	public OnlineExperimentException(String message)
+	public ExperimentException(String message)
 	{
 		super(message);
 	}

@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online.operations;
+package eu.gloria.gs.services.experiment.operations;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -63,6 +63,8 @@ public class OperationContextService extends ExperimentContextService {
 			this.setParameter(operationContext, operationArguments);
 		} else if (operation.equals("executeSequence")) {
 			this.executeSequence(operationContext, operationArguments);
+		} else if (operation.equals("iterateSequence")) {
+			this.iterateSequence(operationContext, operationArguments);
 		} else if (operation.equals("changeFocusRelative")) {
 			this.changeFocusRelative(operationContext, operationArguments);
 		} else if (operation.equals("stopContinuousImage")) {
@@ -166,12 +168,12 @@ public class OperationContextService extends ExperimentContextService {
 		String deviceName = deviceNames.get(deviceOrder);
 
 		try {
-			
-			LinkedHashMap<String, Object> result = new LinkedHashMap<>();
-			result.put("name", deviceName);
-			
+
+			// LinkedHashMap<String, Object> result = new LinkedHashMap<>();
+			// result.put("name", deviceName);
+
 			operationContext.getExperimentContext().setParameterValue(
-					(String) operationArguments[3], result);
+					(String) operationArguments[3], deviceName);
 		} catch (UndefinedExperimentParameterException
 				| NoSuchExperimentException
 				| ExperimentNotInstantiatedException
@@ -209,10 +211,57 @@ public class OperationContextService extends ExperimentContextService {
 
 	}
 
+	private void iterateSequence(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+
+		String sequenceNameParameter = (String) operationArguments[0];
+		String cursorNameParameter = (String) operationArguments[1];
+		String maxIterationsNameParameter = (String) operationArguments[2];		
+
+		String operationName = null;
+
+		try {
+			operationName = (String) operationContext.getExperimentContext()
+					.getParameterValue(sequenceNameParameter);
+		} catch (ExperimentParameterException | NoSuchExperimentException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		try {
+			int cursorInit = (Integer) operationContext.getExperimentContext()
+					.getParameterValue(cursorNameParameter);
+			int	maxIterations = (Integer) operationContext
+						.getExperimentContext().getParameterValue(
+								maxIterationsNameParameter);
+
+			for (int i = cursorInit; i < maxIterations; i++) {
+				OperationContext subContext = null;
+				try {
+					subContext = operationContext.getExperimentContext()
+							.getOperation(operationName);
+				} catch (NoSuchOperationException e) {
+					throw new ExperimentOperationException(e.getMessage());
+				}
+				subContext.execute();
+
+				operationContext.getExperimentContext().setParameterValue(
+						cursorNameParameter, i + 1);
+			}
+
+		} catch (NoSuchExperimentException | ExperimentParameterException
+				| ExperimentNotInstantiatedException
+				| UndefinedExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+
 	private void executeSequence(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 
-		for (Object argument : operationArguments) {
+		List<?> operationPointerNames = (List<?>)operationArguments[0]; 
+		
+		for (Object argument : operationPointerNames) {
 			String operationNameParameter = (String) argument;
 			String operationName = null;
 

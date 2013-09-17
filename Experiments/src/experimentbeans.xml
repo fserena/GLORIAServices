@@ -18,7 +18,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="onlineExperimentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+	<bean id="experimentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="mapperInterface"
 			value="eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentDBService" />
 		<property name="sqlSessionFactory" ref="sqlExperimentSessionFactory" />
@@ -27,7 +27,7 @@
 	<bean id="experimentAdapter"
 		class="eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter"
 		scope="singleton" lazy-init="true">
-		<property name="onlineExperimentDBService" ref="onlineExperimentMapper"></property>
+		<property name="experimentDBService" ref="experimentMapper"></property>
 		<property name="parameterFactory" ref="parameterFactory"></property>
 		<property name="operationFactory" ref="operationFactory"></property>
 	</bean>
@@ -62,12 +62,12 @@
 	</bean>
 
 	<bean id="rtBooker"
-		class="eu.gloria.gs.services.experiment.online.reservation.RTBooker" lazy-init="true">
+		class="eu.gloria.gs.services.experiment.reservation.RTBooker" lazy-init="true">
 		<property name="RTRepository" ref="rtRepository"></property>
 	</bean>
 
 	<bean id="experimentBooker"
-		class="eu.gloria.gs.services.experiment.online.reservation.ExperimentBooker" lazy-init="true">
+		class="eu.gloria.gs.services.experiment.reservation.ExperimentBooker" lazy-init="true">
 		<property name="adapter" ref="experimentAdapter"></property>
 		<property name="RTBooker" ref="rtBooker"></property>
 	</bean>
@@ -111,12 +111,12 @@
 	</bean>
 
 	<bean id="parameterContextService"
-		class="eu.gloria.gs.services.experiment.online.parameters.ParameterContextService"
+		class="eu.gloria.gs.services.experiment.parameters.ParameterContextService"
 		parent="experimentContextService" scope="singleton" lazy-init="true">
 	</bean>
 
 	<bean id="operationContextService"
-		class="eu.gloria.gs.services.experiment.online.operations.OperationContextService"
+		class="eu.gloria.gs.services.experiment.operations.OperationContextService"
 		parent="experimentContextService" scope="singleton" lazy-init="true">
 	</bean>
 

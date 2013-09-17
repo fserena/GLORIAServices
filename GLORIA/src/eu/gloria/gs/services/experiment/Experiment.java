@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.experiment.online;
+package eu.gloria.gs.services.experiment;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -7,14 +7,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jws.WebParam;
-import javax.xml.bind.annotation.XmlSeeAlso;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
+import eu.gloria.gs.services.experiment.ExperimentException;
+import eu.gloria.gs.services.experiment.ExperimentInterface;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextManager;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
@@ -44,24 +41,21 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ObjectResponse;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
-import eu.gloria.gs.services.experiment.base.parameters.Tuple;
 import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.experiment.online.OnlineExperimentException;
-import eu.gloria.gs.services.experiment.online.OnlineExperimentInterface;
-import eu.gloria.gs.services.experiment.online.reservation.ExperimentBooker;
+import eu.gloria.gs.services.experiment.reservation.ExperimentBooker;
 import eu.gloria.gs.services.log.action.ActionLogException;
 import eu.gloria.gs.services.repository.user.UserRepositoryException;
 import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
 import eu.gloria.gs.services.repository.user.data.UserInformation;
 import eu.gloria.gs.services.repository.user.data.UserRole;
 
-public class OnlineExperiment extends GSLogProducerService implements
-		OnlineExperimentInterface {
+public class Experiment extends GSLogProducerService implements
+		ExperimentInterface {
 
 	private ExperimentDBAdapter adapter;
 	private ExperimentBooker experimentBooker;
@@ -69,7 +63,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	private ExperimentContextManager contextManager;
 	private UserRepositoryInterface userRepository;
 
-	public OnlineExperiment() {
+	public Experiment() {
 	}
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
@@ -93,42 +87,43 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
-	public void createExperiment(String experiment)
-			throws DuplicateExperimentException, OnlineExperimentException {
+	public void createOfflineExperiment(String experiment)
+			throws DuplicateExperimentException, ExperimentException {
 
 		try {
-			modelManager.createModel(experiment, this.getClientUsername());
+			modelManager.createModel(experiment, this.getClientUsername(),
+					"OFFLINE");
 		} catch (ExperimentDatabaseException e) {
 
 			try {
 				this.logAction(this.getClientUsername(),
-						"experiments/new?name=" + experiment + "->ERROR");
+						"experiments/offline/new?name=" + experiment
+								+ "->ERROR");
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
 
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
-			this.logAction(this.getClientUsername(), "experiments/new?name="
-					+ experiment);
+			this.logAction(this.getClientUsername(),
+					"experiments/offline/new?name=" + experiment);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
 	public ExperimentInformation getExperimentInformation(String experiment)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		ExperimentInformation expInfo;
 		try {
 			expInfo = adapter.getExperimentInformation(experiment);
 			return expInfo;
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		} catch (NoSuchExperimentException e) {
 			throw e;
 		}
@@ -136,12 +131,12 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public void setExperimentDescription(String experiment, String description)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		try {
 			adapter.setExperimentDescription(experiment, description);
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		} catch (NoSuchExperimentException e) {
 			throw e;
 		}
@@ -156,12 +151,11 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
-	public List<String> getAllOnlineExperiments()
-			throws OnlineExperimentException {
+	public List<String> getAllOnlineExperiments() throws ExperimentException {
 
 		List<String> experiments = null;
 		try {
-			experiments = adapter.getAllOnlineExperiments();
+			experiments = adapter.getAllExperiments("ONLINE");
 
 			if (experiments == null || experiments.size() == 0) {
 
@@ -172,20 +166,47 @@ public class OnlineExperiment extends GSLogProducerService implements
 					e.printStackTrace();
 				}
 
-				throw new OnlineExperimentException(
+				throw new ExperimentException(
 						"There is no online experiments registered");
 			}
 
 			return experiments;
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public List<String> getAllOfflineExperiments() throws ExperimentException {
+
+		List<String> experiments = null;
+		try {
+			experiments = adapter.getAllExperiments("OFFLINE");
+
+			if (experiments == null || experiments.size() == 0) {
+
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/online/list->ERROR");
+				} catch (ActionLogException e) {
+					e.printStackTrace();
+				}
+
+				throw new ExperimentException(
+						"There is no online experiments registered");
+			}
+
+			return experiments;
+		} catch (ExperimentDatabaseException e) {
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
 	@Override
 	public boolean containsExperiment(String experiment)
-			throws OnlineExperimentException {
+			throws ExperimentException {
 
 		try {
 
@@ -194,13 +215,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 			return contains;
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	@Override
 	public List<ReservationInformation> getMyPendingReservations()
-			throws OnlineExperimentException, NoReservationsAvailableException {
+			throws ExperimentException, NoReservationsAvailableException {
 
 		boolean adminMode = false;
 
@@ -240,7 +261,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 				el.printStackTrace();
 			}
 
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		} catch (NoReservationsAvailableException e) {
 
 			try {
@@ -254,7 +275,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
-	public boolean anyReservationActiveNow() throws OnlineExperimentException {
+	public boolean anyReservationActiveNow() throws ExperimentException {
 
 		boolean adminMode = false;
 
@@ -295,13 +316,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 				el.printStackTrace();
 			}
 
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	@Override
 	public List<ReservationInformation> getMyCurrentReservations()
-			throws OnlineExperimentException, NoReservationsAvailableException {
+			throws ExperimentException, NoReservationsAvailableException {
 
 		boolean adminMode = false;
 
@@ -342,7 +363,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		} catch (NoReservationsAvailableException e) {
 			try {
 				this.logAction(this.getClientUsername(),
@@ -355,8 +376,49 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
+	public void applyForExperiment(String experiment)
+			throws ExperimentException, NoReservationsAvailableException,
+			NoSuchExperimentException {
+
+		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		try {
+			experimentBooker.applyFor(experiment, this.getClientUsername());
+		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/applications/make?" + experiment
+								+ "->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+			throw new ExperimentException(e.getMessage());
+		}
+
+		try {
+			this.logAction(this.getClientUsername(),
+					"experiments/applications/make?" + experiment);
+		} catch (ActionLogException el) {
+			el.printStackTrace();
+		}
+	}
+
+	@Override
 	public void reserveExperiment(String experiment, List<String> telescopes,
-			TimeSlot timeSlot) throws OnlineExperimentException,
+			TimeSlot timeSlot) throws ExperimentException,
 			NoReservationsAvailableException,
 			ExperimentReservationArgumentException, MaxReservationTimeException {
 
@@ -389,7 +451,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
@@ -405,7 +467,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public List<TimeSlot> getAvailableReservations(String experiment,
-			List<String> telescopes) throws OnlineExperimentException,
+			List<String> telescopes) throws ExperimentException,
 			ExperimentReservationArgumentException {
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
@@ -434,7 +496,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 				} catch (ActionLogException el) {
 					el.printStackTrace();
 				}
-				throw new OnlineExperimentException(
+				throw new ExperimentException(
 						"There are no timeslots available");
 			}
 
@@ -458,14 +520,14 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
 	@Override
 	public void cancelExperimentReservation(int reservationId)
-			throws OnlineExperimentException, NoSuchReservationException {
+			throws ExperimentException, NoSuchReservationException {
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
@@ -482,7 +544,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 				el.printStackTrace();
 			}
 
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
@@ -497,7 +559,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	public void executeExperimentOperation(int reservationId, String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
 			ExperimentParameterException, ExperimentNotInstantiatedException,
-			OnlineExperimentException, NoSuchReservationException,
+			ExperimentException, NoSuchReservationException,
 			NoSuchExperimentException {
 
 		ExperimentContext context;
@@ -519,7 +581,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
@@ -533,7 +595,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public ExperimentRuntimeInformation getExperimentRuntimeInformation(
-			int reservationId) throws OnlineExperimentException,
+			int reservationId) throws ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
 		boolean adminMode = false;
@@ -578,7 +640,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
@@ -596,7 +658,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 						"The experiment is not instantiated");
 			}
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		ExperimentRuntimeInformation context;
@@ -605,14 +667,14 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 			return context;
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
 	@Override
 	public void addExperimentOperation(String experiment,
-			OperationInformation operation) throws OnlineExperimentException,
+			OperationInformation operation) throws ExperimentException,
 			NoSuchExperimentException, NoSuchExperimentException {
 
 		ExperimentInformation expInfo;
@@ -625,7 +687,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 							this.getClientUsername(),
 							"experiments/" + experiment
 									+ "/model/operations/add?"
-									+ operation.getModelName() + "->OWN_ERROR");
+									+ operation.getName() + "->OWN_ERROR");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
 				}
@@ -636,11 +698,11 @@ public class OnlineExperiment extends GSLogProducerService implements
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/" + experiment + "/model/operations/add?"
-								+ operation.getModelName() + "->DB_ERROR");
+								+ operation.getName() + "->DB_ERROR");
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		CustomExperimentModel model;
@@ -651,13 +713,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 				| OperationTypeNotAvailableException
 				| CustomExperimentException | ExperimentOperationException
 				| ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
 			this.logAction(this.getClientUsername(),
 					"experiments/" + experiment + "/model/operations/add?"
-							+ operation.getModelName());
+							+ operation.getName());
 		} catch (ActionLogException el) {
 			el.printStackTrace();
 		}
@@ -665,7 +727,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public void addExperimentParameter(String experiment,
-			ParameterInformation parameter) throws OnlineExperimentException,
+			ParameterInformation parameter) throws ExperimentException,
 			NoSuchExperimentException, NoSuchExperimentException {
 
 		try {
@@ -679,41 +741,43 @@ public class OnlineExperiment extends GSLogProducerService implements
 							this.getClientUsername(),
 							"experiments/" + experiment
 									+ "/model/parameters/add?"
-									+ parameter.getModelName() + "->OWN_ERROR");
+									+ parameter.getName() + "->OWN_ERROR");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
 				}
-				throw new OnlineExperimentException(
+				throw new ExperimentException(
 						"You cannot edit an experiment that is not yours");
 			}
 		} catch (ExperimentDatabaseException e) {
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/" + experiment + "/model/parameters/add?"
-								+ parameter.getModelName() + "->DB_ERROR");
+								+ parameter.getName() + "->DB_ERROR");
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		CustomExperimentModel model;
 		try {
 			model = modelManager.getModel(experiment);
-			
-			Object[] argsArray = (Object[])JSONConverter.fromJSON(Arrays.toString(parameter.getArguments()), Object[].class, null);
+
+			Object[] argsArray = (Object[]) JSONConverter.fromJSON(
+					Arrays.toString(parameter.getArguments()), Object[].class,
+					null);
 			parameter.setArguments(argsArray);
 			model.buildParameter(parameter);
 		} catch (CustomExperimentException | ParameterTypeNotAvailableException
 				| InvalidExperimentModelException | ExperimentDatabaseException
 				| ExperimentParameterException | IOException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
 			this.logAction(this.getClientUsername(),
 					"experiments/" + experiment + "/model/parameters/add?"
-							+ parameter.getModelName());
+							+ parameter.getName());
 		} catch (ActionLogException el) {
 			el.printStackTrace();
 		}
@@ -721,8 +785,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 	@Override
 	public void setExperimentParameterValue(int reservationId,
-			String parameter, ObjectResponse input)
-			throws OnlineExperimentException,
+			String parameter, ObjectResponse input) throws ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
 		try {
@@ -757,7 +820,8 @@ public class OnlineExperiment extends GSLogProducerService implements
 			ExperimentContext context = contextManager.getContext(
 					this.getClientUsername(), reservationId);
 
-			context.setParameterValue(parameter, JSONConverter.fromJSON((String)input.content, Object.class, null));
+			context.setParameterValue(parameter, JSONConverter.fromJSON(
+					(String) input.content, Object.class, null));
 
 			try {
 				this.logAction(
@@ -783,13 +847,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	@Override
 	public ObjectResponse getExperimentParameterValue(int reservationId,
-			String parameter) throws OnlineExperimentException,
+			String parameter) throws ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
 		boolean adminMode = false;
@@ -872,25 +936,25 @@ public class OnlineExperiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	@Override
 	public void removeExperiment(
 			@WebParam(name = "experiment") String experiment)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 		try {
 			modelManager.removeModel(experiment);
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	@Override
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws OnlineExperimentException {
+			throws ExperimentException {
 
 		boolean adminMode = false;
 
@@ -931,14 +995,13 @@ public class OnlineExperiment extends GSLogProducerService implements
 
 			return reservationInfo;
 		} catch (ExperimentDatabaseException | NoSuchReservationException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
 	@Override
-	public Set<String> getAllExperimentParameters()
-			throws OnlineExperimentException {
+	public Set<String> getAllExperimentParameters() throws ExperimentException {
 
 		Map<String, ExperimentParameter> parameters = modelManager
 				.getAllExperimentParameters();
@@ -947,8 +1010,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	}
 
 	@Override
-	public Set<String> getAllExperimentOperations()
-			throws OnlineExperimentException {
+	public Set<String> getAllExperimentOperations() throws ExperimentException {
 
 		return modelManager.getAllExperimentOperations().keySet();
 	}
@@ -956,7 +1018,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	@Override
 	public ExperimentParameter getExperimentParameter(
 			@WebParam(name = "parameterName") String name)
-			throws OnlineExperimentException {
+			throws ExperimentException {
 
 		return modelManager.getExperimentParameter(name);
 	}
@@ -964,7 +1026,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	@Override
 	public ExperimentOperation getExperimentOperation(
 			@WebParam(name = "operationName") String name)
-			throws OnlineExperimentException {
+			throws ExperimentException {
 		return modelManager.getExperimentOperation(name);
 	}
 
@@ -972,7 +1034,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	public void addExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "segment") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		ExperimentInformation expInfo;
 		try {
@@ -983,7 +1045,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 						"You cannot edit an experiment that is not yours");
 			}
 		} catch (ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		CustomExperimentModel model;
@@ -992,7 +1054,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			model.buildFeature(feature);
 		} catch (InvalidExperimentModelException | CustomExperimentException
 				| ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1000,7 +1062,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	public boolean testExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		CustomExperimentModel model;
 		try {
@@ -1008,7 +1070,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 			return model.testFeature(feature);
 		} catch (InvalidExperimentModelException | CustomExperimentException
 				| ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1016,14 +1078,14 @@ public class OnlineExperiment extends GSLogProducerService implements
 	public FeatureCompliantInformation getFeatureCompliantInformation(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws OnlineExperimentException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 		CustomExperimentModel model;
 		try {
 			model = modelManager.getModel(experiment);
 			return model.getFeatureCompliantInformation(feature);
 		} catch (InvalidExperimentModelException | CustomExperimentException
 				| ExperimentDatabaseException e) {
-			throw new OnlineExperimentException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1034,8 +1096,7 @@ public class OnlineExperiment extends GSLogProducerService implements
 	 * getAllExperimentFeatures()
 	 */
 	@Override
-	public Set<String> getAllExperimentFeatures()
-			throws OnlineExperimentException {
+	public Set<String> getAllExperimentFeatures() throws ExperimentException {
 		return modelManager.getAllExperimentFeatures().keySet();
 	}
 
@@ -1048,7 +1109,41 @@ public class OnlineExperiment extends GSLogProducerService implements
 	@Override
 	public ExperimentFeature getExperimentFeature(
 			@WebParam(name = "featureName") String name)
-			throws OnlineExperimentException {
+			throws ExperimentException {
 		return modelManager.getExperimentFeature(name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.ExperimentInterface#createOnlineExperiment
+	 * (java.lang.String)
+	 */
+	@Override
+	public void createOnlineExperiment(
+			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, DuplicateExperimentException {
+		try {
+			modelManager.createModel(experiment, this.getClientUsername(),
+					"ONLINE");
+		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/online/new?name=" + experiment + "->ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
+			throw new ExperimentException(e.getMessage());
+		}
+
+		try {
+			this.logAction(this.getClientUsername(),
+					"experiments/online/new?name=" + experiment);
+		} catch (ActionLogException e) {
+			e.printStackTrace();
+		}
 	}
 }

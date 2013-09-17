@@ -7,7 +7,7 @@
 	<bean id="ExperimentOperation"
 		class="eu.gloria.gs.services.experiment.base.operations.BeanExperimentOperation"
 		scope="singleton">
-		<property name="type" ref="OPERATION_TYPE"></property>
+		<!-- <property name="type" ref="OPERATION_TYPE"></property>-->
 	</bean>
 
 	<bean id="OPERATION_TYPE"
@@ -37,8 +37,8 @@
 	<bean id="PointToObject" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -56,9 +56,9 @@
 	<bean id="PointToCoordinates" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="DOUBLE"></ref>
-				<ref bean="DOUBLE"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -77,9 +77,9 @@
 	<bean id="GetStream" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="SCAM_NAME"></ref>
-				<ref bean="STREAM_URL"></ref>
+				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -113,13 +113,13 @@
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="LoadDeviceName" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
-				<ref bean="INTEGER"></ref>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
@@ -158,7 +158,7 @@
 		<property name="parameterTypes">
 			<list>
 				<ref bean="DATE"></ref>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -190,30 +190,13 @@
 		</property>
 	</bean>
 
-	<bean id="SaveTuple" parent="ExperimentOperation">
-		<property name="parameterTypes">
-			<list>
-				<ref bean="TUPLE"></ref>
-			</list>
-		</property>
-		<property name="behaviour">
-			<map>
-				<entry key="saveResult">
-					<list>
-						<value>arg0</value>
-					</list>
-				</entry>
-			</map>
-		</property>
-	</bean>
-
 	<bean id="TakeImage" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="CCD_NAME"></ref>
-				<ref bean="STATIC_URL"></ref>
-				<ref bean="FORMAT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="STRING"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -233,10 +216,10 @@
 	<bean id="LoadContinuousImage" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="CCD_NAME"></ref>
-				<ref bean="DYNAMIC_URL"></ref>
-				<ref bean="FORMAT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="STRING"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -256,8 +239,8 @@
 	<bean id="StopContinuousImage" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="CCD_NAME"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -273,10 +256,9 @@
 	</bean>
 
 	<bean id="Park" parent="ExperimentOperation">
-		<property name="type" ref="OPERATION_TYPE"></property>
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -290,11 +272,10 @@
 		</property>
 	</bean>
 
-	<bean id="Sequence1" parent="ExperimentOperation">
-		<property name="type" ref="OPERATION_TYPE"></property>
+	<bean id="Sequence" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="POINTER"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -308,20 +289,21 @@
 		</property>
 	</bean>
 
-	<bean id="Sequence2" parent="ExperimentOperation">
-		<property name="type" ref="OPERATION_TYPE"></property>
+	<bean id="Iteration" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="POINTER"></ref>
-				<ref bean="POINTER"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="iterateSequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
+						<value>arg2</value>
 					</list>
 				</entry>
 			</map>
@@ -389,8 +371,8 @@
 	<bean id="ConstrainedMountMove" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="MOUNT_NAME"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="MOVEMENT"></ref>
 				<ref bean="INTEGER"></ref>
 				<ref bean="INTEGER"></ref>
@@ -414,8 +396,8 @@
 	<bean id="DomeMove" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="DOME_NAME"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="MOVEMENT"></ref>
 			</list>
 		</property>
@@ -435,8 +417,8 @@
 	<bean id="ChangeFocusRelative" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="FOCUSER_NAME"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="INTEGER"></ref>
 			</list>
 		</property>

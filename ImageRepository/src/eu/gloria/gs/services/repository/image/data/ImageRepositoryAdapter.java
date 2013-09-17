@@ -65,19 +65,18 @@ public class ImageRepositoryAdapter {
 	public void setExperimentReservationByUrl(String url, int rid)
 			throws ImageDatabaseException {
 		if (!imageService.containsUrl(url)) {
-			throw new ImageDatabaseException("The image with URL= '"
-					+ url + "' does not exist");
+			throw new ImageDatabaseException("The image with URL= '" + url
+					+ "' does not exist");
 		}
 
 		ImageEntry entry = imageService.getByUrl(url);
 		imageService.setReservation(entry.getIdimage(), rid);
 	}
 
-	public void setUrl(int id, String url)
-			throws ImageDatabaseException {
+	public void setUrl(int id, String url) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image with URL= '"
-					+ url + "' does not exist");
+			throw new ImageDatabaseException("The image with URL= '" + url
+					+ "' does not exist");
 		}
 
 		imageService.setUrl(id, url);
@@ -86,15 +85,14 @@ public class ImageRepositoryAdapter {
 	public void setUrlByRT(String rt, String lid, String url)
 			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image with URL= '"
-					+ url + "' does not exist");
+			throw new ImageDatabaseException("The image with URL= '" + url
+					+ "' does not exist");
 		}
 
 		imageService.setUrlByRTLocalId(rt, lid, url);
 	}
 
-	public void setUser(int id, String user)
-			throws ImageDatabaseException {
+	public void setUser(int id, String user) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
 			throw new ImageDatabaseException("The image '" + id
 					+ "' does not exist");
@@ -106,8 +104,8 @@ public class ImageRepositoryAdapter {
 	public void setUserByUrl(String url, String user)
 			throws ImageDatabaseException {
 		if (!imageService.containsUrl(url)) {
-			throw new ImageDatabaseException("The image with URL= '"
-					+ url + "' does not exist");
+			throw new ImageDatabaseException("The image with URL= '" + url
+					+ "' does not exist");
 		}
 
 		ImageEntry entry = imageService.getByUrl(url);
@@ -160,7 +158,33 @@ public class ImageRepositoryAdapter {
 		return imageInfo;
 	}
 
-	public List<ImageInformation> getAllWithoutUrl()
+	public List<ImageInformation> getImagesByReservation(int rid, int limit)
+			throws ImageDatabaseException {
+
+		List<ImageInformation> imageInfos = new ArrayList<ImageInformation>();
+		List<ImageEntry> entries = imageService.getByReservation(rid);
+
+		if (entries != null) {
+			for (ImageEntry entry : entries) {
+				ImageInformation imageInfo = new ImageInformation();
+
+				imageInfo.setId(entry.getIdimage());
+				imageInfo.setCreationDate(entry.getDate());
+				imageInfo.setLocalid(entry.getLocal_id());
+				imageInfo.setRid(entry.getRid());
+				imageInfo.setRt(entry.getRt());
+				imageInfo.setCcd(entry.getCcd());
+				imageInfo.setUrl(entry.getUrl());
+				imageInfo.setUser(entry.getUser());
+			
+				imageInfos.add(imageInfo);
+			}
+		}
+
+		return imageInfos;
+	}
+
+	public List<ImageInformation> getAllWithoutUrl(int limit)
 			throws ImageDatabaseException {
 
 		List<ImageInformation> imageInfos = new ArrayList<ImageInformation>();
@@ -181,15 +205,15 @@ public class ImageRepositoryAdapter {
 
 		return imageInfos;
 	}
-	
-	public List<Integer> getAllImagesBetween(Date from, Date to) {
-		
+
+	public List<Integer> getAllImagesBetween(Date from, Date to, int limit) {
+
 		List<Integer> imageIds = new ArrayList<Integer>();
 		List<ImageEntry> entries = imageService.getAllBetweenDates(from, to);
 
 		System.out.println(from);
 		System.out.println(to);
-		
+
 		for (ImageEntry entry : entries) {
 			imageIds.add(entry.getIdimage());
 		}
@@ -197,7 +221,7 @@ public class ImageRepositoryAdapter {
 		System.out.println(entries.size());
 		return imageIds;
 	}
-	
+
 	/**
 	 * @param service
 	 */

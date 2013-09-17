@@ -73,11 +73,11 @@
 			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
 	</bean>
 
-	<bean id="onlineExperimentClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
+	<bean id="experimentClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="OnlineExperimentPort"></property>
+		<property name="portName" value="ExperimentPort"></property>
 		<property name="serviceClass"
-			value="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"></property>
+			value="eu.gloria.gs.services.experiment.ExperimentInterface"></property>
 	</bean>
 
 	<bean id="imageRepositoryClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"

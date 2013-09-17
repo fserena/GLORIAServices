@@ -131,11 +131,11 @@
 		<property name="password" ref="imageRepositoryPassword"></property>
 	</bean>
 
-	<jaxws:endpoint xmlns:tns="http://online.experiment.services.gs.gloria.eu/"
-		id="onlineexperiment" endpointName="tns:OnlineExperimentPort"
-		serviceName="tns:OnlineExperimentService" address="/OnlineExperimentPort">
+	<jaxws:endpoint xmlns:tns="http://experiment.services.gs.gloria.eu/"
+		id="experiment" endpointName="tns:ExperimentPort"
+		serviceName="tns:ExperimentService" address="/ExperimentPort">
 		<jaxws:implementor>
-			<bean class="eu.gloria.gs.services.experiment.online.OnlineExperiment">
+			<bean class="eu.gloria.gs.services.experiment.Experiment">
 				<property name="adapter" ref="experimentAdapter"></property>
 				<property name="booker" ref="experimentBooker"></property>
 				<property name="contextManager" ref="contextManager"></property>
@@ -160,7 +160,7 @@
 	</jaxws:endpoint>
 
 	<bean id="experimentExecutor"
-		class="eu.gloria.gs.services.experiment.online.ExperimentExecutor"
+		class="eu.gloria.gs.services.experiment.ExperimentExecutor"
 		scope="singleton" lazy-init="true">
 		<property name="adapter" ref="experimentAdapter"></property>
 		<property name="contextManager" ref="contextManager"></property>

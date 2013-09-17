@@ -62,8 +62,8 @@ public interface ImageRepositoryInterface {
 			@WebParam(name = "experiment") String experiment)
 			throws ImageRepositoryException;
 
-	public List<Integer> getAllReservationImageIdentifiers(
-			@WebParam(name = "rid") String rid) throws ImageRepositoryException;
+	public List<ImageInformation> getAllReservationImages(
+			@WebParam(name = "rid") int rid) throws ImageRepositoryException;
 
 	public List<Integer> getAllImageIdentifiersByDate(
 			@WebParam(name = "dateFrom") Date from,

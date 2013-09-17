@@ -39,12 +39,12 @@ public class ExperimentModelManager {
 		return model;
 	}
 
-	public void createModel(String experiment, String author)
+	public void createModel(String experiment, String author, String type)
 			throws DuplicateExperimentException, ExperimentDatabaseException {
 
 		if (!adapter.containsExperiment(experiment)) {
 
-			factory.createCustomExperiment(experiment, author);
+			factory.createCustomExperiment(experiment, author, type);
 
 			try {
 				factory.loadCustomExperiment(experiment); // Verification load

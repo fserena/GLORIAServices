@@ -4,7 +4,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import eu.gloria.gs.services.core.security.client.Credentials;
 import eu.gloria.gs.services.core.security.client.ThreadCredentialsStore;
-import eu.gloria.gs.services.experiment.online.OnlineExperimentInterface;
+import eu.gloria.gs.services.experiment.ExperimentInterface;
 import eu.gloria.gs.services.log.action.ActionLogInterface;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
@@ -30,9 +30,9 @@ public class GSClientProvider {
 	private final static String FWTELEOPERATION_BEAN_NAME = "fwTeleoperationClientFactory";
 	private final static String GENERICTELEOPERATION_BEAN_NAME = "genericTeleoperationClientFactory";
 	private final static String SCAMTELEOPERATION_BEAN_NAME = "scamTeleoperationClientFactory";
-	private final static String ONLINEEXPERIMENT_BEAN_NAME = "onlineExperimentClientFactory";
+	private final static String ONLINEEXPERIMENT_BEAN_NAME = "experimentClientFactory";
 	private static String HOSTNAME = "localhost";
-	private static String PORT = "9443";
+	private static String PORT = "8443";
 	private static ClassPathXmlApplicationContext context;
 
 	static {
@@ -119,10 +119,10 @@ public class GSClientProvider {
 		return (FilterWheelTeleoperationInterface) factory.create();
 	}
 
-	public static OnlineExperimentInterface getOnlineExperimentClient() {
+	public static ExperimentInterface getOnlineExperimentClient() {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(ONLINEEXPERIMENT_BEAN_NAME);
-		return (OnlineExperimentInterface) factory.create();
+		return (ExperimentInterface) factory.create();
 	}
 
 	public static FocuserTeleoperationInterface getFocuserTeleoperationClient() {
