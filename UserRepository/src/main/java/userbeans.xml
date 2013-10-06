@@ -21,7 +21,6 @@
 
 	<bean id="userAdapter"
 		class="eu.gloria.gs.services.repository.user.data.UserRepositoryAdapter">
-		<property name="userDBService" ref="userMapper"></property>
 		<property name="TeleoperationUsername" ref="teleoperationUsername"></property>
 		<property name="TeleoperationPassword" ref="teleoperationPassword"></property>
 		<property name="ExperimentUsername" ref="experimentUsername"></property>
@@ -35,7 +34,8 @@
 		<property name="ImageRepositoryUsername" ref="imageRepositoryUsername"></property>
 		<property name="ImageRepositoryPassword" ref="imageRepositoryPassword"></property>
 		<property name="AdminUsername" ref="adminUsername"></property>
-		<property name="AdminPassword" ref="adminPassword"></property>		
+		<property name="AdminPassword" ref="adminPassword"></property>
+		<property name="userDBService" ref="userMapper"></property>
 	</bean>
 
 </beans>

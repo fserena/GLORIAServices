@@ -64,7 +64,7 @@ public class OperationContextService extends ExperimentContextService {
 		} else if (operation.equals("executeSequence")) {
 			this.executeSequence(operationContext, operationArguments);
 		} else if (operation.equals("iterateSequence")) {
-			this.iterateSequence(operationContext, operationArguments);
+			this.iterateOperation(operationContext, operationArguments);
 		} else if (operation.equals("changeFocusRelative")) {
 			this.changeFocusRelative(operationContext, operationArguments);
 		} else if (operation.equals("stopContinuousImage")) {
@@ -81,6 +81,8 @@ public class OperationContextService extends ExperimentContextService {
 			this.loadAllRTNames(operationContext, operationArguments);
 		} else if (operation.equals("loadDeviceName")) {
 			this.loadDeviceName(operationContext, operationArguments);
+		} else if (operation.equals("loadDevicesNumber")) {
+			this.loadDevicesNumber(operationContext, operationArguments);
 		}
 	}
 
@@ -111,6 +113,53 @@ public class OperationContextService extends ExperimentContextService {
 		try {
 			operationContext.getExperimentContext().setParameterValue(
 					rtNameParameter, telescopeName);
+		} catch (UndefinedExperimentParameterException
+				| NoSuchExperimentException
+				| ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+	
+	private void loadDevicesNumber(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+
+		String rtParameter = (String) operationArguments[0];		
+		String deviceTypeParameter = (String) operationArguments[1];
+
+		String rtName;
+		try {
+			rtName = (String) operationContext.getExperimentContext()
+					.getParameterValue(rtParameter);
+		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		DeviceType deviceType;
+		try {
+			String deviceTypeStr = (String) operationContext
+					.getExperimentContext().getParameterValue(
+							deviceTypeParameter);
+
+			deviceType = DeviceType.valueOf(deviceTypeStr);
+		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+				| ExperimentParameterException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		List<String> deviceNames = null;
+
+		try {
+			deviceNames = this.getRTRepository().getRTDeviceNames(rtName,
+					deviceType);
+		} catch (RTRepositoryException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+
+		try {
+			operationContext.getExperimentContext().setParameterValue(
+					(String) operationArguments[2], deviceNames.size());
 		} catch (UndefinedExperimentParameterException
 				| NoSuchExperimentException
 				| ExperimentNotInstantiatedException
@@ -211,10 +260,10 @@ public class OperationContextService extends ExperimentContextService {
 
 	}
 
-	private void iterateSequence(OperationContext operationContext,
+	private void iterateOperation(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 
-		String sequenceNameParameter = (String) operationArguments[0];
+		String operationNameParameter = (String) operationArguments[0];
 		String cursorNameParameter = (String) operationArguments[1];
 		String maxIterationsNameParameter = (String) operationArguments[2];		
 
@@ -222,7 +271,7 @@ public class OperationContextService extends ExperimentContextService {
 
 		try {
 			operationName = (String) operationContext.getExperimentContext()
-					.getParameterValue(sequenceNameParameter);
+					.getParameterValue(operationNameParameter);
 		} catch (ExperimentParameterException | NoSuchExperimentException
 				| ExperimentNotInstantiatedException e) {
 			throw new ExperimentOperationException(e.getMessage());
@@ -259,9 +308,9 @@ public class OperationContextService extends ExperimentContextService {
 	private void executeSequence(OperationContext operationContext,
 			Object[] operationArguments) throws ExperimentOperationException {
 
-		List<?> operationPointerNames = (List<?>)operationArguments[0]; 
+		//List<?> operationPointerNames = (List<?>)operationArguments[0]; 
 		
-		for (Object argument : operationPointerNames) {
+		for (Object argument : operationArguments) {
 			String operationNameParameter = (String) argument;
 			String operationName = null;
 

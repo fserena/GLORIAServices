@@ -7,7 +7,7 @@
 	<bean id="ExperimentOperation"
 		class="eu.gloria.gs.services.experiment.base.operations.BeanExperimentOperation"
 		scope="singleton">
-		<!-- <property name="type" ref="OPERATION_TYPE"></property>-->
+		<!-- <property name="type" ref="OPERATION_TYPE"></property> -->
 	</bean>
 
 	<bean id="OPERATION_TYPE"
@@ -15,11 +15,11 @@
 		scope="singleton">
 	</bean>
 
-	<bean id="SetIntParameter" parent="ExperimentOperation">
+	<bean id="SetParameter" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="INTEGER"></ref>
-				<ref bean="INTEGER"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -77,7 +77,7 @@
 	<bean id="GetStream" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 			</list>
@@ -98,7 +98,7 @@
 	<bean id="LoadRTName" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="INTEGER"></ref>
+				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
@@ -131,6 +131,27 @@
 						<value>arg1</value>
 						<value>arg2</value>
 						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadDevicesNumber" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="loadDevicesNumber">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
 					</list>
 				</entry>
 			</map>
@@ -196,7 +217,7 @@
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -272,7 +293,7 @@
 		</property>
 	</bean>
 
-	<bean id="Sequence" parent="ExperimentOperation">
+	<bean id="Sequence1" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
@@ -283,6 +304,121 @@
 				<entry key="executeSequence">
 					<list>
 						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence2" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence3" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence4" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="Sequence5" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="Sequence6" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="executeSequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
 					</list>
 				</entry>
 			</map>

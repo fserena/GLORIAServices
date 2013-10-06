@@ -62,8 +62,8 @@
 		lazy-init="true" scope="singleton">
 	</bean>
 
-	<bean id="onlineExperiment"
-		class="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"
+	<bean id="experiment"
+		class="eu.gloria.gs.services.experiment.ExperimentInterface"
 		factory-bean="onlineExperimentWSClientFactory" factory-method="create"
 		lazy-init="true" scope="singleton">
 	</bean>
@@ -140,10 +140,10 @@
 			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
 	</bean>
 
-	<bean id="onlineExperimentWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="OnlineExperimentPort"></property>
+	<bean id="experimentWSClientFactory" parent="WSClientFactory">
+		<property name="portName" value="ExperimentPort"></property>
 		<property name="serviceClass"
-			value="eu.gloria.gs.services.experiment.online.OnlineExperimentInterface"></property>
+			value="eu.gloria.gs.services.experiment.ExperimentInterface"></property>
 	</bean>
 
 	<bean id="imageRepositoryWSClientFactory" parent="WSClientFactory">

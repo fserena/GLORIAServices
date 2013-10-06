@@ -204,10 +204,10 @@ public class ParameterContext extends Context {
 
 							value = ((List<?>) value).get(index);
 						}
-					} else {
-						throw new IOException(
-								"The parameter is a list, cannot access object-style");
-					}
+					}/*
+					 * else { throw new IOException(
+					 * "The parameter is a list, cannot access object-style"); }
+					 */
 				} else {
 					throw new IOException("Cannot access object property");
 				}
@@ -264,10 +264,9 @@ public class ParameterContext extends Context {
 							if (!((Map<?, ?>) currentNode).containsKey(tree[i])) {
 								((Map<String, Object>) currentNode).put(
 										tree[i], new LinkedHashMap<>());
-							} else {
-								currentNode = ((Map<?, ?>) currentNode)
-										.get(tree[i]);
 							}
+							currentNode = ((Map<?, ?>) currentNode)
+									.get(tree[i]);
 						} else {
 							((Map<String, Object>) currentNode).put(tree[i],
 									value);
@@ -333,9 +332,9 @@ public class ParameterContext extends Context {
 											if (j == paramIndex) {
 												((List<Object>) currentNode)
 														.add(value);
-											}else {
+											} else {
 												((List<Object>) currentNode)
-												.add(null);
+														.add(null);
 											}
 										}
 									}
