@@ -4,50 +4,66 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- <bean id="DomeManagementFeature"
+	<bean id="MultiCamerasFeature"
 		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
 		scope="singleton">
 		<property name="Parameters">
 			<map>
-				<entry key="dome_directions">
+				<entry key="rt">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
 						scope="singleton">
 						<property name="parameter" ref="OBJECT"></property>
 						<property name="parameterArguments">
 							<list>
-								<value>{"open_direction" : "OPEN", "close_direction" : "CLOSE"}</value>
-							</list>
-						</property>
-					</bean>
-				</entry>				
-				<entry key="rt_name">
-					<bean
-						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
-						scope="singleton">
-						<property name="parameter" ref="STRING"></property>
-						<property name="parameterArguments">
-							<list>
-								<value>arg0</value>
+								<value>
+									{
+									"name" : null,
+									"order" : 0
+									}
+								</value>
 							</list>
 						</property>
 					</bean>
 				</entry>
-				<entry key="dome_name">
+				<entry key="cameras">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
 						scope="singleton">
-						<property name="parameter" ref="DOME_NAME"></property>
+						<property name="parameter" ref="OBJECT"></property>
 						<property name="parameterArguments">
 							<list>
-								<value>rt_name</value>
-								<value>arg1</value>
+								<value>
+									{
+									"ccd" :
+									{
+									"type": "CCD",
+									"order" : 0,
+									"number" : 0,
+									"images"
+									: []
+									},
+									"scam" :
+									{
+									"type" : "SURVEILLANCE_CAMERA",
+									"number" : 0,
+									"order" : 0,
+									"images" : []
+									}
+									}
+								</value>
 							</list>
 						</property>
-						<property name="nameSuffix">
+					</bean>
+				</entry>
+				<entry key="load_ccd_name_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
 							<list>
-								<value>arg0</value>
-								<value>arg1</value>
+								<value>"load_ccd_name"</value>
 							</list>
 						</property>
 					</bean>
@@ -56,49 +72,106 @@
 		</property>
 		<property name="Operations">
 			<map>
-				<entry key="open_dome">
+				<entry key="load_rt_name">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
 						scope="singleton">
-						<property name="operation" ref="DomeMove"></property>
+						<property name="operation" ref="LoadRTName"></property>
 						<property name="relations">
 							<list>
-								<value>rt_name</value>
-								<value>dome_name</value>
-								<value>open_direction</value>
-							</list>
-						</property>
-						<property name="nameSuffix">
-							<list>
-								<value>arg0</value>
-								<value>arg1</value>
+								<value>rt.order</value>
+								<value>rt.name</value>
 							</list>
 						</property>
 					</bean>
 				</entry>
-				<entry key="close_dome">
+				<entry key="load_ccd_name">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
 						scope="singleton">
-						<property name="operation" ref="DomeMove"></property>
+						<property name="operation" ref="LoadDeviceName"></property>
 						<property name="relations">
 							<list>
-								<value>rt_name</value>
-								<value>dome_name</value>
-								<value>close_direction</value>
+								<value>rt.name</value>
+								<value>cameras.ccd.order</value>
+								<value>cameras.ccd.type</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].name</value>
 							</list>
 						</property>
-						<property name="nameSuffix">
+					</bean>
+				</entry>
+				<entry key="load_scam_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadDeviceName"></property>
+						<property name="relations">
 							<list>
-								<value>arg0</value>
-								<value>arg1</value>
+								<value>rt.name</value>
+								<value>cameras.scam.order</value>
+								<value>cameras.scam.type</value>
+								<value>cameras.scam.images.[cameras.ccd.order].name</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_ccd_number">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadDevicesNumber"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.ccd.type</value>
+								<value>cameras.ccd.number</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_scam_number">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadDevicesNumber"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.scam.type</value>
+								<value>cameras.scam.number</value>
 							</list>
 						</property>
 					</bean>
 				</entry>
 			</map>
 		</property>
-	</bean>-->
+	</bean>
+
+	<!-- <bean id="DomeManagementFeature" class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature" 
+		scope="singleton"> <property name="Parameters"> <map> <entry key="dome_directions"> 
+		<bean class="eu.gloria.gs.services.experiment.base.models.ParameterFeature" 
+		scope="singleton"> <property name="parameter" ref="OBJECT"></property> <property 
+		name="parameterArguments"> <list> <value>{"open_direction" : "OPEN", "close_direction" 
+		: "CLOSE"}</value> </list> </property> </bean> </entry> <entry key="rt_name"> 
+		<bean class="eu.gloria.gs.services.experiment.base.models.ParameterFeature" 
+		scope="singleton"> <property name="parameter" ref="STRING"></property> <property 
+		name="parameterArguments"> <list> <value>arg0</value> </list> </property> 
+		</bean> </entry> <entry key="dome_name"> <bean class="eu.gloria.gs.services.experiment.base.models.ParameterFeature" 
+		scope="singleton"> <property name="parameter" ref="DOME_NAME"></property> 
+		<property name="parameterArguments"> <list> <value>rt_name</value> <value>arg1</value> 
+		</list> </property> <property name="nameSuffix"> <list> <value>arg0</value> 
+		<value>arg1</value> </list> </property> </bean> </entry> </map> </property> 
+		<property name="Operations"> <map> <entry key="open_dome"> <bean class="eu.gloria.gs.services.experiment.base.models.OperationFeature" 
+		scope="singleton"> <property name="operation" ref="DomeMove"></property> 
+		<property name="relations"> <list> <value>rt_name</value> <value>dome_name</value> 
+		<value>open_direction</value> </list> </property> <property name="nameSuffix"> 
+		<list> <value>arg0</value> <value>arg1</value> </list> </property> </bean> 
+		</entry> <entry key="close_dome"> <bean class="eu.gloria.gs.services.experiment.base.models.OperationFeature" 
+		scope="singleton"> <property name="operation" ref="DomeMove"></property> 
+		<property name="relations"> <list> <value>rt_name</value> <value>dome_name</value> 
+		<value>close_direction</value> </list> </property> <property name="nameSuffix"> 
+		<list> <value>arg0</value> <value>arg1</value> </list> </property> </bean> 
+		</entry> </map> </property> </bean> -->
 
 	<!-- <bean id="DomeManagementFeature" class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature" 
 		scope="singleton"> <property name="Parameters"> <map> <entry key="open_direction"> 
