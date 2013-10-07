@@ -7,7 +7,6 @@
 	<bean id="ExperimentOperation"
 		class="eu.gloria.gs.services.experiment.base.operations.BeanExperimentOperation"
 		scope="singleton">
-		<!-- <property name="type" ref="OPERATION_TYPE"></property> -->
 	</bean>
 
 	<bean id="OPERATION_TYPE"
