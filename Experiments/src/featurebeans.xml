@@ -68,6 +68,126 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="load_scam_name_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_scam_name"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_ccd_names_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_ccd_names"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_scam_names_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_scam_names"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_ccd_number_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_ccd_number"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_scam_number_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_scam_number"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="reset_ccd_order_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"reset_ccd_order"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="reset_scam_order_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"reset_scam_order"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="zero">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="INTEGER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>0</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_ccd_names_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"auto_load_ccd_names"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_scam_names_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"auto_load_scam_names"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 		<property name="Operations">
@@ -110,7 +230,7 @@
 								<value>rt.name</value>
 								<value>cameras.scam.order</value>
 								<value>cameras.scam.type</value>
-								<value>cameras.scam.images.[cameras.ccd.order].name</value>
+								<value>cameras.scam.images.[cameras.scam.order].name</value>
 							</list>
 						</property>
 					</bean>
@@ -139,6 +259,430 @@
 								<value>rt.name</value>
 								<value>cameras.scam.type</value>
 								<value>cameras.scam.number</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="reset_ccd_order">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="SetParameter"></property>
+						<property name="relations">
+							<list>
+								<value>cameras.ccd.order</value>
+								<value>zero</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="reset_scam_order">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="SetParameter"></property>
+						<property name="relations">
+							<list>
+								<value>cameras.scam.order</value>
+								<value>zero</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_ccd_names">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Iteration"></property>
+						<property name="relations">
+							<list>
+								<value>load_ccd_name_ptr</value>
+								<value>cameras.ccd.order</value>
+								<value>cameras.ccd.number</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_scam_names">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Iteration"></property>
+						<property name="relations">
+							<list>
+								<value>load_scam_name_ptr</value>
+								<value>cameras.scam.order</value>
+								<value>cameras.scam.number</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_ccd_names">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Sequence3"></property>
+						<property name="relations">
+							<list>
+								<value>reset_ccd_order_ptr</value>
+								<value>load_ccd_number_ptr</value>
+								<value>load_ccd_names_ptr</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_scam_names">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Sequence3"></property>
+						<property name="relations">
+							<list>
+								<value>reset_scam_order_ptr</value>
+								<value>load_scam_number_ptr</value>
+								<value>load_scam_names_ptr</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MultiStreamFeature"
+		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="load_stream_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_stream"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_streams_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_streams"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_streams_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"auto_load_streams"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="load_stream">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="GetStream"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.scam.images.[cameras.scam.order].name</value>
+								<value>cameras.scam.images.[cameras.scam.order].url</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="load_streams">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Iteration"></property>
+						<property name="relations">
+							<list>
+								<value>load_stream_ptr</value>
+								<value>cameras.scam.order</value>
+								<value>cameras.scam.number</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="auto_load_streams">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="Sequence3"></property>
+						<property name="relations">
+							<list>
+								<value>reset_scam_order_ptr</value>
+								<value>load_scam_number_ptr</value>
+								<value>load_streams_ptr</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MultiContinuousImageFeature"
+		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="load_continuous_image_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"load_continuous_image"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="formats">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="OBJECT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>
+									{
+									"jpg" : "JPG",
+									"fits" : "FITS"
+									}
+								</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="load_continuous_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadContinuousImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].cont</value>
+								<value>formats.jpg</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MultiTakeImageFeature"
+		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="take_jpg_image_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"take_jpg_image"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="take_fits_image_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"take_fits_image"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="take_jpg_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="TakeImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].inst.jpg</value>
+								<value>formats.jpg</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="take_fits_image">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="TakeImage"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].name</value>
+								<value>cameras.ccd.images.[cameras.ccd.order].inst.fits</value>
+								<value>formats.fits</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToCoordinatesFeature"
+		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="mount">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="OBJECT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>
+									{
+									"name" : null,
+									"target" :
+									{
+									"coordinates" :
+									{
+									"ra" : 0,
+									"dec" : 0
+									},
+									"object" : null
+									}
+									}
+								</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="point_to_coordinates_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"point_to_coordinates"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="point_to_coordinates">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="PointToCoordinates"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>mount.target.coordinates.ra</value>
+								<value>mount.target.coordinates.dec</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToObjectFeature"
+		class="eu.gloria.gs.services.experiment.base.models.ExperimentFeature"
+		scope="singleton">
+		<property name="Parameters">
+			<map>
+				<entry key="mount">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="OBJECT"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>
+									{
+									"name" : null,
+									"target" :
+									{
+									"coordinates" :
+									{
+									"ra" : 0,
+									"dec" : 0
+									},
+									"object" : null
+									}
+									}
+								</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="point_to_object_ptr">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.ParameterFeature"
+						scope="singleton">
+						<property name="parameter" ref="POINTER"></property>
+						<property name="parameterArguments">
+							<list>
+								<value>"point_to_object"</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="Operations">
+			<map>
+				<entry key="point_to_object">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="PointToCoordinates"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>mount.target.object</value>
 							</list>
 						</property>
 					</bean>

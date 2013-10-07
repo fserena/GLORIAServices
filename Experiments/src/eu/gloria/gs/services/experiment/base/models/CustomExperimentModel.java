@@ -108,7 +108,7 @@ public class CustomExperimentModel extends ExperimentModel {
 		}
 
 		parameterInfo.setParameter(parameter);
-		
+
 		this.addParameter(parameterInfo.getName(), parameter,
 				parameterInfo.getArguments());
 
@@ -214,7 +214,19 @@ public class CustomExperimentModel extends ExperimentModel {
 						for (String paramArg : paramFeatureArgs) {
 							if (parameterFeature.getParameter()
 									.argumentIsOperation(order)) {
-								if (!createdOperations.contains(paramArg)) {
+
+								String concreteParamArg = null;
+								try {
+									concreteParamArg = (String) JSONConverter
+											.fromJSON(paramArg, String.class,
+													null);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+								if (!createdOperations
+										.contains(concreteParamArg)) {
 									allowCreate = false;
 									break;
 								}
@@ -226,12 +238,11 @@ public class CustomExperimentModel extends ExperimentModel {
 
 					if (allowCreate) {
 						ParameterInformation paramInfo = new ParameterInformation();
-						paramInfo.setName(concreteParamNames
-								.get(paramName));
+						paramInfo.setName(concreteParamNames.get(paramName));
 						paramInfo.setParameter(parameterFeature.getParameter());
 
-						paramInfo.setType(parameterFeature
-								.getParameter().getConcreteName());
+						paramInfo.setType(parameterFeature.getParameter()
+								.getConcreteName());
 
 						String[] parameterArguments = parameterFeature
 								.getParameterArguments();
@@ -254,8 +265,9 @@ public class CustomExperimentModel extends ExperimentModel {
 											.parseInt(filteredArgument);
 
 									processedArguments[i] = featureInfo
-											.getArguments()[featureArgumentOrder].trim();
-																		
+											.getArguments()[featureArgumentOrder]
+											.trim();
+
 								} else {
 									ExperimentParameter expParameter = parameterFeature
 											.getParameter();
@@ -278,27 +290,27 @@ public class CustomExperimentModel extends ExperimentModel {
 										}
 									}
 
-									processedArguments[i] = argument.trim();									
+									processedArguments[i] = argument.trim();
 								}
 
 								i++;
 							}
 						}
 						Object[] argsArray = null;
-						
+
 						try {
 							argsArray = (Object[]) JSONConverter.fromJSON(
-									Arrays.toString(processedArguments), Object[].class,
-									null);
+									Arrays.toString(processedArguments),
+									Object[].class, null);
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						
+
 						paramInfo.setArguments(argsArray);
-						
+
 						try {
-							
+
 							this.buildParameter(paramInfo);
 
 							addedParameters++;
@@ -340,7 +352,10 @@ public class CustomExperimentModel extends ExperimentModel {
 					String[] relations = operationFeature.getRelations();
 
 					for (String relation : relations) {
-						if (!createdParameters.contains(relation.split("\\.")[0])) {
+
+						String dependencyName = relation.split("\\.")[0];
+						if (!this.containsParameter(dependencyName)
+								&& !createdParameters.contains(dependencyName)) {
 							allowCreate = false;
 							break;
 						}
@@ -351,8 +366,8 @@ public class CustomExperimentModel extends ExperimentModel {
 						operationInfo.setName(concreteOpNames.get(opName));
 						operationInfo.setOperation(operationFeature
 								.getOperation());
-						operationInfo.setType(operationFeature
-								.getOperation().getConcreteName());
+						operationInfo.setType(operationFeature.getOperation()
+								.getConcreteName());
 
 						String[] argumentRelations = new String[0];
 
@@ -363,8 +378,8 @@ public class CustomExperimentModel extends ExperimentModel {
 						int i = 0;
 						for (String relation : relations) {
 
-							argumentRelations[i] = relation;//concreteParamNames
-									//.get(relation.split("\\.")[0]);
+							argumentRelations[i] = relation;// concreteParamNames
+							// .get(relation.split("\\.")[0]);
 							i++;
 						}
 
@@ -546,8 +561,7 @@ public class CustomExperimentModel extends ExperimentModel {
 						i++;
 					}
 
-					System.out
-							.println("---> " + paramInfo.getName() + ":");
+					System.out.println("---> " + paramInfo.getName() + ":");
 
 					List<String> featureParameterDepOps = this
 							.getParameterDependentOperations(feature,

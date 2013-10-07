@@ -239,7 +239,7 @@
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="STRING"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">

@@ -43,6 +43,8 @@ public class OperationContextService extends ExperimentContextService {
 
 		if (operation.equals("pointToObject")) {
 			this.pointToObject(operationContext, operationArguments);
+		} else if (operation.equals("pointToCoordinates")) {
+			this.pointToCoordinates(operationContext, operationArguments);
 		} else if (operation.equals("park")) {
 			this.park(operationContext, operationArguments);
 		} else if (operation.equals("getStream")) {
@@ -1112,6 +1114,88 @@ public class OperationContextService extends ExperimentContextService {
 
 					this.getMountTeleoperation().slewToObject(rtName,
 							mountName, object);
+
+				} catch (MountTeleoperationException e) {
+					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
+				}
+			}
+
+			else {
+				throw new ExperimentOperationException(
+						"No mount available on the '" + rtName + "' RT");
+			}
+
+		} catch (ExperimentParameterException | NoSuchExperimentException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getMessage());
+		}
+	}
+	
+	private void pointToCoordinates(OperationContext operationContext,
+			Object[] operationArguments) throws ExperimentOperationException {
+
+		try {
+			String rtNameParameter = (String) operationArguments[0];
+			String raParameter = (String) operationArguments[1];
+			String decParameter = (String) operationArguments[2];
+
+			String rtName = (String) operationContext.getExperimentContext()
+					.getParameterValue(rtNameParameter);
+			Double ra = (Double) operationContext.getExperimentContext()
+					.getParameterValue(raParameter);
+			Double dec = (Double) operationContext.getExperimentContext()
+					.getParameterValue(decParameter);
+
+			GSClientProvider.setCredentials(this.getUsername(),
+					this.getPassword());
+
+			List<String> mounts;
+			List<String> domes;
+
+			try {
+				mounts = this.getRTRepository().getRTDeviceNames(rtName,
+						DeviceType.MOUNT);
+				domes = this.getRTRepository().getRTDeviceNames(rtName,
+						DeviceType.DOME);
+			} catch (RTRepositoryException e) {
+				throw new ExperimentOperationException(e.getMessage());
+			}
+
+			if (domes != null && domes.size() > 0) {
+				String domeName = domes.get(0);
+				try {
+					DomeOpeningState domeState = this.getDomeTeleoperation()
+							.getState(rtName, domeName);
+
+					System.out.println(domeState.name());
+
+					// if (domeState.equals(DomeOpeningState.UNDEFINED)
+					// || domeState.equals(DomeOpeningState.CLOSED)) {
+					this.getDomeTeleoperation().open(rtName, domeName);
+					// }
+				} catch (DomeTeleoperationException e) {
+					throw new ExperimentOperationException(e.getMessage());
+				} catch (DeviceOperationFailedException e) {
+				}
+			}
+
+			if (mounts != null && mounts.size() > 0) {
+
+				String mountName = mounts.get(0);
+
+				try {
+
+					/*this.getMountTeleoperation().setTrackingRate(rtName,
+							mountName, TrackingRate.DRIVE_SOLAR);
+
+					this.getMountTeleoperation().setTracking(rtName, mountName,
+							true);
+
+					this.getMountTeleoperation().setSlewRate(rtName, mountName,
+							"CENTER");*/
+
+					this.getMountTeleoperation().slewToCoordinates(rtName, mountName, ra, dec);
 
 				} catch (MountTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
