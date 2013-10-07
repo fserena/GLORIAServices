@@ -1,15 +1,21 @@
 package eu.gloria.gs.services.experiment.base.models;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
+import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
@@ -248,7 +254,8 @@ public class CustomExperimentModel extends ExperimentModel {
 											.parseInt(filteredArgument);
 
 									processedArguments[i] = featureInfo
-											.getArguments()[featureArgumentOrder];
+											.getArguments()[featureArgumentOrder].trim();
+																		
 								} else {
 									ExperimentParameter expParameter = parameterFeature
 											.getParameter();
@@ -271,16 +278,27 @@ public class CustomExperimentModel extends ExperimentModel {
 										}
 									}
 
-									processedArguments[i] = argument;
+									processedArguments[i] = argument.trim();									
 								}
 
 								i++;
 							}
 						}
-
-						paramInfo.setArguments(processedArguments);
-
+						Object[] argsArray = null;
+						
 						try {
+							argsArray = (Object[]) JSONConverter.fromJSON(
+									Arrays.toString(processedArguments), Object[].class,
+									null);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+						paramInfo.setArguments(argsArray);
+						
+						try {
+							
 							this.buildParameter(paramInfo);
 
 							addedParameters++;
@@ -322,7 +340,7 @@ public class CustomExperimentModel extends ExperimentModel {
 					String[] relations = operationFeature.getRelations();
 
 					for (String relation : relations) {
-						if (!createdParameters.contains(relation)) {
+						if (!createdParameters.contains(relation.split("\\.")[0])) {
 							allowCreate = false;
 							break;
 						}
@@ -345,8 +363,8 @@ public class CustomExperimentModel extends ExperimentModel {
 						int i = 0;
 						for (String relation : relations) {
 
-							argumentRelations[i] = concreteParamNames
-									.get(relation);
+							argumentRelations[i] = relation;//concreteParamNames
+									//.get(relation.split("\\.")[0]);
 							i++;
 						}
 
