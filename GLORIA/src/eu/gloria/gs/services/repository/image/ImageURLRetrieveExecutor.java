@@ -99,18 +99,35 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				url = ccd.getImageURL(imageInfo.getRt(), imageInfo.getCcd(),
 						imageInfo.getLocalid(), ImageExtensionFormat.JPG);
 
-				adapter.setUrlByRT(imageInfo.getRt(), imageInfo.getLocalid(),
+				adapter.setJpgByRT(imageInfo.getRt(), imageInfo.getLocalid(),
 						url);
-
+								
 				try {
 					alog.registerAction(
 							username,
 							new Date(),
-							"images/" + imageInfo.getId() + "/setURL?"
+							"images/" + imageInfo.getId() + "/setJPG?"
 									+ url.substring(0, 15) + "...");
 				} catch (ActionLogException e) {
 					System.out.println(e.getMessage());
 				}
+				
+				url = ccd.getImageURL(imageInfo.getRt(), imageInfo.getCcd(),
+						imageInfo.getLocalid(), ImageExtensionFormat.FITS);
+
+				adapter.setFitsByRT(imageInfo.getRt(), imageInfo.getLocalid(),
+						url);
+								
+				try {
+					alog.registerAction(
+							username,
+							new Date(),
+							"images/" + imageInfo.getId() + "/setFITS?"
+									+ url.substring(0, 15) + "...");
+				} catch (ActionLogException e) {
+					System.out.println(e.getMessage());
+				}
+
 			} catch (ImageNotAvailableException e) {
 				// Ignore the image this time, it will be treated by the
 				// next
