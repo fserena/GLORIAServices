@@ -192,6 +192,9 @@ public class CustomExperimentModel extends ExperimentModel {
 		String[] operationNames = operations.keySet().toArray(new String[0]);
 		String[] parameterNames = parameters.keySet().toArray(new String[0]);
 
+		if (parameterNames.length == 0) allParametersCreated = true;
+		if (operationNames.length == 0) allOperationsCreated = true;
+		
 		while (!allParametersCreated || !allOperationsCreated) {
 
 			if (!allParametersCreated) {
@@ -355,7 +358,7 @@ public class CustomExperimentModel extends ExperimentModel {
 
 						String dependencyName = relation.split("\\.")[0];
 						if (!this.containsParameter(dependencyName)
-								&& !createdParameters.contains(dependencyName)) {
+								&& !createdParameters.contains(dependencyName) && !this.containsOperation(dependencyName)) {
 							allowCreate = false;
 							break;
 						}

@@ -153,7 +153,16 @@ public abstract class ExperimentModel {
 				}
 
 			} catch (UndefinedExperimentParameterException e) {
-				throw new ExperimentOperationArgumentException(e.getMessage());
+
+				if (this.containsOperation(actualArgument)) {
+					if (!parameterTypes[order].getName().equals("POINTER")) {
+						throw new ExperimentOperationArgumentException(
+								e.getMessage());
+					}
+				} else {
+					throw new ExperimentOperationArgumentException(
+							e.getMessage());
+				}
 			}
 
 			order++;
