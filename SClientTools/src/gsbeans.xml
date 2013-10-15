@@ -58,6 +58,13 @@
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
 	</bean>
+	
+	<bean id="weatherTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
+		lazy-init="true" scope="singleton">
+		<property name="portName" value="WeatherTeleoperationPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface"></property>
+	</bean>
 
 	<bean id="fwTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
@@ -85,6 +92,13 @@
 		<property name="portName" value="ImageRepositoryPort"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"></property>
+	</bean>
+	
+	<bean id="schedulerClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
+		lazy-init="true" scope="singleton">
+		<property name="portName" value="SchedulerPort"></property>
+		<property name="serviceClass"
+			value="eu.gloria.gs.services.scheduler.SchedulerInterface"></property>
 	</bean>
 
 </beans>
