@@ -33,6 +33,9 @@
         <dependent-module archiveName="GLORIAInterfaces-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/GLORIAInterfaces/GLORIAInterfaces">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="Scheduler-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Scheduler/Scheduler">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/GLORIA/build/classes"/>
         <property name="context-root" value="GLORIA"/>
     </wb-module>
