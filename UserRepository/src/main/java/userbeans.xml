@@ -33,6 +33,8 @@
 		<property name="UserRepositoryPassword" ref="userRepositoryPassword"></property>
 		<property name="ImageRepositoryUsername" ref="imageRepositoryUsername"></property>
 		<property name="ImageRepositoryPassword" ref="imageRepositoryPassword"></property>
+		<property name="SchedulerUsername" ref="schedulerUsername"></property>
+		<property name="SchedulerPassword" ref="schedulerPassword"></property>
 		<property name="AdminUsername" ref="adminUsername"></property>
 		<property name="AdminPassword" ref="adminPassword"></property>
 		<property name="userDBService" ref="userMapper"></property>

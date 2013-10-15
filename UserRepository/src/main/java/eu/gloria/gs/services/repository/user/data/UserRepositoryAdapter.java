@@ -24,6 +24,8 @@ public class UserRepositoryAdapter {
 	private String TELEOPERATION_PWD;
 	private String EXPERIMENT_NAME;
 	private String EXPERIMENT_PWD;
+	private String SCHEDULER_NAME;
+	private String SCHEDULER_PWD;
 	private UserDBService userService;
 
 	public UserRepositoryAdapter() {
@@ -86,6 +88,14 @@ public class UserRepositoryAdapter {
 		this.ADMIN_PWD = pass;
 	}
 	
+	public void setSchedulerUsername(String user) {
+		this.SCHEDULER_NAME = user;
+	}
+	
+	public void setSchedulerPassword(String pass) {
+		this.SCHEDULER_PWD = pass;
+	}
+	
 	public void setUserDBService(UserDBService service) {
 		this.userService = service;
 	}
@@ -123,6 +133,8 @@ public class UserRepositoryAdapter {
 				UserRole.WEB_SERVICE);
 		this.createUser(EXPERIMENT_NAME, EXPERIMENT_PWD, UserRole.WEB_SERVICE);
 		this.createUser(IMAGE_REPOSITORY_NAME, IMAGE_REPOSITORY_PWD,
+				UserRole.WEB_SERVICE);
+		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD,
 				UserRole.WEB_SERVICE);
 	}
 
