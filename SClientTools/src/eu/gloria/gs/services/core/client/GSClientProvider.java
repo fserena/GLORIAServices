@@ -9,6 +9,7 @@ import eu.gloria.gs.services.log.action.ActionLogInterface;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
 import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
+import eu.gloria.gs.services.scheduler.SchedulerInterface;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface;
@@ -16,6 +17,7 @@ import eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface;
 
 public class GSClientProvider {
 
@@ -27,10 +29,12 @@ public class GSClientProvider {
 	private final static String DOMETELEOPERATION_BEAN_NAME = "domeTeleoperationClientFactory";
 	private final static String MOUNTTELEOPERATION_BEAN_NAME = "mountTeleoperationClientFactory";
 	private final static String FOCUSERTELEOPERATION_BEAN_NAME = "focuserTeleoperationClientFactory";
+	private final static String WEATHERTELEOPERATION_BEAN_NAME = "weatherTeleoperationClientFactory";
 	private final static String FWTELEOPERATION_BEAN_NAME = "fwTeleoperationClientFactory";
 	private final static String GENERICTELEOPERATION_BEAN_NAME = "genericTeleoperationClientFactory";
 	private final static String SCAMTELEOPERATION_BEAN_NAME = "scamTeleoperationClientFactory";
 	private final static String ONLINEEXPERIMENT_BEAN_NAME = "experimentClientFactory";
+	private final static String SCHEDULER_BEAN_NAME = "schedulerClientFactory";
 	private static String HOSTNAME = "localhost";
 	private static String PORT = "8443";
 	private static ClassPathXmlApplicationContext context;
@@ -82,6 +86,13 @@ public class GSClientProvider {
 
 		return (ImageRepositoryInterface) factory.create();
 	}
+	
+	public static SchedulerInterface getSchedulerClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(SCHEDULER_BEAN_NAME);
+
+		return (SchedulerInterface) factory.create();
+	}
 
 	public static UserRepositoryInterface getUserRepositoryClient() {
 		ClientFactory factory = (ClientFactory) context
@@ -99,6 +110,12 @@ public class GSClientProvider {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(DOMETELEOPERATION_BEAN_NAME);
 		return (DomeTeleoperationInterface) factory.create();
+	}
+	
+	public static WeatherTeleoperationInterface getWeatherTeleoperationClient() {
+		ClientFactory factory = (ClientFactory) context
+				.getBean(WEATHERTELEOPERATION_BEAN_NAME);
+		return (WeatherTeleoperationInterface) factory.create();
 	}
 
 	public static MountTeleoperationInterface getMountTeleoperationClient() {
