@@ -106,8 +106,8 @@ public class ExperimentDBAdapter {
 
 				String type = parameterInfo.getType();
 
-				ArrayList<Class<?>> argumentTypes = parameterInfo
-						.getParameter().getType().getArgumentTypes();
+			//	ArrayList<Class<?>> argumentTypes = parameterInfo
+			//			.getParameter().getType().getArgumentTypes();
 
 				type += JSONConverter.toJSON(parameterInfo.getArguments());
 
@@ -536,11 +536,29 @@ public class ExperimentDBAdapter {
 
 						for (ArgumentEntry argumentEntry : argumentEntries) {
 
-							ParameterEntry paramEntry = service
-									.getParameterById(argumentEntry
-											.getParameter());
+							ParameterEntry paramEntry = null;
 
-							String actualArgument = paramEntry.getParameter();
+							if (argumentEntry.getParameter() != null) {
+								paramEntry = service
+										.getParameterById(argumentEntry
+												.getParameter());
+							}
+
+							OperationEntry opEntry = null;
+
+							if (argumentEntry.getPointer() != null) {
+								opEntry = service
+										.getOperationById(argumentEntry
+												.getPointer());
+							}
+
+							String actualArgument = null;
+
+							if (paramEntry != null) {
+								actualArgument = paramEntry.getParameter();
+							} else if (opEntry != null) {
+								actualArgument = opEntry.getOperation();
+							}
 							String subArg = argumentEntry.getSubarg();
 							if (subArg != null && !subArg.equals("")) {
 								actualArgument = actualArgument + "." + subArg;
@@ -1111,17 +1129,33 @@ public class ExperimentDBAdapter {
 								.getExperimentParameter(experimentId,
 										actualArgument);
 
-						if (parameterEntry == null) {
+						OperationEntry argOpEntry = service
+								.getExperimentOperation(experimentId,
+										actualArgument);
+
+						if (parameterEntry == null && argOpEntry == null) {
+
 							throw new ExperimentDatabaseException(
 									"The experiment '"
 											+ experiment
-											+ "' does not contain a parameter named '"
+											+ "' does not contain a parameter nor operation named '"
 											+ actualArgument + "'");
 						}
 
 						ArgumentEntry entry = new ArgumentEntry();
 						entry.setOperation(operationEntry.getIdoperation());
-						entry.setParameter(parameterEntry.getIdparameter());
+						if (parameterEntry != null) {
+							entry.setParameter(parameterEntry.getIdparameter());
+						} else {
+							entry.setParameter(null);
+						}
+
+						if (argOpEntry != null) {
+							entry.setPointer(argOpEntry.getIdoperation());
+						} else {
+							entry.setPointer(null);
+						}
+
 						if (argument.contains(".")) {
 							entry.setSubarg(argument.substring(
 									argument.indexOf(".") + 1,
@@ -1237,6 +1271,75 @@ public class ExperimentDBAdapter {
 			entry.setContext(reservationId);
 			service.saveResult(entry);
 
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	public List<ResultInformation> getExperimentResults(String experiment)
+			throws ExperimentDatabaseException {
+
+		try {
+
+			List<ResultInformation> results = new ArrayList<>();
+
+			List<Integer> contexts = service
+					.getAllExperimentContexts(experiment);
+
+			for (Integer context : contexts) {
+				List<ResultEntry> contextResults = service
+						.getContextResults(context);
+
+				for (ResultEntry res : contextResults) {
+					ResultInformation resInfo = new ResultInformation();
+					resInfo.setDate(res.getDate());
+					resInfo.setExperiment(experiment);
+					resInfo.setReservationId(context);
+					resInfo.setUser(res.getUser());
+					resInfo.setValue(res.getValue());
+
+					results.add(resInfo);
+				}
+			}
+
+			return results;
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	public List<ResultInformation> getContextResults(int context)
+			throws ExperimentDatabaseException, NoSuchReservationException {
+
+		try {
+
+			List<ResultInformation> results = new ArrayList<>();
+
+			List<ResultEntry> contextResults = service
+					.getContextResults(context);
+
+			ReservationEntry resEntry = service.getReservationById(context);
+
+			if (resEntry == null) {
+				throw new NoSuchReservationException("The context " + context
+						+ " does not exist");
+			}
+
+			int expId = resEntry.getExperiment();
+			String experiment = service.getExperimentById(expId).getName();
+
+			for (ResultEntry res : contextResults) {
+				ResultInformation resInfo = new ResultInformation();
+				resInfo.setDate(res.getDate());
+				resInfo.setExperiment(experiment);
+				resInfo.setReservationId(context);
+				resInfo.setUser(res.getUser());
+				resInfo.setValue(res.getValue());
+
+				results.add(resInfo);
+			}
+
+			return results;
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
