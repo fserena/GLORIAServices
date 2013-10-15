@@ -1,4 +1,4 @@
-package eu.gloria.gs.services.teleoperation.ccd.operations;
+package eu.gloria.gs.services.teleoperation.weather.operations;
 
 import eu.gloria.gs.services.repository.rt.data.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
@@ -8,24 +8,24 @@ import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
 import eu.gloria.rti.client.DeviceFactory;
-import eu.gloria.rti.client.devices.CCD;
+import eu.gloria.rti.client.devices.RHSensor;
 
-public abstract class CCDOperation extends DeviceOperation {
+public abstract class RHSensorOperation extends DeviceOperation {
 
-	private String ccd;
+	private String rhSensor;
 
-	public CCDOperation(OperationArgs args) {
+	public RHSensorOperation(OperationArgs args) {
 		super(args);
 
 		if (args.getArguments().size() > 1)
-			this.ccd = (String) args.getArguments().get(1);
+			this.rhSensor = (String) args.getArguments().get(1);
 	}
 
-	public String getCCDName() {
-		return this.ccd;
+	public String getRHSensorName() {
+		return this.rhSensor;
 	}
 
-	protected abstract void operateCCD(CCD ccd, OperationReturn returns)
+	protected abstract void operateRHSensor(RHSensor rhSensor, OperationReturn returns)
 			throws TeleoperationException;
 
 	@Override
@@ -33,13 +33,13 @@ public abstract class CCDOperation extends DeviceOperation {
 			throws TeleoperationException {
 
 		ServerKeyData keyData = resolver.resolve(this.getServer());
-		return DeviceFactory.getReference().createCCD(keyData, this.getCCDName());
+		return DeviceFactory.getReference().createRHSensor(keyData, this.getRHSensorName());
 	}
 
 	@Override
 	protected void operateHandler(DeviceHandler handler, OperationReturn returns)
 			throws TeleoperationException {
-		this.operateCCD((CCD) handler, returns);
+		this.operateRHSensor((RHSensor) handler, returns);
 
 	}
 

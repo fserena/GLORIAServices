@@ -6,7 +6,7 @@ import java.util.HashMap;
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
 import eu.gloria.gs.services.repository.rt.data.RTCredentials;
 import eu.gloria.gs.services.repository.rt.data.RTInformation;
-import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
+import eu.gloria.gs.services.repository.rt.data.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.base.ServerResolver;
@@ -34,6 +34,7 @@ public class RTSResolver implements ServerResolver {
 					RTInformation rtInfo = repository.getRTInformation(server);
 
 					keyData.setUrl(rtInfo.getUrl());
+					keyData.setPort(rtInfo.getPort());
 					RTCredentials rtCredentials = new RTCredentials();
 					rtCredentials.setUser(rtInfo.getUser());
 					rtCredentials.setPassword(rtInfo.getPassword());
@@ -62,6 +63,7 @@ public class RTSResolver implements ServerResolver {
 				ServerKeyData keyData = new ServerKeyData();
 
 				keyData.setUrl(rtInfo.getUrl());
+				keyData.setPort(rtInfo.getPort());
 				RTCredentials rtCredentials = new RTCredentials();
 				rtCredentials.setUser(rtInfo.getUser());
 				rtCredentials.setPassword(rtInfo.getPassword());

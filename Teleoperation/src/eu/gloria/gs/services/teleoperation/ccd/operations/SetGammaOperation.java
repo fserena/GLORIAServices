@@ -18,6 +18,8 @@ public class SetGammaOperation extends CCDOperation {
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
-		ccd.setGamma((long) this.gamma);
+		if (this.gamma >= 0) {
+			ccd.setGamma((long) this.gamma);
+		}
 	}
 }

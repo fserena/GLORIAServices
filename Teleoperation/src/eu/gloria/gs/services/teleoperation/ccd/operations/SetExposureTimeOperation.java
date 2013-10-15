@@ -19,9 +19,8 @@ public class SetExposureTimeOperation extends CCDOperation {
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
 
-		ccd.setExposureTime(this.exposure);
-
-		returns.setMessage("Set exposure operation executed: " + this.exposure
-				+ ", " + this.getServer() + "," + this.getCCDName());
+		if (this.exposure >= 0) {
+			ccd.setExposureTime(this.exposure);
+		}
 	}
 }

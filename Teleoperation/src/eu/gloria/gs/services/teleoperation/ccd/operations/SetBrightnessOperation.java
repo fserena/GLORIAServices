@@ -18,7 +18,9 @@ public class SetBrightnessOperation extends CCDOperation {
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
-		ccd.setBrightness((long)this.brightness);
+		if (this.brightness >= 0) {
+			ccd.setBrightness((long) this.brightness);
+		}
 
 		returns.setMessage("Set brightness operation executed: "
 				+ this.brightness + ", " + this.getServer() + ","

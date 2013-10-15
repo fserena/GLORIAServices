@@ -18,10 +18,8 @@ public class SetGainOperation extends CCDOperation {
 	@Override
 	protected void operateCCD(CCD ccd, OperationReturn returns)
 			throws TeleoperationException {
-		ccd.setGain((long) this.gain);
-
-		returns.setMessage("Set gain operation executed: " + this.gain + ", "
-				+ this.getServer() + "," + this.getCCDName());
-
+		if (this.gain >= 0) {
+			ccd.setGain((long) this.gain);
+		}
 	}
 }
