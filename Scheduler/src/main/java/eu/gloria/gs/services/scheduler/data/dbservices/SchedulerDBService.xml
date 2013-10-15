@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.scheduler.data.dbservices.SchedulerDBService">
+
+	<update id="createSchedule">
+		CREATE TABLE IF NOT EXISTS `schedule` (
+		`idschedule`
+		int(11) NOT NULL AUTO_INCREMENT,
+		`telescope` varchar(50) NOT NULL,
+		`uuid` varchar(45) DEFAULT NULL,
+		`status` varchar(45) NOT NULL,
+		`publish_date` datetime NOT NULL,
+		`last_date` datetime DEFAULT NULL,
+		`user` varchar(40) DEFAULT NULL,
+		`plan` text NOT NULL,
+		`candidates`
+		text,
+		`results` text,
+		PRIMARY KEY (`idschedule`),
+		KEY `fk_schedule_rt`
+		(`telescope`),
+		KEY `fk_schedule_user` (`user`),
+		CONSTRAINT
+		`fk_schedule_user` FOREIGN KEY (`user`) REFERENCES `user` (`name`) ON
+		DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=23
+		DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="get"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		idschedule=#{id_}
+	</select>
+
+	<select id="getLastUserScheduleId" resultType="int">
+		SELECT idschedule
+		FROM
+		`schedule`
+		WHERE
+		user=#{user_} ORDER BY publish_date DESC LIMIT 1
+	</select>
+
+	<select id="getByUser"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		user=#{user_}
+	</select>
+
+	<select id="getByRT"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		telescope=#{rt_}
+	</select>
+
+	<select id="getByRTLocalId"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		rt=#{rt_} AND
+		local_id=#{lid_}
+	</select>
+
+	<insert id="save"
+		parameterType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		INSERT INTO
+		`schedule`
+		(telescope, uuid, status,
+		publish_date, last_date, user, plan, candidates, results)
+		VALUE (
+		#{telescope},
+		#{uuid},
+		#{status},
+		#{publish_date}, #{last_date}, #{user},
+		#{plan},
+		#{candidates}, #{results})
+	</insert>
+
+	<delete id="remove">
+		DELETE FROM `schedule`
+		WHERE
+		idschedule=#{id_}
+	</delete>
+
+	<select id="contains" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`schedule`
+		WHERE
+		idschedule=#{id_}
+	</select>
+
+	<update id="setTelescope">
+		UPDATE `schedule`
+		SET
+		telescope=#{rt_}
+		WHERE idschedule
+		=#{id_}
+	</update>
+
+	<update id="setLastDate">
+		UPDATE `schedule`
+		SET
+		last_date=#{ld_}
+		WHERE idschedule
+		=#{id_}
+	</update>
+
+	<update id="setStatus">
+		UPDATE `schedule`
+		SET
+		status=#{status_}
+		WHERE idschedule
+		=#{id_}
+	</update>
+
+	<update id="setUuid">
+		UPDATE `schedule`
+		SET
+		uuid=#{uuid_}
+		WHERE idschedule
+		=#{id_}
+	</update>
+
+	<update id="setPlan">
+		UPDATE `schedule`
+		SET
+		plan=#{plan_}
+		WHERE idschedule
+		=#{id_}
+	</update>
+
+	<update id="setCandidates">
+		UPDATE `schedule`
+		SET
+		candidates=#{cand_}
+		WHERE
+		idschedule
+		=#{id_}
+	</update>
+
+	<update id="setResults">
+		UPDATE `schedule`
+		SET
+		results=#{res_}
+		WHERE
+		idschedule
+		=#{id_}
+	</update>
+
+	<select id="getUserActiveSchedulesCount" resultType="int">
+		SELECT
+		count(*) FROM
+		`schedule`
+		WHERE
+		user=#{user_} AND (status='ADVERTISED' OR
+		status='QUEUED' OR status='PREPARED')
+	</select>
+
+	<select id="getUserActiveSchedules"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		user=#{user_} AND
+		(status='ADVERTISED' OR
+		status='QUEUED' OR status='PREPARED' OR
+		status='REJECTED')
+	</select>
+
+	<select id="getUserInactiveSchedules"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		user=#{user_} AND
+		(status='ERROR' OR
+		status='ABORTED' OR status='IMPOSSIBLE')
+	</select>
+
+
+	<select id="containsRTLocalId" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`schedule`
+		WHERE
+		telescope=#{rt_} AND uuid=#{uuid_}
+	</select>
+
+	<select id="getAllActiveSchedules"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		status='ADVERTISED' OR
+		status='QUEUED' OR status='PREPARED' OR status='REJECTED'
+	</select>
+
+	<select id="getActiveByRT"
+		resultType="eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry">
+		SELECT * FROM
+		`schedule`
+		WHERE
+		telescope=#{rt_} AND
+		(status='ADVERTISED' OR
+		status='QUEUED' OR status='PREPARED' OR
+		status='REJECTED')
+	</select>
+
+</mapper>
