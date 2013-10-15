@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
+import eu.gloria.gs.services.repository.image.data.ImageTargetData;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -11,6 +12,8 @@ import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningXOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningYOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBrightnessOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetContrastOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetExposureTimeOperation;
@@ -18,6 +21,8 @@ import eu.gloria.gs.services.teleoperation.ccd.operations.GetGainOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetGammaOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetImageURLOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetStateOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.SetBiningXOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.SetBiningYOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetBrightnessOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetContrastOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.SetExposureTimeOperation;
@@ -440,8 +445,13 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			String imageId = (String) returns.getReturns().get(0);
 
+			ImageTargetData target = new ImageTargetData();
+			target.setDec(null);
+			target.setRa(null);
+			target.setObject(null);
+			
 			imageRepository.saveImage(this.getClientUsername(), rt, ccd,
-					imageId);
+					imageId, target);
 
 			this.processSuccess(rt, ccd, "startExposure", null, imageId);
 
@@ -593,6 +603,180 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			long gain = (Long) returns.getReturns().get(0);
 
 			this.processSuccess(rt, ccd, "getGamma", null, gain);
+
+			return gain;
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface#setBiningX
+	 * (java.lang.String, java.lang.String, long)
+	 */
+	@Override
+	public void setBinningX(String rt, String ccd, long value)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+		args.getArguments().add(value);
+
+		SetBiningXOperation operation = null;
+
+		try {
+			operation = new SetBiningXOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/setBiningX/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "setBiningX", new Object[] { value },
+					null);
+
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface#getBiningX
+	 * (java.lang.String, java.lang.String)
+	 */
+	@Override
+	public long getBiningX(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+
+		GetBiningXOperation operation = null;
+
+		try {
+			operation = new GetBiningXOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getBiningX/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			long gain = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getBiningX", null, gain);
+
+			return gain;
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface#setBiningY
+	 * (java.lang.String, java.lang.String, long)
+	 */
+	@Override
+	public void setBinningY(String rt, String ccd, long value)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+		args.getArguments().add(value);
+
+		SetBiningYOperation operation = null;
+
+		try {
+			operation = new SetBiningYOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/setBiningY/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			this.executeOperation(operation);
+
+			this.processSuccess(rt, ccd, "setBiningY", new Object[] { value },
+					null);
+
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new CCDTeleoperationException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface#getBiningY
+	 * (java.lang.String, java.lang.String)
+	 */
+	@Override
+	public long getBiningY(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(ccd);
+
+		GetBiningYOperation operation = null;
+
+		try {
+			operation = new GetBiningYOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getBiningY/Bad args", rt);
+
+			throw new CCDTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			long gain = (Long) returns.getReturns().get(0);
+
+			this.processSuccess(rt, ccd, "getBiningY", null, gain);
 
 			return gain;
 		} catch (DeviceOperationFailedException e) {
