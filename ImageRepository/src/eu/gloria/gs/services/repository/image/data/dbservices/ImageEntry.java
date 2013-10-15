@@ -17,11 +17,13 @@ public class ImageEntry implements Serializable {
 	private int idimage;
 	private String user;
 	private Date date;
-	private String url;
+	private String jpg;
+	private String fits;
 	private int rid;
 	private String local_id;
 	private String rt;
 	private String ccd;
+	private String target;
 
 	public int getIdimage() {
 		return idimage;
@@ -47,12 +49,20 @@ public class ImageEntry implements Serializable {
 		this.date = date;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getJpg() {
+		return jpg;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setJpg(String jpg) {
+		this.jpg = jpg;
+	}
+
+	public String getFits() {
+		return fits;
+	}
+
+	public void setFits(String fits) {
+		this.fits = fits;
 	}
 
 	public int getRid() {
@@ -85,5 +95,13 @@ public class ImageEntry implements Serializable {
 
 	public void setCcd(String ccd) {
 		this.ccd = ccd;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 }

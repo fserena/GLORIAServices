@@ -1,8 +1,12 @@
 package eu.gloria.gs.services.repository.image.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry;
@@ -31,7 +35,7 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void saveImage(String rt, String ccd, String user, Date when,
-			String lid) throws ImageDatabaseException {
+			String lid, ImageTargetData target) throws ImageDatabaseException {
 
 		ImageEntry entry = new ImageEntry();
 		entry.setUser(user);
@@ -39,6 +43,12 @@ public class ImageRepositoryAdapter {
 		entry.setLocal_id(lid);
 		entry.setRt(rt);
 		entry.setCcd(ccd);
+
+		try {
+			entry.setTarget(JSONConverter.toJSON(target));
+		} catch (IOException e) {
+			throw new ImageDatabaseException(e.getMessage());
+		}
 
 		imageService.save(entry);
 	}
@@ -62,34 +72,79 @@ public class ImageRepositoryAdapter {
 		imageService.setReservation(id, rid);
 	}
 
-	public void setExperimentReservationByUrl(String url, int rid)
+	public void setExperimentReservationByJpg(String jpg, int rid)
 			throws ImageDatabaseException {
-		if (!imageService.containsUrl(url)) {
-			throw new ImageDatabaseException("The image with URL= '" + url
+		if (!imageService.containsJpg(jpg)) {
+			throw new ImageDatabaseException("The image with URL= '" + jpg
 					+ "' does not exist");
 		}
 
-		ImageEntry entry = imageService.getByUrl(url);
+		ImageEntry entry = imageService.getByJpg(jpg);
 		imageService.setReservation(entry.getIdimage(), rid);
 	}
 
-	public void setUrl(int id, String url) throws ImageDatabaseException {
-		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image with URL= '" + url
+	public void setExperimentReservationByFits(String fits, int rid)
+			throws ImageDatabaseException {
+		if (!imageService.containsJpg(fits)) {
+			throw new ImageDatabaseException("The image with URL= '" + fits
 					+ "' does not exist");
 		}
 
-		imageService.setUrl(id, url);
+		ImageEntry entry = imageService.getByJpg(fits);
+		imageService.setReservation(entry.getIdimage(), rid);
 	}
 
-	public void setUrlByRT(String rt, String lid, String url)
-			throws ImageDatabaseException {
-		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image with URL= '" + url
+	public void setJpg(int id, String jpg) throws ImageDatabaseException {
+		if (!imageService.contains(id)) {
+			throw new ImageDatabaseException("The image with URL= '" + jpg
 					+ "' does not exist");
 		}
 
-		imageService.setUrlByRTLocalId(rt, lid, url);
+		imageService.setJpg(id, jpg);
+	}
+
+	public void setFits(int id, String fits) throws ImageDatabaseException {
+		if (!imageService.contains(id)) {
+			throw new ImageDatabaseException("The image with URL= '" + fits
+					+ "' does not exist");
+		}
+
+		imageService.setFits(id, fits);
+	}
+
+	public void setJpgByRT(String rt, String lid, String jpg)
+			throws ImageDatabaseException {
+		if (!imageService.containsRTLocalId(rt, lid)) {
+			throw new ImageDatabaseException("The image with URL= '" + jpg
+					+ "' does not exist");
+		}
+
+		imageService.setJpgByRTLocalId(rt, lid, jpg);
+	}
+
+	public void setFitsByRT(String rt, String lid, String fits)
+			throws ImageDatabaseException {
+		if (!imageService.containsRTLocalId(rt, lid)) {
+			throw new ImageDatabaseException("The image with URL= '" + fits
+					+ "' does not exist");
+		}
+
+		imageService.setFitsByRTLocalId(rt, lid, fits);
+	}
+
+	public void setTargetByRT(String rt, String lid, ImageTargetData target)
+			throws ImageDatabaseException {
+		if (!imageService.containsRTLocalId(rt, lid)) {
+			throw new ImageDatabaseException("The image with URL= '"
+					+ "' does not exist");
+		}
+
+		try {
+			imageService.setTargetByRTLocalId(rt, lid,
+					JSONConverter.toJSON(target));
+		} catch (IOException e) {
+			throw new ImageDatabaseException(e.getMessage());
+		}
 	}
 
 	public void setUser(int id, String user) throws ImageDatabaseException {
@@ -101,14 +156,25 @@ public class ImageRepositoryAdapter {
 		imageService.setUser(id, user);
 	}
 
-	public void setUserByUrl(String url, String user)
+	public void setUserByJpg(String jpg, String user)
 			throws ImageDatabaseException {
-		if (!imageService.containsUrl(url)) {
-			throw new ImageDatabaseException("The image with URL= '" + url
+		if (!imageService.containsJpg(jpg)) {
+			throw new ImageDatabaseException("The image with URL= '" + jpg
 					+ "' does not exist");
 		}
 
-		ImageEntry entry = imageService.getByUrl(url);
+		ImageEntry entry = imageService.getByJpg(jpg);
+		imageService.setUser(entry.getIdimage(), user);
+	}
+
+	public void setUserByFits(String fits, String user)
+			throws ImageDatabaseException {
+		if (!imageService.containsJpg(fits)) {
+			throw new ImageDatabaseException("The image with URL= '" + fits
+					+ "' does not exist");
+		}
+
+		ImageEntry entry = imageService.getByJpg(fits);
 		imageService.setUser(entry.getIdimage(), user);
 	}
 
@@ -129,8 +195,15 @@ public class ImageRepositoryAdapter {
 		imageInfo.setRt(entry.getRt());
 		imageInfo.setCcd(entry.getCcd());
 		imageInfo.setRid(entry.getRid());
-		imageInfo.setUrl(entry.getUrl());
+		imageInfo.setJpg(entry.getJpg());
+		imageInfo.setFits(entry.getFits());
 		imageInfo.setUser(entry.getUser());
+		try {
+			imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
+					entry.getTarget(), ImageTargetData.class, null));
+		} catch (IOException e) {
+			throw new ImageDatabaseException(e.getMessage());
+		}
 
 		return imageInfo;
 	}
@@ -152,9 +225,15 @@ public class ImageRepositoryAdapter {
 		imageInfo.setRt(rt);
 		imageInfo.setCcd(entry.getCcd());
 		imageInfo.setRid(entry.getRid());
-		imageInfo.setUrl(entry.getUrl());
+		imageInfo.setJpg(entry.getJpg());
+		imageInfo.setFits(entry.getFits());
 		imageInfo.setUser(entry.getUser());
-
+		try {
+			imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
+					entry.getTarget(), ImageTargetData.class, null));
+		} catch (IOException e) {
+			throw new ImageDatabaseException(e.getMessage());
+		}
 		return imageInfo;
 	}
 
@@ -174,9 +253,16 @@ public class ImageRepositoryAdapter {
 				imageInfo.setRid(entry.getRid());
 				imageInfo.setRt(entry.getRt());
 				imageInfo.setCcd(entry.getCcd());
-				imageInfo.setUrl(entry.getUrl());
+				imageInfo.setJpg(entry.getJpg());
+				imageInfo.setFits(entry.getFits());
 				imageInfo.setUser(entry.getUser());
-			
+				try {
+					imageInfo.setTarget((ImageTargetData) JSONConverter
+							.fromJSON(entry.getTarget(), ImageTargetData.class,
+									null));
+				} catch (IOException e) {
+					throw new ImageDatabaseException(e.getMessage());
+				}
 				imageInfos.add(imageInfo);
 			}
 		}
@@ -199,7 +285,12 @@ public class ImageRepositoryAdapter {
 			imageInfo.setRid(entry.getRid());
 			imageInfo.setRt(entry.getRt());
 			imageInfo.setCcd(entry.getCcd());
-
+			try {
+				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
+						entry.getTarget(), ImageTargetData.class, null));
+			} catch (IOException e) {
+				throw new ImageDatabaseException(e.getMessage());
+			}
 			imageInfos.add(imageInfo);
 		}
 
@@ -208,17 +299,36 @@ public class ImageRepositoryAdapter {
 
 	public List<Integer> getAllImagesBetween(Date from, Date to, int limit) {
 
-		List<Integer> imageIds = new ArrayList<Integer>();
-		List<ImageEntry> entries = imageService.getAllBetweenDates(from, to);
+		List<Integer> imageIds = imageService.getAllBetweenDates(from, to);
 
-		System.out.println(from);
-		System.out.println(to);
-
-		for (ImageEntry entry : entries) {
-			imageIds.add(entry.getIdimage());
+		if (imageIds == null) {
+			imageIds = new ArrayList<>();
 		}
 
-		System.out.println(entries.size());
+		return imageIds;
+	}
+
+	public List<Integer> getAllObjectImages(String object) {
+
+		List<Integer> imageIds = imageService.getAllObjectImages("%" + object
+				+ "%");
+
+		if (imageIds == null) {
+			imageIds = new ArrayList<>();
+		}
+
+		return imageIds;
+	}
+	
+	public List<Integer> getAllObjectImagesByDate(String object, Date from, Date to) {
+
+		List<Integer> imageIds = imageService.getAllObjectImagesBetweenDates("%" + object
+				+ "%", from, to);
+
+		if (imageIds == null) {
+			imageIds = new ArrayList<>();
+		}
+
 		return imageIds;
 	}
 

@@ -15,13 +15,17 @@ public interface ImageDBService {
 
 	public ImageEntry get(@Param(value = "id_") int id);
 
-	public ImageEntry getByUrl(@Param(value = "url_") String url);
+	public ImageEntry getByFits(@Param(value = "fits_") String fits);
+
+	public ImageEntry getByJpg(@Param(value = "jpg_") String jpg);
 
 	public void save(ImageEntry entry);
 
 	public boolean contains(@Param(value = "id_") int id);
 
-	public boolean containsUrl(@Param(value = "url_") String url);
+	public boolean containsJpg(@Param(value = "jpg_") String jpg);
+
+	public boolean containsFits(@Param(value = "fits_") String fits);
 
 	public boolean containsRTLocalId(@Param(value = "rt_") String rt,
 			@Param(value = "lid_") String lid);
@@ -34,18 +38,36 @@ public interface ImageDBService {
 	public void setUser(@Param(value = "id_") int id,
 			@Param(value = "user_") String user);
 
-	public void setUrl(@Param(value = "id_") int id,
-			@Param(value = "url_") String url);
+	public void setJpg(@Param(value = "id_") int id,
+			@Param(value = "jpg_") String jpg);
 
-	public void setUrlByRTLocalId(@Param(value = "rt_") String rt,
-			@Param(value = "lid_") String lid, @Param(value = "url_") String url);
+	public void setFits(@Param(value = "id_") int id,
+			@Param(value = "fits_") String fits);
+
+	public void setJpgByRTLocalId(@Param(value = "rt_") String rt,
+			@Param(value = "lid_") String lid, @Param(value = "jpg_") String jpg);
+
+	public void setFitsByRTLocalId(@Param(value = "rt_") String rt,
+			@Param(value = "lid_") String lid,
+			@Param(value = "fits_") String fits);
+
+	public void setTargetByRTLocalId(@Param(value = "rt_") String rt,
+			@Param(value = "lid_") String lid,
+			@Param(value = "target_") String target);
 
 	public List<ImageEntry> getByUser(@Param(value = "user_") String user);
 
 	public List<ImageEntry> getByReservation(@Param(value = "rid_") int rid);
 
-	public List<ImageEntry> getAllBetweenDates(
+	public List<Integer> getAllObjectImages(
+			@Param(value = "object_") String object);
+
+	public List<Integer> getAllObjectImagesBetweenDates(
+			@Param(value = "object_") String object,
 			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+
+	public List<Integer> getAllBetweenDates(@Param(value = "from_") Date from,
+			@Param(value = "to_") Date to);
 
 	public List<ImageEntry> getByRT(@Param(value = "rt_") String rt);
 

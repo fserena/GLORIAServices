@@ -6,37 +6,36 @@
 	namespace="eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService">
 
 	<update id="create">
-		CREATE TABLE IF NOT EXISTS `image`
-		(
-		`idimage` int(11) NOT NULL AUTO_INCREMENT,
+		CREATE TABLE IF NOT EXISTS `image` (
+		`idimage` int(11)
+		NOT NULL AUTO_INCREMENT,
 		`rt` varchar(50) NOT NULL,
-		`user` varchar(40) NOT NULL,
-		`url` varchar(200) DEFAULT NULL,
-		`date`
-		datetime NOT NULL,
-		`rid` int(11) DEFAULT NULL,
-		`local_id` varchar(50)
+		`user` varchar(40)
 		NOT NULL,
-		`ccd` varchar(40) NOT NULL,
+		`jpg` varchar(200) DEFAULT NULL,
+		`date` datetime NOT NULL,
+		`rid` int(11) DEFAULT NULL,
+		`local_id` varchar(50) NOT NULL,
+		`ccd`
+		varchar(40) NOT NULL,
+		`fits` varchar(200) DEFAULT NULL,
+		`target` text,
 		PRIMARY KEY (`idimage`),
-		KEY
-		`fk_image_rt` (`rt`),
-		KEY `fk_image_user` (`user`),
-		KEY `fk_image_rid`
-		(`rid`),
+		KEY `fk_image_rt` (`rt`),
+		KEY `fk_image_user`
+		(`user`),
+		KEY `fk_image_rid` (`rid`),
 		KEY `fk_image_ccd` (`ccd`),
-		CONSTRAINT `fk_image_rid` FOREIGN
-		KEY (`rid`) REFERENCES `reservation`
+		CONSTRAINT `fk_image_rid` FOREIGN KEY (`rid`) REFERENCES `reservation`
 		(`idreservation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 		CONSTRAINT
-		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `rt`
-		(`name`) ON DELETE
+		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `rt` (`name`) ON DELETE
 		CASCADE ON UPDATE CASCADE,
-		CONSTRAINT `fk_image_user`
-		FOREIGN KEY (`user`) REFERENCES `user` (`name`) ON
-		DELETE NO ACTION ON UPDATE NO ACTION
-		) ENGINE=InnoDB DEFAULT
-		CHARSET=utf8
+		CONSTRAINT `fk_image_user` FOREIGN KEY
+		(`user`) REFERENCES `user` (`name`) ON
+		DELETE NO ACTION ON UPDATE NO
+		ACTION
+		) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8
 	</update>
 
 	<select id="get"
@@ -55,12 +54,20 @@
 		user=#{user_}
 	</select>
 
-	<select id="getByUrl"
+	<select id="getByJpg"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
 		`image`
 		WHERE
-		url=#{url_}
+		jpg=#{jpg_}
+	</select>
+
+	<select id="getByFits"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`image`
+		WHERE
+		fits=#{fits_}
 	</select>
 
 	<select id="getByRT"
@@ -89,12 +96,29 @@
 	</select>
 
 	<select id="getAllBetweenDates"
-		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
-		SELECT * FROM
+		resultType="int">
+		SELECT idimage FROM
 		`image`
 		WHERE date &gt;=
 		#{from_}
-		AND date &lt;=#{to_}
+		AND date
+		&lt;=#{to_}
+	</select>
+
+	<select id="getAllObjectImages" resultType="int">
+		SELECT idimage FROM
+		`image`
+		WHERE target LIKE #{object_}
+	</select>
+
+	<select id="getAllObjectImagesBetweenDates" resultType="int">
+		SELECT
+		idimage FROM
+		`image`
+		WHERE target LIKE #{object_} AND date &gt;=
+		#{from_}
+		AND date
+		&lt;=#{to_}
 	</select>
 
 	<insert id="save"
@@ -102,21 +126,19 @@
 		INSERT INTO
 		`image`
 		(rt, user, date,
-		local_id, ccd)
-		VALUE ( #{rt}, #{user}, #{date}, #{local_id}, #{ccd})
+		local_id, ccd, target)
+		VALUE (
+		#{rt}, #{user}, #{date}, #{local_id}, #{ccd}, #{target})
 	</insert>
-	
+
 	<delete id="remove">
 		DELETE FROM `image`
 		WHERE
 		idimage=#{id_}
 	</delete>
 
-	<!-- <delete id="removeByUser">
-		DELETE FROM `image`
-		WHERE
-		user=#{user_}
-	</delete>-->
+	<!-- <delete id="removeByUser"> DELETE FROM `image` WHERE user=#{user_} 
+		</delete> -->
 
 	<update id="setUser">
 		UPDATE `image`
@@ -135,21 +157,49 @@
 		=#{id_}
 	</update>
 
-	<update id="setUrl">
+	<update id="setJpg">
 		UPDATE `image`
 		SET
-		url=#{url_}
+		jpg=#{jpg_}
 		WHERE
 		idimage
 		=#{id_}
 	</update>
 
-	<update id="setUrlByRTLocalId">
+	<update id="setFits">
 		UPDATE `image`
 		SET
-		url=#{url_}
+		fits=#{fits_}
 		WHERE
-		rt=#{rt_} AND local_id=#{lid_}
+		idimage
+		=#{id_}
+	</update>
+
+	<update id="setJpgByRTLocalId">
+		UPDATE `image`
+		SET
+		jpg=#{jpg_}
+		WHERE
+		rt=#{rt_} AND
+		local_id=#{lid_}
+	</update>
+
+	<update id="setFitsByRTLocalId">
+		UPDATE `image`
+		SET
+		fits=#{fits_}
+		WHERE
+		rt=#{rt_} AND
+		local_id=#{lid_}
+	</update>
+
+	<update id="setTargetByRTLocalId">
+		UPDATE `image`
+		SET
+		target=#{target_}
+		WHERE
+		rt=#{rt_} AND
+		local_id=#{lid_}
 	</update>
 
 	<select id="contains" resultType="boolean">
@@ -159,11 +209,18 @@
 		idimage=#{id_}
 	</select>
 
-	<select id="containsUrl" resultType="boolean">
+	<select id="containsJpg" resultType="boolean">
 		SELECT count(*)>0 FROM
 		`image`
 		WHERE
-		url=#{url_}
+		jpg=#{jpg_}
+	</select>
+
+	<select id="containsFits" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`image`
+		WHERE
+		fits=#{fits_}
 	</select>
 
 	<select id="containsRTLocalId" resultType="boolean">
@@ -178,7 +235,7 @@
 		SELECT * FROM
 		`image`
 		WHERE
-		url IS NULL
+		jpg IS NULL AND fits is NULL
 	</select>
 
 </mapper>
