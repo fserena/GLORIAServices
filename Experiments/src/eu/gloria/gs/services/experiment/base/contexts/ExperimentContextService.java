@@ -15,6 +15,7 @@ import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface
 import eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
 import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
+import eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -34,7 +35,8 @@ public abstract class ExperimentContextService {
 	private FocuserTeleoperationInterface focus;
 	private FilterWheelTeleoperationInterface fw;
 	private ImageRepositoryInterface image;
-
+	private WeatherTeleoperationInterface weather;
+	
 	public ExperimentDBAdapter getAdapter() {
 		return adapter;
 	}
@@ -121,6 +123,14 @@ public abstract class ExperimentContextService {
 
 	public FilterWheelTeleoperationInterface getFilterWheelTeleoperation() {
 		return this.fw;
+	}
+	
+	public WeatherTeleoperationInterface getWeatherTeleoperation() {
+		return weather;
+	}
+
+	public void setWeatherTeleoperation(WeatherTeleoperationInterface weather) {
+		this.weather = weather;
 	}
 
 	public ImageRepositoryInterface getImageRepository() {
