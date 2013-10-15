@@ -152,22 +152,28 @@
 	<update id="createExperimentArgumentTable">
 		CREATE TABLE IF NOT EXISTS `experiment_argument` (
 		`operation` int(11) NOT NULL,
-		`parameter` int(11) NOT NULL,
-		`number`
-		int(11) NOT NULL,
+		`parameter` int(11) DEFAULT NULL,
+		`number` int(11) NOT NULL,
 		`subarg` varchar(100) DEFAULT NULL,
-		PRIMARY KEY
-		(`operation`,`parameter`,`number`),
-		KEY `args_parameter_fk`
-		(`parameter`),
-		KEY `args_operation_fk` (`operation`),
+		`pointer` int(11) DEFAULT NULL,
+		PRIMARY KEY (`operation`,`number`),
+		KEY
+		`args_parameter_fk` (`parameter`),
+		KEY `args_operation_fk`
+		(`operation`),
+		KEY `args_pointer_fk` (`pointer`),
 		CONSTRAINT
-		`args_operation_fk` FOREIGN KEY (`operation`) REFERENCES
-		`experiment_operation` (`idoperation`) ON DELETE CASCADE ON UPDATE
+		`args_parameter_fk` FOREIGN KEY (`parameter`) REFERENCES
+		`experiment_parameter` (`idparameter`) ON DELETE CASCADE ON UPDATE
 		CASCADE,
-		CONSTRAINT `args_parameter_fk` FOREIGN KEY (`parameter`)
+		CONSTRAINT `args_operation_fk` FOREIGN KEY (`operation`)
 		REFERENCES
-		`experiment_parameter` (`idparameter`) ON DELETE CASCADE ON
+		`experiment_operation` (`idoperation`) ON DELETE CASCADE ON
+		UPDATE
+		CASCADE,
+		CONSTRAINT `args_pointer_fk` FOREIGN KEY (`pointer`)
+		REFERENCES
+		`experiment_operation` (`idoperation`) ON DELETE CASCADE ON
 		UPDATE
 		CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -258,6 +264,14 @@
 		`experiment_parameter`
 		WHERE
 		idparameter=#{pid_}
+	</select>
+
+	<select id="getOperationById"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.OperationEntry">
+		SELECT * FROM
+		`experiment_operation`
+		WHERE
+		idoperation=#{oid_}
 	</select>
 
 	<insert id="saveExperimentParameter"
@@ -378,10 +392,11 @@
 		INSERT INTO
 		`experiment_argument`
 		(operation, parameter,
-		number, subarg)
+		number, pointer, subarg)
 		VALUE (
 		#{operation}, #{parameter},
-		#{number}, #{subarg})
+		#{number},
+		#{pointer}, #{subarg})
 	</insert>
 
 	<select id="getExperiment"
@@ -647,5 +662,19 @@
 		#{value}, #{date}, #{context}, #{user}, #{tag})
 	</insert>
 
+	<select id="getContextResults"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ResultEntry">
+		SELECT * FROM
+		`experiment_results`
+		WHERE
+		context=#{rid_}
+	</select>
+
+	<select id="getAllExperimentContexts"
+		resultType="int">
+		SELECT idreservation FROM (SELECT exp.name,res.idreservation from
+		`experiment` as exp left join `reservation` as res on
+		exp.idexperiment=res.experiment) as rids where name=#{name_}
+	</select>
 
 </mapper>

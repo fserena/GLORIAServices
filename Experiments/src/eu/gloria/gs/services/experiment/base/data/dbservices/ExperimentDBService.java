@@ -71,6 +71,12 @@ public interface ExperimentDBService {
 	 * @return
 	 */
 	public ParameterEntry getParameterById(@Param(value = "pid_") int pid);
+	
+	/**
+	 * @param oid
+	 * @return
+	 */
+	public OperationEntry getOperationById(@Param(value = "oid_") int oid);
 
 	/**
 	 * @param pid
@@ -358,5 +364,8 @@ public interface ExperimentDBService {
 	
 	public void saveResult(ResultEntry entry);
 	
+	public List<ResultEntry> getContextResults(@Param(value = "rid_") int rid);
+	
+	public List<Integer> getAllExperimentContexts(@Param(value = "name_") String name);
 	
 }

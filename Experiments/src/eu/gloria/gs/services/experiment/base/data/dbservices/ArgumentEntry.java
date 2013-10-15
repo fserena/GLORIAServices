@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class ArgumentEntry implements Serializable {
 
@@ -14,7 +14,8 @@ public class ArgumentEntry implements Serializable {
 	private static final long serialVersionUID = 8784408047690730988L;
 
 	private int operation;
-	private int parameter;
+	private Integer parameter;
+	private Integer pointer;
 	private int number;
 	private String subarg;
 
@@ -35,14 +36,14 @@ public class ArgumentEntry implements Serializable {
 	/**
 	 * @return
 	 */
-	public int getParameter() {
+	public Integer getParameter() {
 		return parameter;
 	}
 
 	/**
 	 * @param parameter
 	 */
-	public void setParameter(int parameter) {
+	public void setParameter(Integer parameter) {
 		this.parameter = parameter;
 	}
 
@@ -66,6 +67,14 @@ public class ArgumentEntry implements Serializable {
 
 	public void setSubarg(String subarg) {
 		this.subarg = subarg;
+	}
+
+	public Integer getPointer() {
+		return pointer;
+	}
+
+	public void setPointer(Integer pointer) {
+		this.pointer = pointer;
 	}
 
 }
