@@ -9,15 +9,17 @@ public class ImageInformation implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1054114642496522379L;
-	
+
 	private String rt;
 	private String ccd;
 	private String user;
-	private String url;
+	private String jpg;
+	private String fits;
 	private int id;
 	private int rid;
 	private String localid;
 	private Date creationDate;
+	private ImageTargetData target;
 
 	public String getRt() {
 		return rt;
@@ -35,12 +37,20 @@ public class ImageInformation implements Serializable {
 		this.user = user;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getJpg() {
+		return jpg;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setJpg(String jpg) {
+		this.jpg = jpg;
+	}
+
+	public String getFits() {
+		return fits;
+	}
+
+	public void setFits(String fits) {
+		this.fits = fits;
 	}
 
 	public int getId() {
@@ -81,6 +91,14 @@ public class ImageInformation implements Serializable {
 
 	public void setCcd(String ccd) {
 		this.ccd = ccd;
+	}
+
+	public ImageTargetData getTarget() {
+		return target;
+	}
+
+	public void setTarget(ImageTargetData target) {
+		this.target = target;
 	}
 
 }

@@ -15,7 +15,10 @@ import javax.jws.WebService;
 @WebService(name = "RTRepositoryInterface", targetNamespace = "http://rt.repository.services.gs.gloria.eu/")
 public interface RTRepositoryInterface {
 
-	public void registerRT(String rt, String owner, String url, String user, String password)
+	public void registerInteractiveRT(String rt, String owner, String url, String port, String user, String password)
+			throws RTRepositoryException;
+
+	public void registerBatchRT(String rt, String owner, String url, String port, String user, String password)
 			throws RTRepositoryException;
 
 	public void unregisterRT(String rt) throws RTRepositoryException;
@@ -67,6 +70,10 @@ public interface RTRepositoryInterface {
 			throws RTRepositoryException;
 
 	public List<String> getAllObservatoryNames() throws RTRepositoryException;
+
+	public List<String> getAllInteractiveRTs() throws RTRepositoryException;
+
+	public List<String> getAllBatchRTs() throws RTRepositoryException;
 
 	public List<String> getAllRTInObservatory(
 			@WebParam(name = "observatory") String observatory)

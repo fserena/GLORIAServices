@@ -6,11 +6,13 @@ public class RTInformation {
 
 	private List<DeviceInformation> devices;
 	private String url;
+	private String port;
 	private String description;
 	private String owner;
 	private String user;
 	private String password;
 	private String observatory;
+	private String type;
 	private RTCoordinates coordinates;
 	private RTAvailability availability;
 
@@ -84,5 +86,21 @@ public class RTInformation {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
 	}
 }

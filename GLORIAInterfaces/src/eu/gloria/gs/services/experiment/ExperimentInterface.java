@@ -14,6 +14,7 @@ import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
+import eu.gloria.gs.services.experiment.base.data.ResultInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
 import eu.gloria.gs.services.experiment.base.models.ExperimentFeature;
@@ -71,6 +72,11 @@ public interface ExperimentInterface {
 
 	public ExperimentInformation getExperimentInformation(
 			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, NoSuchExperimentException;
+
+	public ParameterInformation getParameterInformation(
+			@WebParam(name = "experiment") String experiment,
+			@WebParam(name = "parameter") String parameter)
 			throws ExperimentException, NoSuchExperimentException;
 
 	public void setExperimentDescription(
@@ -139,6 +145,15 @@ public interface ExperimentInterface {
 			@WebParam(name = "parameter") String parameter)
 			throws ExperimentException, ExperimentNotInstantiatedException,
 			NoSuchReservationException;
+
+	public List<ResultInformation> getContextResults(
+			@WebParam(name = "reservationId") int reservationId)
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
+
+	public List<ResultInformation> getExperimentResults(
+			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException;
 
 	public ExperimentRuntimeInformation getExperimentRuntimeInformation(
 			@WebParam(name = "reservationId") int reservationId)
