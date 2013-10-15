@@ -32,18 +32,20 @@ import eu.gloria.rt.entity.device.ImageFormat;
 import eu.gloria.rt.entity.device.TrackingRateType;
 import eu.gloria.rti.GloriaRti;
 import eu.gloria.rti.RtiError;
+import eu.gloria.rti.client.devices.Barometer;
 import eu.gloria.rti.client.devices.CCD;
 import eu.gloria.rti.client.devices.FilterWheel;
 import eu.gloria.rti.client.devices.Focuser;
 import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
 import eu.gloria.rti.client.devices.Scam;
+import eu.gloria.rti.client.devices.RHSensor;
+import eu.gloria.rti.client.devices.WindSensor;
 import eu.gloria.rti.factory.ProxyFactory;
 
 public class RTSHandler implements ServerHandler {
 
 	private GloriaRti rtsPort;
-	private static String port;
 	private static String serviceName;
 	private static boolean teleoperationStarted = false;
 
@@ -57,7 +59,7 @@ public class RTSHandler implements ServerHandler {
 			properties.load(in);
 			in.close();
 
-			port = (String) properties.get("port");
+			//port = (String) properties.get("port");
 			serviceName = (String) properties.get("service_name");
 			// user = (String) properties.get("user");
 			// password = (String) properties.get("password");
@@ -68,7 +70,7 @@ public class RTSHandler implements ServerHandler {
 		}
 	}
 
-	public RTSHandler(String host, String user, String password)
+	public RTSHandler(String host, String port, String user, String password)
 			throws TeleoperationException {
 
 		String actionMessage = "rts/" + host + "?" + host + "->";
@@ -185,6 +187,12 @@ public class RTSHandler implements ServerHandler {
 				return new Dome(this, name);
 			} else if (type.equals(DeviceType.FW)) {
 				return new FilterWheel(this, name);
+			} else if (type.equals(DeviceType.RH_SENSOR)) {
+				return new RHSensor(this, name);
+			} else if (type.equals(DeviceType.WIND_SPEED_SENSOR)) {
+				return new WindSensor(this, name);
+			} else if (type.equals(DeviceType.BAROMETER)) {
+				return new Barometer(this, name);
 			}
 		}
 
@@ -270,6 +278,76 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				rtsPort.scamSetBrightness(null, camera, (long) value);
 			}
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
+	public long getBiningX(String camera) throws TeleoperationException {
+
+		String actionMessage = camera + "/biningX" + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.camGetBinX(null, camera);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public long getBiningY(String camera) throws TeleoperationException {
+
+		String actionMessage = camera + "/biningY" + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.camGetBinY(null, camera);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public void setBiningX(String camera, long value)
+			throws TeleoperationException {
+
+		String actionMessage = camera + "/biningX?" + value + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			rtsPort.camSetBinX(null, camera, (int)value);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public void setBiningY(String camera, long value)
+			throws TeleoperationException {
+
+		String actionMessage = camera + "/biningY?" + value + "->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			rtsPort.camSetBinY(null, camera, (int)value);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");
@@ -974,15 +1052,14 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntSlewToCoordinates(null, mount, ra, dec);
-			
+
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");
 		}
 	}
-	
-	public double getRA(String mount)
-			throws TeleoperationException {
+
+	public double getRA(String mount) throws TeleoperationException {
 		String actionMessage = mount + "/getRA->";
 
 		if (rtsPort == null) {
@@ -998,9 +1075,8 @@ public class RTSHandler implements ServerHandler {
 					+ "OPERATION_FAILED");
 		}
 	}
-	
-	public double getDEC(String mount)
-			throws TeleoperationException {
+
+	public double getDEC(String mount) throws TeleoperationException {
 		String actionMessage = mount + "/getDEC->";
 
 		if (rtsPort == null) {
@@ -1143,6 +1219,58 @@ public class RTSHandler implements ServerHandler {
 		try {
 
 			rtsPort.fwSelectFilterKind(null, filterWheel, filter);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
+	public double getRelativeHumidity(String rhSensor)
+			throws TeleoperationException {
+
+		String actionMessage = rhSensor + "/getRelativeHumidity?->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.rhsGetMeasure(null, rhSensor);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
+	public double getPressure(String barometer) throws TeleoperationException {
+
+		String actionMessage = barometer + "/getPressure?->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.barGetMeasure(null, barometer);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+
+	public double getWindSpeed(String wind) throws TeleoperationException {
+
+		String actionMessage = wind + "/getWindSpeed?->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.wspGetMeasure(null, wind);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");

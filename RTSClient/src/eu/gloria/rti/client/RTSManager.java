@@ -2,7 +2,7 @@ package eu.gloria.rti.client;
 
 import java.util.HashMap;
 
-import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
+import eu.gloria.gs.services.repository.rt.data.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rti.client.RTSHandler;
 
@@ -29,10 +29,11 @@ public class RTSManager {
 			throws TeleoperationException {
 
 		String requestedUrl = keyData.getUrl();
+		String requestedPort = keyData.getPort();
 
 		synchronized (rtsTable) {
 			if (!rtsTable.containsKey(requestedUrl)) {
-				RTSHandler rts = new RTSHandler(requestedUrl, keyData
+				RTSHandler rts = new RTSHandler(requestedUrl, requestedPort, keyData
 						.getCredentials().getUser(), keyData.getCredentials()
 						.getPassword());
 				rtsTable.put(requestedUrl, rts);

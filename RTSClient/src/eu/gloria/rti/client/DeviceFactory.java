@@ -1,14 +1,17 @@
 package eu.gloria.rti.client;
 
-import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
+import eu.gloria.gs.services.repository.rt.data.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rt.entity.device.DeviceType;
+import eu.gloria.rti.client.devices.Barometer;
 import eu.gloria.rti.client.devices.CCD;
 import eu.gloria.rti.client.devices.FilterWheel;
 import eu.gloria.rti.client.devices.Focuser;
 import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
+import eu.gloria.rti.client.devices.RHSensor;
 import eu.gloria.rti.client.devices.Scam;
+import eu.gloria.rti.client.devices.WindSensor;
 
 public class DeviceFactory {
 
@@ -64,5 +67,23 @@ public class DeviceFactory {
 		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
 
 		return (FilterWheel) rts.getDeviceHandler(name, DeviceType.FW);
+	}
+	
+	public Barometer createBarometer(ServerKeyData keyData, String name) throws TeleoperationException {
+		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
+
+		return (Barometer) rts.getDeviceHandler(name, DeviceType.BAROMETER);
+	}
+	
+	public RHSensor createRHSensor(ServerKeyData keyData, String name) throws TeleoperationException {
+		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
+
+		return (RHSensor) rts.getDeviceHandler(name, DeviceType.RH_SENSOR);
+	}
+	
+	public WindSensor createWindSensor(ServerKeyData keyData, String name) throws TeleoperationException {
+		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
+
+		return (WindSensor) rts.getDeviceHandler(name, DeviceType.WIND_SPEED_SENSOR);
 	}
 }
