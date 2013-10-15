@@ -12,8 +12,8 @@ import eu.gloria.gs.services.repository.rt.data.RTCoordinates;
 import eu.gloria.gs.services.repository.rt.data.RTCredentials;
 import eu.gloria.gs.services.repository.rt.data.RTInformation;
 import eu.gloria.gs.services.repository.rt.data.RTRepositoryAdapter;
+import eu.gloria.gs.services.repository.rt.data.ServerKeyData;
 import eu.gloria.gs.services.repository.rt.data.dbservices.RTRepositoryAdapterException;
-import eu.gloria.gs.services.teleoperation.base.ServerKeyData;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.rt.entity.device.Device;
 import eu.gloria.rti.GloriaRti;
@@ -33,18 +33,85 @@ public class RTRepository extends GSLogProducerService implements
 	}
 
 	@Override
-	public void registerRT(String rt, String owner, String url, String user,
+	public void registerBatchRT(String rt, String owner, String url, String port, String user,
 			String password) throws RTRepositoryException {
 
 		try {
 			this.logAction(this.getClientUsername(),
-					"Trying to register a new RT: '" + rt + "'");
+					"Trying to register a new batch RT: '" + rt + "'");
 		} catch (ActionLogException e) {
 			e.printStackTrace();
 		}
 
 		try {
-			adapter.registerRT(rt, owner, url, user, password);
+			adapter.registerBatchRT(rt, owner, url, port, user, password);
+		} catch (RTRepositoryAdapterException e) {
+
+			throw new RTRepositoryException(e.getMessage());
+		}
+
+		/*Gloria rti;
+		try {
+
+			ServerKeyData keyData = new ServerKeyData();
+			keyData.setUrl(url);
+			RTCredentials rtCredentials = new RTCredentials();
+			rtCredentials.setUser(user);
+			rtCredentials.setPassword(password);
+			keyData.setCredentials(rtCredentials);
+
+			rti = RTSManager.getReference().getRTS(keyData).getPort();
+
+			try {
+				List<Device> devices = rti.devGetDevices(null, false);
+
+				for (Device device : devices) {
+					DeviceType type = DeviceType.valueOf(device.getType()
+							.name());
+
+					try {
+						this.registerDevice(type, device.getShortName());
+					} catch (RTRepositoryException e) {
+
+					}
+
+					this.addRTDevice(type, rt, device.getShortName(),
+							device.getShortName());
+				}
+
+			} catch (RtiError e) {
+				e.printStackTrace();
+			}
+
+		} catch (NullPointerException en) {
+			throw new RTRepositoryException("The RTS on " + url
+					+ " is not available.");
+		} catch (TeleoperationException e1) {
+			throw new RTRepositoryException(e1.getMessage());
+		}*/
+
+		try {
+			this.logAction(this.getClientUsername(),
+					"Succesful registration of a new RT: '" + rt + "'");
+		} catch (ActionLogException e2) {
+			e2.printStackTrace();
+		}
+
+	}
+	
+	@Override
+	public void registerInteractiveRT(String rt, String owner, String url, String port, String user,
+			String password) throws RTRepositoryException {
+
+		try {
+			this.logAction(this.getClientUsername(),
+					"Trying to register a new interactive RT: '" + rt + "'");
+		} catch (ActionLogException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			adapter.registerInteractiveRT(rt, owner, url, port, user, password);
 		} catch (RTRepositoryAdapterException e) {
 
 			throw new RTRepositoryException(e.getMessage());
@@ -55,6 +122,7 @@ public class RTRepository extends GSLogProducerService implements
 
 			ServerKeyData keyData = new ServerKeyData();
 			keyData.setUrl(url);
+			keyData.setPort(port);
 			RTCredentials rtCredentials = new RTCredentials();
 			rtCredentials.setUser(user);
 			rtCredentials.setPassword(password);
@@ -491,6 +559,7 @@ public class RTRepository extends GSLogProducerService implements
 			rtInfo.setAvailability(adapter.getRTAvailability(rt));
 			rtInfo.setObservatory(adapter.getRTObservatory(rt));
 			rtInfo.setUrl(adapter.getRTUrl(rt));
+			rtInfo.setPort(adapter.getRTPort(rt));
 			rtInfo.setUser(adapter.getRTCredentials(rt).getUser());
 			rtInfo.setPassword(adapter.getRTCredentials(rt).getPassword());
 
@@ -500,6 +569,42 @@ public class RTRepository extends GSLogProducerService implements
 			throw new RTRepositoryException(e.getMessage());
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.gs.services.repository.rt.RTRepositoryInterface#getAllInteractiveRTs()
+	 */
+	@Override
+	public List<String> getAllInteractiveRTs() throws RTRepositoryException {
+		try {
+			List<String> rts = adapter.getAllInterativeRTs();
+
+			if (rts == null) {
+				throw new RTRepositoryException("There is no interactive telescope");
+			}
+
+			return rts;
+		} catch (RTRepositoryAdapterException e) {
+			throw new RTRepositoryException(e.getMessage());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.gs.services.repository.rt.RTRepositoryInterface#getAllBatchRTs()
+	 */
+	@Override
+	public List<String> getAllBatchRTs() throws RTRepositoryException {
+		try {
+			List<String> rts = adapter.getAllBatchRTs();
+
+			if (rts == null) {
+				throw new RTRepositoryException("There is no batch telescope");
+			}
+
+			return rts;
+		} catch (RTRepositoryAdapterException e) {
+			throw new RTRepositoryException(e.getMessage());
+		}
 	}
 
 }
