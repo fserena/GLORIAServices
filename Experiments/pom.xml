@@ -35,11 +35,8 @@
 		</dependency>
 
 		<!-- MySQL database driver -->
-		<!-- <dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
-		</dependency>-->
+		<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId> 
+			<version>5.1.9</version> </dependency> -->
 
 		<!-- Mybatis Spring -->
 		<dependency>
@@ -70,7 +67,6 @@
 			<version>1.9.11</version>
 		</dependency>
 	</dependencies>
-
 	<repositories>
 		<repository>
 			<id>springsource-repo</id>
