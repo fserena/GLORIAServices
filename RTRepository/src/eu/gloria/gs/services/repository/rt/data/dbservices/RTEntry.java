@@ -11,11 +11,13 @@ public class RTEntry implements Serializable {
 
 	private String name;
 	private String url;
+	private String port;
 	private String description;
 	private String publicKey;
 	private String user;
 	private String password;
 	private String owner;
+	private String type;
 	private double longitude;
 	private double latitude;
 	private int observatory;
@@ -98,6 +100,22 @@ public class RTEntry implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
 	}
 	
 	

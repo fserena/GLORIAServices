@@ -26,5 +26,8 @@ public interface RTDBService {
 	public void setObservatory(@Param(value="name_")String name, @Param(value="oid_")int oid);
 	public int getObservatory(@Param(value="name_")String name);	
 	public List<String> getByObservatoryId(@Param(value="oid_")int oid);
+	public List<String> getAllInteractive();
+	public List<String> getAllBatch();
 	public void remove(@Param(value="name_")String name);
+	
 }

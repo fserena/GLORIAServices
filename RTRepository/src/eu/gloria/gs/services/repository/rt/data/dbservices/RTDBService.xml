@@ -8,25 +8,31 @@
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `rt` (
 		`name`
-		varchar(50) NOT NULL,
+		varchar(50)
+		NOT NULL,
 		`description` varchar(100) DEFAULT NULL,
 		`url`
-		varchar(100) NOT NULL,
+		varchar(100) NOT
+		NULL,
 		`public_key` blob,
 		`owner` varchar(50) NOT NULL,
-		`oid` int(11) DEFAULT NULL,
+		`oid` int(11)
+		DEFAULT NULL,
 		`longitude` double DEFAULT NULL,
 		`latitude`
-		double DEFAULT NULL,
+		double DEFAULT
+		NULL,
 		`starting_avl` datetime DEFAULT NULL,
 		`ending_avl`
-		datetime DEFAULT NULL,
+		datetime DEFAULT
+		NULL,
 		`user` varchar(45) NOT NULL,
 		`password`
 		varchar(45) NOT NULL,
 		PRIMARY KEY (`name`),
 		KEY `oid` (`oid`),
-		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES
+		CONSTRAINT `oid` FOREIGN KEY
+		(`oid`) REFERENCES
 		`observatory` (`oid`) ON DELETE
 		CASCADE ON UPDATE
 		CASCADE
@@ -41,16 +47,32 @@
 		name=#{name_}
 	</select>
 
+	<select id="getAllInteractive" resultType="string">
+		SELECT name FROM
+		`rt`
+		WHERE
+		type='INTERACTIVE'
+	</select>
+
+	<select id="getAllBatch" resultType="string">
+		SELECT name FROM
+		`rt`
+		WHERE
+		type='BATCH'
+	</select>
+
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.repository.rt.data.dbservices.RTEntry">
 		INSERT INTO
 		`rt`
 		(name,
-		owner, url, user,
-		password)
+		owner, url, port, user,
+		password,
+		type, longitude, latitude)
 		VALUE
 		( #{name}, #{owner},
-		#{url}, #{user}, #{password} )
+		#{url}, #{port},
+		#{user}, #{password}, #{type}, #{longitude}, #{latitude} )
 	</insert>
 
 	<delete id="remove">
@@ -130,14 +152,16 @@
 		UPDATE `rt`
 		SET starting_avl=
 		#{starting_}
-		WHERE name=#{name_}
+		WHERE
+		name=#{name_}
 	</update>
 
 	<update id="setEndingAvailability">
 		UPDATE `rt`
 		SET ending_avl=
 		#{ending_}
-		WHERE name=#{name_}
+		WHERE
+		name=#{name_}
 	</update>
 
 	<select id="getLongitude" resultType="double">
