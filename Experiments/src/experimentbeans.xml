@@ -107,6 +107,7 @@
 		<property name="mountTeleoperation" ref="mountTeleoperation"></property>
 		<property name="focuserTeleoperation" ref="focuserTeleoperation"></property>
 		<property name="filterWheelTeleoperation" ref="fwTeleoperation"></property>
+		<property name="weatherTeleoperation" ref="weatherTeleoperation"></property>
 		<property name="imageRepository" ref="imageRepository"></property>
 	</bean>
 

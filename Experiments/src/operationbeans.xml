@@ -23,7 +23,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="setParameter">
+				<entry key="SetParameter">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -42,7 +42,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="pointToObject">
+				<entry key="PointToObject">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -62,7 +62,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="pointToCoordinates">
+				<entry key="PointToCoordinates">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -83,7 +83,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="getStream">
+				<entry key="GetStream">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -103,7 +103,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadRTName">
+				<entry key="LoadRTName">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -124,7 +124,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadDeviceName">
+				<entry key="LoadDeviceName">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -146,7 +146,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadDevicesNumber">
+				<entry key="LoadDevicesNumber">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -165,7 +165,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadRTNames">
+				<entry key="LoadAllRTNames">
 					<list>
 						<value>arg0</value>
 					</list>
@@ -183,10 +183,31 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadImage">
+				<entry key="LoadImageFromRepository">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="LoadObjectImage" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="DATE"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadObjectImageFromRepository">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
 					</list>
 				</entry>
 			</map>
@@ -201,7 +222,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="saveResult">
+				<entry key="SaveResult">
 					<list>
 						<value>arg0</value>
 					</list>
@@ -210,7 +231,7 @@
 		</property>
 	</bean>
 
-	<bean id="TakeImage" parent="ExperimentOperation">
+	<bean id="StartExposure" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
@@ -221,12 +242,310 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="takeImage">
+				<entry key="StartExposure">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
 						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDGamma" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetCCDGamma">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDGain" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetCCDGain">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDExposure" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetCCDExposure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDContrast" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetCCDContrast">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDGamma" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetCCDGamma">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDGain" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetCCDGain">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDExposure" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetCCDExposure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDContrast" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetCCDContrast">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetCCDBining" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetCCDBining">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="SetCCDBining" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetCCDBining">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetWindSpeed" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetWindSpeed">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetPressure" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetPressure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetRelativeHumidity" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetRelativeHumidity">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadImageUrls" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadImageUrls">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
 					</list>
 				</entry>
 			</map>
@@ -239,17 +558,15 @@
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="getContinuousImage">
+				<entry key="LoadContinuousImage">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
-						<value>arg3</value>
 					</list>
 				</entry>
 			</map>
@@ -265,10 +582,31 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="stopContinuousImage">
+				<entry key="StopContinuousImage">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadCCDStatus" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadCCDStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
 					</list>
 				</entry>
 			</map>
@@ -283,7 +621,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="park">
+				<entry key="ParkTelescope">
 					<list>
 						<value>arg0</value>
 					</list>
@@ -295,12 +633,12 @@
 	<bean id="Sequence1" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 					</list>
@@ -312,13 +650,13 @@
 	<bean id="Sequence2" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -331,14 +669,14 @@
 	<bean id="Sequence3" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -352,15 +690,15 @@
 	<bean id="Sequence4" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -371,20 +709,20 @@
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="Sequence5" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -396,21 +734,21 @@
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="Sequence6" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
-				<ref bean="OBJECT"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
+				<ref bean="POINTER"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="executeSequence">
+				<entry key="Sequence">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -434,7 +772,7 @@
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="iterateSequence">
+				<entry key="Iteration">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -445,100 +783,132 @@
 		</property>
 	</bean>
 
-	<bean id="LoadCCDAttributes" parent="ExperimentOperation">
+	<bean id="MoveWest" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="CCD_NAME"></ref>
-				<ref bean="CCD_BRIGHTNESS"></ref>
-				<ref bean="CCD_CONTRAST"></ref>
-				<ref bean="CCD_GAIN"></ref>
-				<ref bean="CCD_EXPOSURE"></ref>
-				<ref bean="CCD_GAMMA"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="loadCCDAttributes">
+				<entry key="MoveWest">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
 						<value>arg3</value>
-						<value>arg4</value>
-						<value>arg5</value>
-						<value>arg6</value>
 					</list>
 				</entry>
 			</map>
 		</property>
 	</bean>
 
-	<bean id="SaveCCDAttributes" parent="ExperimentOperation">
+	<bean id="MoveEast" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
-				<ref bean="RT_NAME"></ref>
-				<ref bean="CCD_NAME"></ref>
-				<ref bean="CCD_BRIGHTNESS"></ref>
-				<ref bean="CCD_CONTRAST"></ref>
-				<ref bean="CCD_GAIN"></ref>
-				<ref bean="CCD_EXPOSURE"></ref>
-				<ref bean="CCD_GAMMA"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="saveCCDAttributes">
+				<entry key="MoveEast">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
 						<value>arg3</value>
-						<value>arg4</value>
-						<value>arg5</value>
-						<value>arg6</value>
 					</list>
 				</entry>
 			</map>
 		</property>
 	</bean>
 
-	<bean id="ConstrainedMountMove" parent="ExperimentOperation">
+	<bean id="MoveNorth" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="MOVEMENT"></ref>
-				<ref bean="INTEGER"></ref>
-				<ref bean="INTEGER"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="constrainedMountMove">
+				<entry key="MoveNorth">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
 						<value>arg3</value>
-						<value>arg4</value>
 					</list>
 				</entry>
 			</map>
 		</property>
 	</bean>
 
-	<bean id="DomeMove" parent="ExperimentOperation">
+	<bean id="MoveSouth" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="MOVEMENT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="domeMove">
+				<entry key="MoveSouth">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetRADEC" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetRADEC">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadFilters" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadFilters">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -549,17 +919,17 @@
 		</property>
 	</bean>
 
-	<bean id="ChangeFocusRelative" parent="ExperimentOperation">
+	<bean id="SelectFilter" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
 				<ref bean="OBJECT"></ref>
 				<ref bean="OBJECT"></ref>
-				<ref bean="INTEGER"></ref>
+				<ref bean="OBJECT"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
 			<map>
-				<entry key="changeFocusRelative">
+				<entry key="SelectFilter">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -570,4 +940,146 @@
 		</property>
 	</bean>
 
+	<bean id="OpenDome" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="OpenDome">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CloseDome" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="CloseDome">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadDomeStatus" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadDomeStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadMountStatus" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="LoadMountStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FocusRelativeMove" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="FocusRelativeMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetTrackingRate" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetTrackingRate">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetSlewRate" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="SetSlewRate">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
 </beans>
