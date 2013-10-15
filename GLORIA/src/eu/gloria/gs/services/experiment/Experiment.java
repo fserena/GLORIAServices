@@ -25,6 +25,7 @@ import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
+import eu.gloria.gs.services.experiment.base.data.ResultInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.models.CustomExperimentException;
 import eu.gloria.gs.services.experiment.base.models.CustomExperimentModel;
@@ -122,6 +123,23 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			expInfo = adapter.getExperimentInformation(experiment);
 			return expInfo;
+		} catch (ExperimentDatabaseException e) {
+			throw new ExperimentException(e.getMessage());
+		} catch (NoSuchExperimentException e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public ParameterInformation getParameterInformation(String experiment,
+			String parameter) throws ExperimentException,
+			NoSuchExperimentException {
+
+		ParameterInformation paramInfo;
+		try {
+			paramInfo = adapter.getExperimentInformation(experiment)
+					.getParameter(parameter);
+			return paramInfo;
 		} catch (ExperimentDatabaseException e) {
 			throw new ExperimentException(e.getMessage());
 		} catch (NoSuchExperimentException e) {
@@ -382,17 +400,14 @@ public class Experiment extends GSLogProducerService implements
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-		}
+		/*
+		 * boolean adminMode = false;
+		 * 
+		 * UserInformation userInfo = null; try { userInfo =
+		 * this.userRepository.getUserInformation(this .getClientUsername()); if
+		 * (userInfo.getRoles()[0].equals(UserRole.ADMIN)) { adminMode = true; }
+		 * } catch (UserRepositoryException e1) { }
+		 */
 
 		try {
 			experimentBooker.applyFor(experiment, this.getClientUsername());
@@ -788,13 +803,20 @@ public class Experiment extends GSLogProducerService implements
 			String parameter, ObjectResponse input) throws ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
 
+		String contentStr = String.valueOf(input.content);
+
 		try {
 			if (!adapter.anyUserReservationActiveNow(this.getClientUsername())) {
 				try {
-					this.logAction(this.getClientUsername(),
-							"experiments/contexts/" + reservationId
-									+ "/parameters/set?" + parameter + "&"
-									+ String.valueOf(input.content)
+					this.logAction(
+							this.getClientUsername(),
+							"experiments/contexts/"
+									+ reservationId
+									+ "/parameters/set?"
+									+ parameter
+									+ "&"
+									+ contentStr.substring(0,
+											Math.min(contentStr.length(), 15))
 									+ "->INACTIVE");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
@@ -805,10 +827,15 @@ public class Experiment extends GSLogProducerService implements
 
 			if (!adapter.isReservationContextInstantiated(reservationId)) {
 				try {
-					this.logAction(this.getClientUsername(),
-							"experiments/contexts/" + reservationId
-									+ "/parameters/set?" + parameter + "&"
-									+ String.valueOf(input.content)
+					this.logAction(
+							this.getClientUsername(),
+							"experiments/contexts/"
+									+ reservationId
+									+ "/parameters/set?"
+									+ parameter
+									+ "&"
+									+ contentStr.substring(0,
+											Math.min(contentStr.length(), 15))
 									+ "->NOT_INSTANTIATED");
 				} catch (ActionLogException el) {
 					el.printStackTrace();
@@ -826,9 +853,13 @@ public class Experiment extends GSLogProducerService implements
 			try {
 				this.logAction(
 						this.getClientUsername(),
-						"experiments/contexts/" + reservationId
-								+ "/parameters/set?" + parameter + "&"
-								+ String.valueOf(input.content));
+						"experiments/contexts/"
+								+ reservationId
+								+ "/parameters/set?"
+								+ parameter
+								+ "&"
+								+ contentStr.substring(0,
+										Math.min(contentStr.length(), 15)));
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
@@ -840,10 +871,14 @@ public class Experiment extends GSLogProducerService implements
 			try {
 				this.logAction(
 						this.getClientUsername(),
-						"experiments/contexts/" + reservationId
-								+ "/parameters/set?" + parameter + "&"
-								+ String.valueOf(input.content) + "->"
-								+ e.getClass().getSimpleName());
+						"experiments/contexts/"
+								+ reservationId
+								+ "/parameters/set?"
+								+ parameter
+								+ "&"
+								+ contentStr.substring(0,
+										Math.min(contentStr.length(), 15))
+								+ "->" + e.getClass().getSimpleName());
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
@@ -913,12 +948,18 @@ public class Experiment extends GSLogProducerService implements
 					reservationId);
 
 			Object value = context.getParameterValue(parameter);
+			String valueStr = String.valueOf(value);
 
 			try {
-				this.logAction(this.getClientUsername(),
-						"experiments/contexts/" + reservationId
-								+ "/parameters/get?" + parameter + "->"
-								+ String.valueOf(value));
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/contexts/"
+								+ reservationId
+								+ "/parameters/get?"
+								+ parameter
+								+ "->"
+								+ valueStr.substring(0,
+										Math.min(valueStr.length(), 15)));
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
@@ -1144,6 +1185,49 @@ public class Experiment extends GSLogProducerService implements
 					"experiments/online/new?name=" + experiment);
 		} catch (ActionLogException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.ExperimentInterface#getContextResults
+	 * (int)
+	 */
+	@Override
+	public List<ResultInformation> getContextResults(
+			@WebParam(name = "reservationId") int reservationId)
+			throws ExperimentException, NoSuchReservationException {
+
+		try {
+			List<ResultInformation> results = adapter
+					.getContextResults(reservationId);
+
+			return results;
+		} catch (ExperimentDatabaseException e) {
+			throw new ExperimentException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.ExperimentInterface#getExperimentResults
+	 * (java.lang.String)
+	 */
+	@Override
+	public List<ResultInformation> getExperimentResults(
+			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException {
+		try {
+			List<ResultInformation> results = adapter
+					.getExperimentResults(experiment);
+
+			return results;
+		} catch (ExperimentDatabaseException e) {
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 }
