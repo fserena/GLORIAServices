@@ -45,6 +45,9 @@
 	<listener>
 		<listener-class>eu.gloria.gs.services.repository.image.ImageExecutorTask</listener-class>
 	</listener>
+	<listener>
+		<listener-class>eu.gloria.gs.services.scheduler.SchedulerExecutorTask</listener-class>
+	</listener>
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>GLORIA</web-resource-name>
