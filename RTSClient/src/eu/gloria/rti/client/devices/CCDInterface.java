@@ -26,6 +26,14 @@ public interface CCDInterface {
 
 	public long getGain() throws TeleoperationException;
 	
+	public void setBinningX(long value) throws TeleoperationException;
+
+	public long getBiningX() throws TeleoperationException;
+
+	public void setBinningY(long value) throws TeleoperationException;
+
+	public long getBiningY() throws TeleoperationException;
+
 	public void setGamma(long value) throws TeleoperationException;
 
 	public long getGamma() throws TeleoperationException;

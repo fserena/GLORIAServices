@@ -119,4 +119,36 @@ public class CCD extends DeviceHandler implements CCDInterface {
 	public long getGamma() throws TeleoperationException {
 		return rts.getGamma(this.ccd);
 	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.rti.client.devices.CCDInterface#setBiningX(long)
+	 */
+	@Override
+	public void setBinningX(long value) throws TeleoperationException {
+		rts.setBiningX(this.ccd, value);
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.rti.client.devices.CCDInterface#getBiningX()
+	 */
+	@Override
+	public long getBiningX() throws TeleoperationException {
+		return rts.getBiningX(this.ccd);
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.rti.client.devices.CCDInterface#setBiningY(long)
+	 */
+	@Override
+	public void setBinningY(long value) throws TeleoperationException {
+		rts.setBiningY(this.ccd, value);
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.gloria.rti.client.devices.CCDInterface#getBiningY()
+	 */
+	@Override
+	public long getBiningY() throws TeleoperationException {
+		return rts.getBiningY(this.ccd);
+	}
 }
