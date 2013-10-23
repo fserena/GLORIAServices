@@ -7,36 +7,25 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `rt` (
-		`name`
-		varchar(50)
-		NOT NULL,
+		`name` varchar(50) NOT NULL,
 		`description` varchar(100) DEFAULT NULL,
-		`url`
-		varchar(100) NOT
-		NULL,
+		`url` varchar(100) NOT NULL,
 		`public_key` blob,
 		`owner` varchar(50) NOT NULL,
-		`oid` int(11)
-		DEFAULT NULL,
+		`oid` int(11) DEFAULT NULL,
 		`longitude` double DEFAULT NULL,
-		`latitude`
-		double DEFAULT
-		NULL,
+		`latitude` double DEFAULT NULL,
 		`starting_avl` datetime DEFAULT NULL,
-		`ending_avl`
-		datetime DEFAULT
-		NULL,
+		`ending_avl` datetime DEFAULT NULL,
 		`user` varchar(45) NOT NULL,
-		`password`
-		varchar(45) NOT NULL,
+		`password` varchar(45) NOT NULL,
+		`type` varchar(20) NOT NULL,
+		`port` varchar(5) NOT NULL,
 		PRIMARY KEY (`name`),
 		KEY `oid` (`oid`),
-		CONSTRAINT `oid` FOREIGN KEY
-		(`oid`) REFERENCES
-		`observatory` (`oid`) ON DELETE
-		CASCADE ON UPDATE
-		CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED
+		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES `observatory` (`oid`) ON DELETE
+		CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
 	</update>
 
 	<select id="get"
