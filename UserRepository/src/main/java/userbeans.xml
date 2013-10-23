@@ -36,7 +36,7 @@
 		<property name="SchedulerUsername" ref="schedulerUsername"></property>
 		<property name="SchedulerPassword" ref="schedulerPassword"></property>
 		<property name="AdminUsername" ref="adminUsername"></property>
-		<property name="AdminPassword" ref="adminPassword"></property>
+		<property name="adminPassword" ref="adminPassword"></property>
 		<property name="userDBService" ref="userMapper"></property>
 	</bean>
 
