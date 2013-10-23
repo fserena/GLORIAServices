@@ -694,7 +694,7 @@ public class RTSHandler implements ServerHandler {
 				return rtsPort.camGetImageURLProperFormat(null, camera,
 						imageId, imageFormat);
 			} else {
-				return rtsPort.scamGetImageURL(null, camera);
+				return rtsPort.scamGetVideoStreamingURL(null, camera);
 			}
 		} catch (RtiError e) {
 			if (e.getMessage().equals("NOT_AVAILABLE"))
