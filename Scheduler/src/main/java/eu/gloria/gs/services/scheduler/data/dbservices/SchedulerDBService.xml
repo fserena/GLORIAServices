@@ -184,7 +184,7 @@
 		WHERE
 		user=#{user_} AND
 		(status='ERROR' OR
-		status='ABORTED' OR status='IMPOSSIBLE')
+		status='ABORTED' OR status='IMPOSSIBLE' or status='DONE')
 	</select>
 
 
