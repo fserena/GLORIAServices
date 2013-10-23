@@ -220,7 +220,7 @@ public class SchedulerBrain {
 
 				if (planState.equals(PlanState.REJECTED)
 						|| planState.equals(PlanState.QUEUED)
-						|| planState.equals(PlanState.RUNNING)) {
+						|| planState.equals(PlanState.RUNNING) || planState.equals(PlanState.ERROR)) {
 					this.adapter.setState(schInfo.getId(), planState.name());
 					this.adapter.setLastDate(schInfo.getId(), new Date());
 				}
