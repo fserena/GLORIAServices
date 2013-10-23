@@ -15,12 +15,15 @@ import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class SetCCDExposure extends ServiceOperation {
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
 	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
@@ -35,8 +38,17 @@ public class SetCCDExposure extends ServiceOperation {
 					.getParameterValue(camNameParameter);
 
 			String exposureParameter = (String) this.getArguments()[2];
-			Double exposure = (Double) this.getContext().getExperimentContext()
+
+			Object paramValue = this.getContext().getExperimentContext()
 					.getParameterValue(exposureParameter);
+
+			double exposure;
+
+			if (paramValue instanceof Integer) {
+				exposure = (int) (Integer) paramValue;
+			} else {
+				exposure = (Double) paramValue;
+			}
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
