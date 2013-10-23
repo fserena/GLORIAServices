@@ -6,14 +6,14 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	<import resource="classpath*:userbeans.xml" />
-	<import resource="classpath*:experimentbeans.xml" />
 	<import resource="classpath*:rtbeans.xml" />
 	<import resource="classpath*:actionlogbeans.xml" />
-	<import resource="classpath*:schedulerbeans.xml" />
 	<import resource="classpath*:imagebeans.xml" />
+	<import resource="classpath*:schedulerbeans.xml" />
 	<import resource="classpath*:wsclientbeans.xml" />
+	<import resource="classpath*:experimentbeans.xml" />
 	<import resource="classpath*:credentialbeans.xml" />
-
+	
 	<jaxws:endpoint xmlns:tns="http://action.log.services.gs.gloria.eu/"
 		id="actionlog" endpointName="tns:ActionLogPort" serviceName="tns:ActionLogService"
 		address="/ActionLogPort">
