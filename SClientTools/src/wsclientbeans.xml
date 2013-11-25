@@ -87,8 +87,8 @@
 
 	<bean id="WSClientFactory" class="eu.gloria.gs.services.core.client.WSClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="host" value="localhost"></property>
-		<property name="port" value="8443"></property>
+		<property name="host" value="ws.users.gloria-project.eu"></property>
+		<property name="port" value="443"></property>
 	</bean>
 
 	<bean id="ccdTeleoperationWSClientFactory" parent="WSClientFactory">
