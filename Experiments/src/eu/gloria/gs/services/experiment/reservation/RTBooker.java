@@ -122,17 +122,21 @@ public class RTBooker {
 		calendar.setTime(timeSlot.getBegin());
 		int beginHour = calendar.get(Calendar.HOUR_OF_DAY);
 		int beginDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+		int beginYear = calendar.get(Calendar.YEAR);
 		calendar.setTime(timeSlot.getEnd());
 		// int endHour = calendar.get(Calendar.HOUR_OF_DAY);
-		int endDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
+		int endDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);		
+		int endYear = calendar.get(Calendar.YEAR);
+		
 		calendar.setTime(startingTime);
+		calendar.set(Calendar.YEAR, beginYear);
 		if (beginHour < endingHour) {
 			calendar.set(Calendar.DAY_OF_YEAR, beginDayOfYear);
 		} else
 			calendar.set(Calendar.DAY_OF_YEAR, endDayOfYear);
 		startingTime = calendar.getTime();
 		calendar.setTime(endingTime);
+		calendar.set(Calendar.YEAR, endYear);
 		calendar.set(Calendar.DAY_OF_YEAR, endDayOfYear);
 		endingTime = calendar.getTime();
 
