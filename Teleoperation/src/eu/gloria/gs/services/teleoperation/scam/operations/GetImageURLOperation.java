@@ -2,6 +2,7 @@ package eu.gloria.gs.services.teleoperation.scam.operations;
 
 import java.util.ArrayList;
 
+import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
@@ -16,10 +17,11 @@ public class GetImageURLOperation extends SurveillanceCameraOperation {
 	@Override
 	protected void operateSCam(Scam scam, OperationReturn returns)
 			throws TeleoperationException {
-		String url = scam.getImageURL();
-		
-		returns.setMessage("Get image URL operation executed: " + url + ", "
-				+ this.getServer() + ", " + this.getSCamName());
+		String url = null;
+		try {
+			url = scam.getImageURL();
+		} catch (DeviceOperationFailedException e) {
+		}
 
 		returns.setReturns(new ArrayList<Object>());
 		returns.getReturns().add(url);
