@@ -979,12 +979,12 @@
 									"type" : "RH_SENSOR",
 									"value" : -1
 									},
-									"barometer" :
+									"temperature" :
 									{
 									"name" :
 									null,
 									"order" : 0,
-									"type" : "BAROMETER",
+									"type" : "TEMPERATURE_SENSOR",
 									"value" : -1
 									}
 									}
@@ -1012,6 +1012,21 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="load_temp_name">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="LoadDeviceName"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>weather.temperature.order</value>
+								<value>weather.temperature.type</value>
+								<value>weather.temperature.name</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
 				<entry key="load_rh_name">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
@@ -1023,21 +1038,6 @@
 								<value>weather.rh.order</value>
 								<value>weather.rh.type</value>
 								<value>weather.rh.name</value>
-							</list>
-						</property>
-					</bean>
-				</entry>
-				<entry key="load_bar_name">
-					<bean
-						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
-						scope="singleton">
-						<property name="operation" ref="LoadDeviceName"></property>
-						<property name="relations">
-							<list>
-								<value>rt.name</value>
-								<value>weather.barometer.order</value>
-								<value>weather.barometer.type</value>
-								<value>weather.barometer.name</value>
 							</list>
 						</property>
 					</bean>
@@ -1056,16 +1056,16 @@
 						</property>
 					</bean>
 				</entry>
-				<entry key="get_pressure">
+				<entry key="get_temperature">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
 						scope="singleton">
-						<property name="operation" ref="GetPressure"></property>
+						<property name="operation" ref="GetTemperature"></property>
 						<property name="relations">
 							<list>
 								<value>rt.name</value>
-								<value>weather.barometer.name</value>
-								<value>weather.barometer.value</value>
+								<value>weather.temperature.name</value>
+								<value>weather.temperature.value</value>
 							</list>
 						</property>
 					</bean>
@@ -1091,9 +1091,9 @@
 						<property name="operation" ref="Sequence3"></property>
 						<property name="relations">
 							<list>
-								<value>load_wind_name</value>
-								<value>load_bar_name</value>
+								<value>load_wind_name</value>								
 								<value>load_rh_name</value>
+								<value>load_temp_name</value>
 							</list>
 						</property>
 					</bean>
@@ -1106,7 +1106,7 @@
 						<property name="relations">
 							<list>
 								<value>get_wind_speed</value>
-								<value>get_pressure</value>
+								<value>get_temperature</value>
 								<value>get_rh</value>
 							</list>
 						</property>
@@ -1211,9 +1211,9 @@
 								<value>load_rt_name</value>
 								<value>auto_load_camera_names</value>
 								<value>load_mount_name</value>
-								<value>load_dome_name</value>
 								<value>load_fw_name</value>
 								<value>load_weather_names</value>
+								<value>load_focuser_name</value>
 							</list>
 						</property>
 					</bean>
@@ -1222,14 +1222,13 @@
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
 						scope="singleton">
-						<property name="operation" ref="Sequence5"></property>
+						<property name="operation" ref="Sequence4"></property>
 						<property name="relations">
 							<list>
 								<value>load_device_names</value>
 								<value>auto_load_streams</value>
 								<value>reset_ccd_order</value>
 								<value>reset_scam_order</value>
-								<value>load_focuser_name</value>
 							</list>
 						</property>
 					</bean>

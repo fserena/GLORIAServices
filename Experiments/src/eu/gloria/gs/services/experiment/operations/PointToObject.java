@@ -21,12 +21,15 @@ import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class PointToObject extends ServiceOperation {
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
 	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
@@ -62,10 +65,10 @@ public class PointToObject extends ServiceOperation {
 
 					System.out.println(domeState.name());
 
-					// if (domeState.equals(DomeOpeningState.UNDEFINED)
-					// || domeState.equals(DomeOpeningState.CLOSED)) {
-					this.getDomeTeleoperation().open(rtName, domeName);
-					// }
+					if (domeState.equals(DomeOpeningState.UNDEFINED)
+							|| domeState.equals(DomeOpeningState.CLOSED)) {
+						this.getDomeTeleoperation().open(rtName, domeName);
+					}
 				} catch (DomeTeleoperationException e) {
 					throw new ExperimentOperationException(e.getMessage());
 				} catch (DeviceOperationFailedException e) {
@@ -78,14 +81,18 @@ public class PointToObject extends ServiceOperation {
 
 				try {
 
-					/*this.getMountTeleoperation().setTrackingRate(rtName,
-							mountName, TrackingRate.DRIVE_SOLAR);
+					/*
+					 * this.getMountTeleoperation().setTrackingRate(rtName,
+					 * mountName, TrackingRate.DRIVE_SOLAR);
+					 * 
+					 * this.getMountTeleoperation().setTracking(rtName,
+					 * mountName, true);
+					 */
 
-					this.getMountTeleoperation().setTracking(rtName, mountName,
-							true);*/
-
-					/*this.getMountTeleoperation().setSlewRate(rtName, mountName,
-							"CENTER");*/
+					/*
+					 * this.getMountTeleoperation().setSlewRate(rtName,
+					 * mountName, "CENTER");
+					 */
 
 					this.getMountTeleoperation().slewToObject(rtName,
 							mountName, object);

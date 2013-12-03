@@ -489,6 +489,27 @@
 		</property>
 	</bean>
 	
+	<bean id="GetTemperature" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetTemperature">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
 	<bean id="GetPressure" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>

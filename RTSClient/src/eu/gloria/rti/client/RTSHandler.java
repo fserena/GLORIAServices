@@ -40,6 +40,7 @@ import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
 import eu.gloria.rti.client.devices.Scam;
 import eu.gloria.rti.client.devices.RHSensor;
+import eu.gloria.rti.client.devices.TempSensor;
 import eu.gloria.rti.client.devices.WindSensor;
 import eu.gloria.rti.factory.ProxyFactory;
 
@@ -193,6 +194,8 @@ public class RTSHandler implements ServerHandler {
 				return new WindSensor(this, name);
 			} else if (type.equals(DeviceType.BAROMETER)) {
 				return new Barometer(this, name);
+			} else if (type.equals(DeviceType.TEMPERATURE_SENSOR)) {
+				return new TempSensor(this, name);
 			}
 		}
 
@@ -1254,6 +1257,23 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.barGetMeasure(null, barometer);
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(actionMessage
+					+ "OPERATION_FAILED");
+		}
+	}
+	
+	public double getTemperature(String tempSensor) throws TeleoperationException {
+
+		String actionMessage = tempSensor + "/getTemperature?->";
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		}
+
+		try {
+			return rtsPort.tempGetMeasure(null, tempSensor);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(actionMessage
 					+ "OPERATION_FAILED");

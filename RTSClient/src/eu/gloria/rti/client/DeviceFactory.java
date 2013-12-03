@@ -11,6 +11,7 @@ import eu.gloria.rti.client.devices.Dome;
 import eu.gloria.rti.client.devices.Mount;
 import eu.gloria.rti.client.devices.RHSensor;
 import eu.gloria.rti.client.devices.Scam;
+import eu.gloria.rti.client.devices.TempSensor;
 import eu.gloria.rti.client.devices.WindSensor;
 
 public class DeviceFactory {
@@ -85,5 +86,11 @@ public class DeviceFactory {
 		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
 
 		return (WindSensor) rts.getDeviceHandler(name, DeviceType.WIND_SPEED_SENSOR);
+	}
+	
+	public TempSensor createTempSensor(ServerKeyData keyData, String name) throws TeleoperationException {
+		RTSHandler rts = RTSManager.getReference().getRTS(keyData);
+
+		return (TempSensor) rts.getDeviceHandler(name, DeviceType.TEMPERATURE_SENSOR);
 	}
 }
