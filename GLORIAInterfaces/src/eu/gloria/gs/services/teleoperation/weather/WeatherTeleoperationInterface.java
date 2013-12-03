@@ -14,4 +14,7 @@ public interface WeatherTeleoperationInterface {
 
 	public double getRelativeHumidity(String rt, String rhSensor)
 			throws DeviceOperationFailedException, WeatherTeleoperationException;
+	
+	public double getTemperature(String rt, String tempSensor)
+			throws DeviceOperationFailedException, WeatherTeleoperationException;
 }
