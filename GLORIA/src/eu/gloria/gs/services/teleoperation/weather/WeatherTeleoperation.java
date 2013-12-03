@@ -9,6 +9,7 @@ import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetPressureOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetRelativeHumidityOperation;
+import eu.gloria.gs.services.teleoperation.weather.operations.GetTemperatureOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetWindSpeedOperation;
 
 public class WeatherTeleoperation extends AbstractTeleoperation implements
@@ -46,6 +47,45 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 			this.processSuccess(rt, barometer, "getPressure", null, pressure);
 
 			return pressure;
+
+		} catch (DeviceOperationFailedException e) {
+			this.processException(e.getMessage(), rt);
+			throw e;
+		} catch (TeleoperationException e) {
+			this.processException(e.getMessage(), rt);
+			throw new WeatherTeleoperationException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public double getTemperature(String rt, String tempSensor)
+			throws DeviceOperationFailedException,
+			WeatherTeleoperationException {
+		OperationArgs args = new OperationArgs();
+
+		args.setArguments(new ArrayList<Object>());
+		args.getArguments().add(rt);
+		args.getArguments().add(tempSensor);
+
+		GetTemperatureOperation operation = null;
+
+		try {
+			operation = new GetTemperatureOperation(args);
+		} catch (Exception e) {
+			this.processException(e.getClass().getSimpleName()
+					+ "/getTemperature/Bad args", rt);
+
+			throw new WeatherTeleoperationException(
+					"DEBUG: Bad teleoperation request");
+		}
+
+		try {
+			OperationReturn returns = this.executeOperation(operation);
+			double temperature = (Double) returns.getReturns().get(0);
+
+			this.processSuccess(rt, tempSensor, "getTemperature", null, temperature);
+
+			return temperature;
 
 		} catch (DeviceOperationFailedException e) {
 			this.processException(e.getMessage(), rt);
