@@ -164,11 +164,11 @@ public class ParameterContext extends Context {
 		if (tree != null && tree.length > 1) {
 			for (int i = 1; i < tree.length; i++) {
 				if (value instanceof Map) {
-					if (((Map<?, ?>) value).containsKey(tree[i])) {
+					//if (((Map<?, ?>) value).containsKey(tree[i])) {
 						value = ((Map<?, ?>) value).get(tree[i]);
-					} else {
+					/*} else {
 						throw new ExperimentParameterException("The property does not exist.");
-					}
+					}*/
 				} else if (value instanceof List) {
 					if (!listIndexing && tree[i].startsWith("[")) {
 						listIndexing = true;
