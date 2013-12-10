@@ -3,15 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+	<import resource="classpath*:credentialbeans.xml" />
+
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:comp/env/jdbc/gloriaDB" />
 	</bean>
 
-	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
-		destroy-method="close"> <property name="driverClassName" value="com.mysql.jdbc.Driver" 
-		/> <property name="url" value="jdbc:mysql://localhost/gloria_services" /> 
-		<property name="username" value="root" /> <property name="password" value="ciclope" 
-		/> </bean> -->
 
 	<bean id="sqlUserRepositorySessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -26,6 +23,23 @@
 	<bean id="userAdapter"
 		class="eu.gloria.gs.services.repository.user.data.UserRepositoryAdapter">
 		<property name="userDBService" ref="userMapper"></property>
+		<property name="userRepositoryUsername" ref="userRepositoryUsername"></property>
+		<property name="userRepositoryPassword" ref="userRepositoryPassword"></property>
+		<property name="RTRepositoryUsername" ref="rtRepositoryUsername"></property>
+		<property name="RTRepositoryPassword" ref="rtRepositoryPassword"></property>
+		<property name="imageRepositoryUsername" ref="imageRepositoryUsername"></property>
+		<property name="imageRepositoryPassword" ref="imageRepositoryPassword"></property>
+		<property name="experimentUsername" ref="experimentUsername"></property>
+		<property name="experimentPassword" ref="experimentPassword"></property>
+		<property name="teleoperationUsername" ref="teleoperationUsername"></property>
+		<property name="teleoperationPassword" ref="teleoperationPassword"></property>
+		<property name="actionLogUsername" ref="actionLogUsername"></property>
+		<property name="actionLogPassword" ref="actionLogPassword"></property>
+		<property name="adminUsername" ref="adminUsername"></property>
+		<property name="adminPassword" ref="adminPassword"></property>
+		<property name="schedulerUsername" ref="schedulerUsername"></property>
+		<property name="schedulerPassword" ref="schedulerPassword"></property>
+		
 	</bean>
 
 </beans>
