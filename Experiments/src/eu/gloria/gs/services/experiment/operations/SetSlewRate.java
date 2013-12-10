@@ -38,6 +38,10 @@ public class SetSlewRate extends ServiceOperation {
 					.getExperimentContext().getParameterValue(mountParameter);
 			String rate = (String) this.getContext().getExperimentContext()
 					.getParameterValue(rateParameter);
+			
+			if (rate == null) {
+				throw new ExperimentOperationException("Slew rate cannot be null");
+			}
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());

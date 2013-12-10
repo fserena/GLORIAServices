@@ -39,6 +39,10 @@ public class SetTrackingRate extends ServiceOperation {
 					.getExperimentContext().getParameterValue(mountParameter);
 			String rate = (String) this.getContext().getExperimentContext()
 					.getParameterValue(rateParameter);
+			
+			if (rate == null) {
+				throw new ExperimentOperationException("Tracking rate cannot be null");
+			}
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
