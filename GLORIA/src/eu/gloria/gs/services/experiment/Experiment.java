@@ -2,6 +2,7 @@ package eu.gloria.gs.services.experiment;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -253,13 +254,70 @@ public class Experiment extends GSLogProducerService implements
 		} catch (UserRepositoryException e1) {
 		}
 
+		return this.getPendingReservations(null, adminMode);
+
+	}
+
+	@Override
+	public List<ReservationInformation> getMyPendingOfflineReservations()
+			throws ExperimentException, NoReservationsAvailableException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.getPendingReservations("OFFLINE", adminMode);
+
+	}
+
+	@Override
+	public List<ReservationInformation> getMyPendingOnlineReservations()
+			throws ExperimentException, NoReservationsAvailableException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.getPendingReservations("ONLINE", adminMode);
+
+	}
+
+	private List<ReservationInformation> getPendingReservations(String type,
+			boolean adminMode) throws ExperimentException,
+			NoReservationsAvailableException {
 		List<ReservationInformation> resInfo = null;
 		try {
 			if (adminMode) {
-				resInfo = adapter.getUserPendingReservations();
+				if (type == null) {
+					resInfo = adapter.getAllPendingReservations();
+				} else {
+					resInfo = adapter.getAllPendingReservations(type);
+				}
 			} else {
-				resInfo = adapter.getUserPendingReservations(this
-						.getClientUsername());
+				if (type == null) {
+					resInfo = adapter.getUserPendingReservations(this
+							.getClientUsername());
+
+				} else {
+					resInfo = adapter.getUserPendingReservations(type,
+							this.getClientUsername());
+				}
 			}
 
 			try {
@@ -292,6 +350,50 @@ public class Experiment extends GSLogProducerService implements
 		}
 	}
 
+	private boolean anyReservationActiveNow(String type, boolean adminMode)
+			throws ExperimentException {
+		boolean anyActiveNow;
+		try {
+
+			if (adminMode) {
+				if (type == null) {
+					anyActiveNow = adapter.anyReservationActiveNow();
+				} else {
+					anyActiveNow = adapter.anyReservationActiveNow(type);
+				}
+			} else {
+				if (type == null) {
+					anyActiveNow = adapter.anyUserReservationActiveNow(this
+							.getClientUsername());
+				} else {
+					anyActiveNow = adapter.anyUserReservationActiveNow(type,
+							this.getClientUsername());
+				}
+			}
+			
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/anyactive->" + anyActiveNow);
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
+			
+			
+			return anyActiveNow;
+		} catch (ExperimentDatabaseException e) {
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/reservations/anyactive->DB_ERROR");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
+			throw new ExperimentException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public boolean anyReservationActiveNow() throws ExperimentException {
 
@@ -307,37 +409,85 @@ public class Experiment extends GSLogProducerService implements
 		} catch (UserRepositoryException e1) {
 		}
 
-		boolean anyActiveNow;
-		try {
-
-			if (adminMode) {
-				anyActiveNow = adapter.anyUserReservationActiveNow();
-			} else {
-				anyActiveNow = adapter.anyUserReservationActiveNow(this
-						.getClientUsername());
-			}
-
-			try {
-				this.logAction(this.getClientUsername(),
-						"experiments/reservations/anyactive->" + anyActiveNow);
-			} catch (ActionLogException el) {
-				el.printStackTrace();
-			}
-
-			return anyActiveNow;
-		} catch (ExperimentDatabaseException e) {
-
-			try {
-				this.logAction(this.getClientUsername(),
-						"experiments/reservations/anyactive->DB_ERROR");
-			} catch (ActionLogException el) {
-				el.printStackTrace();
-			}
-
-			throw new ExperimentException(e.getMessage());
-		}
+		return this.anyReservationActiveNow(null, adminMode);
 	}
 
+	@Override
+	public boolean anyOnlineReservationActiveNow() throws ExperimentException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.anyReservationActiveNow("ONLINE", adminMode);
+	}
+
+	@Override
+	public boolean anyOfflineReservationActiveNow() throws ExperimentException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.anyReservationActiveNow("OFFLINE", adminMode);
+	}
+
+	@Override
+	public List<ReservationInformation> getMyCurrentOnlineReservations()
+			throws ExperimentException, NoReservationsAvailableException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.getCurrentReservations("ONLINE", adminMode);
+
+	}
+
+	@Override
+	public List<ReservationInformation> getMyCurrentOfflineReservations()
+			throws ExperimentException, NoReservationsAvailableException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		return this.getCurrentReservations("OFFLINE", adminMode);
+
+	}
+	
 	@Override
 	public List<ReservationInformation> getMyCurrentReservations()
 			throws ExperimentException, NoReservationsAvailableException {
@@ -354,14 +504,30 @@ public class Experiment extends GSLogProducerService implements
 		} catch (UserRepositoryException e1) {
 		}
 
+		return this.getCurrentReservations(null, adminMode);
+
+	}
+
+	private List<ReservationInformation> getCurrentReservations(String type,
+			boolean adminMode) throws ExperimentException,
+			NoReservationsAvailableException {
 		List<ReservationInformation> reservations;
 		try {
 
 			if (adminMode) {
-				reservations = adapter.getAllReservationsActiveNow();
+				if (type == null) {
+					reservations = adapter.getAllReservationsActiveNow();
+				} else {
+					reservations = adapter.getAllReservationsActiveNow(type);
+				}
 			} else {
-				reservations = adapter.getUserReservationActiveNow(this
-						.getClientUsername());
+				if (type == null) {
+					reservations = adapter.getUserReservationsActiveNow(this
+							.getClientUsername());
+				} else {
+					reservations = adapter.getUserReservationsActiveNow(type,
+							this.getClientUsername());
+				}
 			}
 
 			try {
@@ -628,7 +794,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			boolean grantAccess;
 			if (adminMode) {
-				grantAccess = adapter.anyUserReservationActiveNow();
+				grantAccess = adapter.anyReservationActiveNow();
 			} else {
 				grantAccess = adapter.anyUserReservationActiveNow(this
 						.getClientUsername());
@@ -887,6 +1053,149 @@ public class Experiment extends GSLogProducerService implements
 	}
 
 	@Override
+	public ObjectResponse getExperimentContext(int reservationId)
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		try {
+
+			boolean grantAccess;
+			if (adminMode) {
+				grantAccess = adapter.anyReservationActiveNow();
+			} else {
+				grantAccess = adapter.anyUserReservationActiveNow(this
+						.getClientUsername());
+			}
+
+			if (!grantAccess) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/get?->INACTIVE");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
+				throw new NoSuchReservationException(
+						"You have no reservations at this moment");
+			}
+
+			if (!adapter.isReservationContextInstantiated(reservationId)) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/get?->NOT_INSTANTIATED");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
+				throw new ExperimentNotInstantiatedException(
+						"The experiment is not instantiated");
+			}
+
+			ExperimentContext context;
+
+			ReservationInformation resInfo = this.adapter
+					.getReservationInformation(reservationId);
+
+			context = contextManager.getContext(resInfo.getUser(),
+					reservationId);
+
+			LinkedHashMap<String, Object> contextValues = new LinkedHashMap<>();
+
+			for (String parameter : context.getParameterNames()) {
+				Object value = context.getParameterValue(parameter);
+				contextValues.put(parameter, value);
+			}
+
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId + "/get?->DONE");
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+
+			return new ObjectResponse(JSONConverter.toJSON(contextValues));
+
+		} catch (ExperimentDatabaseException | InvalidExperimentModelException
+				| InvalidUserContextException | ExperimentParameterException
+				| NoSuchExperimentException | IOException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId + "/get?->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+			throw new ExperimentException(e.getMessage());
+		}
+	}
+
+	@Override
+	public boolean isExperimentContextInstantiated(int reservationId)
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException {
+
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e1) {
+		}
+
+		try {
+
+			boolean grantAccess;
+			if (adminMode) {
+				grantAccess = adapter.anyReservationActiveNow();
+			} else {
+				grantAccess = adapter.anyUserReservationActiveNow(this
+						.getClientUsername());
+			}
+
+			if (!grantAccess) {
+				try {
+					this.logAction(this.getClientUsername(),
+							"experiments/contexts/" + reservationId
+									+ "/get/ready?->INACTIVE");
+				} catch (ActionLogException el) {
+					el.printStackTrace();
+				}
+				throw new NoSuchReservationException(
+						"You have no reservations at this moment");
+			}
+
+			return adapter.isReservationContextInstantiated(reservationId);
+
+		} catch (ExperimentDatabaseException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/get/ready?->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+			throw new ExperimentException(e.getMessage());
+		}
+	}
+
+	@Override
 	public ObjectResponse getExperimentParameterValue(int reservationId,
 			String parameter) throws ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException {
@@ -907,7 +1216,7 @@ public class Experiment extends GSLogProducerService implements
 
 			boolean grantAccess;
 			if (adminMode) {
-				grantAccess = adapter.anyUserReservationActiveNow();
+				grantAccess = adapter.anyReservationActiveNow();
 			} else {
 				grantAccess = adapter.anyUserReservationActiveNow(this
 						.getClientUsername());

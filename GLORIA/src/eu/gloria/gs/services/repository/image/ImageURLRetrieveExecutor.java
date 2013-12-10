@@ -57,10 +57,10 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		try {
 			if (thereArePending) {
 				Thread.sleep(100);
-				System.out.println("Image daemon alive...images pending!");
+				//System.out.println("Image daemon alive...images pending!");
 			} else {
 				Thread.sleep(1000);
-				System.out.println("Image daemon alive...no images pending!");
+				//System.out.println("Image daemon alive...no images pending!");
 			}
 		} catch (InterruptedException e) {
 		}

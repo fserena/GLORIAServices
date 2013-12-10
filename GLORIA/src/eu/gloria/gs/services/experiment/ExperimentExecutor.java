@@ -60,7 +60,7 @@ public class ExperimentExecutor extends ServerThread {
 	protected void doWork() {
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -72,8 +72,8 @@ public class ExperimentExecutor extends ServerThread {
 			List<ReservationInformation> reservations = adapter
 					.getAllReservationsActiveNow();
 
-			System.out.println("[ExperimentExecutor] Active reservations: "
-					+ reservations.size());
+			// System.out.println("[ExperimentExecutor] Active reservations: "
+			// + reservations.size());
 
 			for (ReservationInformation reservation : reservations) {
 
@@ -81,12 +81,14 @@ public class ExperimentExecutor extends ServerThread {
 						.isReservationContextInstantiated(reservation
 								.getReservationId());
 
-				ExperimentContext context = manager.getContext(
-						reservation.getUser(), reservation.getReservationId());
-
 				if (!instantiated) {
+
 					adapter.deleteExperimentContext(reservation
 							.getReservationId());
+
+					ExperimentContext context = manager.getContext(
+							reservation.getUser(),
+							reservation.getReservationId());
 
 					context.instantiate();
 
@@ -101,16 +103,23 @@ public class ExperimentExecutor extends ServerThread {
 
 					// Notify all telescopes the teleoperation timeslot
 					List<String> telescopes = reservation.getTelescopes();
-					long duration = (reservation.getTimeSlot().getEnd()
-							.getTime() - reservation.getTimeSlot().getBegin()
-							.getTime()) / 1000;
 
-					for (String rt : telescopes) {
-						genericTeleoperation.notifyTeleoperation(rt, duration);
+					if (telescopes != null && telescopes.size() > 0) {
+
+						long duration = (reservation.getTimeSlot().getEnd()
+								.getTime() - reservation.getTimeSlot()
+								.getBegin().getTime()) / 1000;
+
+						for (String rt : telescopes) {
+							genericTeleoperation.notifyTeleoperation(rt,
+									duration);
+						}
 					}
 
 					try {
 						context.init();
+
+						adapter.setContextReady(reservation.getReservationId());
 
 						try {
 							alog.registerAction(
@@ -146,6 +155,9 @@ public class ExperimentExecutor extends ServerThread {
 									.getReservationId());
 
 					if (runtimeInfo.getRemainingTime() < 10) {
+						ExperimentContext context = manager.getContext(
+								reservation.getUser(),
+								reservation.getReservationId());
 						try {
 							context.end();
 

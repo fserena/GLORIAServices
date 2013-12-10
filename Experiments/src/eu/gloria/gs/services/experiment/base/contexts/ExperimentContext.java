@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
+import java.util.Set;
 
 import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
@@ -28,6 +26,14 @@ public class ExperimentContext extends Context {
 	public ExperimentContext() {
 		parameterContexts = new HashMap<>();
 		operationContexts = new HashMap<>();
+	}
+	
+	public Set<String> getParameterNames() {
+		return parameterContexts.keySet();
+	}
+	
+	public Set<String> getOperationNames() {
+		return operationContexts.keySet();
 	}
 
 	public void setExperimentName(String experiment) {

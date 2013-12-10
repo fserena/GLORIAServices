@@ -71,7 +71,7 @@ public interface ExperimentDBService {
 	 * @return
 	 */
 	public ParameterEntry getParameterById(@Param(value = "pid_") int pid);
-	
+
 	/**
 	 * @param oid
 	 * @return
@@ -140,6 +140,14 @@ public interface ExperimentDBService {
 	public boolean isReservationContextInstantiated(
 			@Param(value = "rid_") int rid);
 
+	
+	/**
+	 * @param rid
+	 * @return
+	 */
+	public int getParametersNumberInContext(
+			@Param(value = "rid_") int rid);
+	
 	/**
 	 * @param opid
 	 * @return
@@ -241,11 +249,32 @@ public interface ExperimentDBService {
 			@Param(value = "from_") Date from);
 
 	/**
+	 * @param type
+	 * @param user
+	 * @param from
+	 * @return
+	 */
+	public List<ReservationEntry> getUserReservationsFromByType(
+			@Param(value = "type_") String type,
+			@Param(value = "user_") String user,
+			@Param(value = "from_") Date from);
+
+	/**
 	 * @param user
 	 * @param from
 	 * @return
 	 */
 	public List<ReservationEntry> getAllReservationsFrom(
+			@Param(value = "from_") Date from);
+
+	/**
+	 * @param type
+	 * @param user
+	 * @param from
+	 * @return
+	 */
+	public List<ReservationEntry> getAllReservationsFromByType(
+			@Param(value = "type_") String type,
 			@Param(value = "from_") Date from);
 
 	/**
@@ -279,17 +308,47 @@ public interface ExperimentDBService {
 			@Param(value = "when_") Date when);
 
 	/**
+	 * @param type
+	 * @param user
+	 * @param when
+	 * @return
+	 */
+	public boolean anyUserReservationAtByType(
+			@Param(value = "type_") String type,
+			@Param(value = "user_") String user,
+			@Param(value = "when_") Date when);
+
+	/**
 	 * @param when
 	 * @return
 	 */
 	public boolean anyReservationAt(@Param(value = "when_") Date when);
 
 	/**
+	 * @param type
+	 * @param when
+	 * @return
+	 */
+	public boolean anyReservationAtByType(@Param(value = "type_") String type,
+			@Param(value = "when_") Date when);
+
+	/**
 	 * @param user
 	 * @param when
 	 * @return
 	 */
-	public List<ReservationEntry> getUserReservationAt(
+	public List<ReservationEntry> getUserReservationsAt(
+			@Param(value = "user_") String user,
+			@Param(value = "when_") Date when);
+
+	/**
+	 * @param type
+	 * @param user
+	 * @param when
+	 * @return
+	 */
+	public List<ReservationEntry> getUserReservationsAtByType(
+			@Param(value = "type_") String type,
 			@Param(value = "user_") String user,
 			@Param(value = "when_") Date when);
 
@@ -301,10 +360,28 @@ public interface ExperimentDBService {
 			@Param(value = "when_") Date when);
 
 	/**
+	 * @param type
+	 * @param when
+	 * @return
+	 */
+	public List<ReservationEntry> getAllReservationsAtByType(
+			@Param(value = "type_") String type,
+			@Param(value = "when_") Date when);
+
+	/**
 	 * @param when
 	 * @return
 	 */
 	public List<ReservationEntry> getAllReservationsBefore(
+			@Param(value = "when_") Date when);
+
+	/**
+	 * @param type
+	 * @param when
+	 * @return
+	 */
+	public List<ReservationEntry> getAllReservationsBeforeByType(
+			@Param(value = "type_") String type,
 			@Param(value = "when_") Date when);
 
 	/**
@@ -360,12 +437,15 @@ public interface ExperimentDBService {
 	 */
 	public void removeReservationContext(
 			@Param(value = "rid_") int idreservation);
-	
-	
+
 	public void saveResult(ResultEntry entry);
-	
+
 	public List<ResultEntry> getContextResults(@Param(value = "rid_") int rid);
-	
-	public List<Integer> getAllExperimentContexts(@Param(value = "name_") String name);
-	
+
+	public List<Integer> getAllExperimentContexts(
+			@Param(value = "name_") String name);
+
+	public void setReservationStatus(@Param(value = "rid_") int rid,
+			@Param(value = "status_") String status);
+
 }

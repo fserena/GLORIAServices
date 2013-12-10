@@ -18,10 +18,14 @@
 		NULL,
 		`type` varchar(10) NOT
 		NULL,
-		PRIMARY KEY (`idexperiment`),
+		`status` varchar(20) NOT
+		NULL,
+		PRIMARY
+		KEY (`idexperiment`),
 		UNIQUE
 		KEY `name_UNIQUE` (`name`),
-		KEY `author_fk` (`author`),
+		KEY `author_fk`
+		(`author`),
 		CONSTRAINT
 		`author_fk` FOREIGN KEY
 		(`author`) REFERENCES
@@ -30,7 +34,8 @@
 		NO
 		ACTION ON UPDATE NO
 		ACTION
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		) ENGINE=InnoDB
+		DEFAULT CHARSET=utf8
 	</update>
 
 	<update id="createReservationTable">
@@ -369,6 +374,14 @@
 		rid=#{rid_}
 	</select>
 
+	<select id="getParametersNumberInContext" resultType="int">
+		SELECT
+		count(*) FROM
+		`experiment_context`
+		WHERE
+		rid=#{rid_}
+	</select>
+
 	<select id="isReservationContextInstantiated" resultType="boolean">
 		SELECT
 		count(*) > 0
@@ -486,6 +499,18 @@
 		&gt; #{from_} ORDER BY begin
 	</select>
 
+	<select id="getAllReservationsFromByType"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT * FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE type =
+		#{type_} AND (begin
+		&gt;=#{from_} OR end
+		&gt; #{from_}) ORDER BY begin
+	</select>
+
 	<select id="getUserReservationsFrom"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM
@@ -494,6 +519,19 @@
 		user=#{user_} AND (begin
 		&gt;=#{from_} OR end &gt; #{from_}) ORDER BY
 		begin
+	</select>
+
+	<select id="getUserReservationsFromByType"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT * FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE user=#{user_}
+		AND type=#{type_} AND (begin
+		&gt;=#{from_} OR end
+		&gt; #{from_}) ORDER
+		BY begin
 	</select>
 
 	<select id="getReservation"
@@ -533,6 +571,19 @@
 		#{when_}
 	</select>
 
+	<select id="anyReservationAtByType" resultType="boolean">
+		SELECT count(*)>0
+		FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE
+		type=#{type_} AND begin &lt;=
+		#{when_} AND end
+		&gt;=
+		#{when_}
+	</select>
+
 	<select id="anyUserReservationAt" resultType="boolean">
 		SELECT count(*)>0
 		FROM
@@ -543,7 +594,23 @@
 		&gt;= #{when_}
 	</select>
 
-	<select id="getUserReservationAt"
+	<select id="anyUserReservationAtByType" resultType="boolean">
+		SELECT
+		count(*)>0
+		FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE
+		type=#{type_} AND
+		user=#{user_} AND
+		begin &lt;=
+		#{when_} AND end
+		&gt;=
+		#{when_}
+	</select>
+
+	<select id="getUserReservationsAt"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT *
 		FROM
@@ -551,6 +618,20 @@
 		WHERE
 		user=#{user_} AND begin &lt;=
 		#{when_} AND end &gt;= #{when_}
+	</select>
+
+	<select id="getUserReservationsAtByType"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT *
+		FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE
+		type=#{type_} AND
+		user=#{user_} AND begin &lt;=
+		#{when_} AND end &gt;=
+		#{when_}
 	</select>
 
 	<select id="getAllReservationsAt"
@@ -565,12 +646,42 @@
 		#{when_}
 	</select>
 
+	<select id="getAllReservationsAtByType"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT *
+		FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE
+		type=#{type_} AND
+		begin &lt;=
+		#{when_} AND end
+		&gt;=
+		#{when_}
+	</select>
+
 	<select id="getAllReservationsBefore"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT *
 		FROM
 		`reservation`
 		WHERE
+		begin &lt;=
+		#{when_} AND end
+		&lt;=
+		#{when_}
+	</select>
+
+	<select id="getAllReservationsBeforeByType"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT *
+		FROM
+		`reservation` LEFT JOIN `experiment`
+		ON
+		(reservation.experiment=experiment.idexperiment)
+		WHERE
+		type=#{type_} AND
 		begin &lt;=
 		#{when_} AND end
 		&lt;=
@@ -617,10 +728,11 @@
 		INSERT INTO
 		`reservation`
 		(user,
-		experiment, begin, end)
+		experiment, begin, end,
+		status)
 		VALUE (
 		#{user}, #{experiment}, #{begin},
-		#{end})
+		#{end}, #{status})
 	</insert>
 
 	<insert id="saveRTReservation">
@@ -644,6 +756,14 @@
 		WHERE
 		idreservation=#{rid_}
 	</delete>
+
+	<update id="setReservationStatus">
+		UPDATE `reservation`
+		SET
+		status=#{status_}
+		WHERE
+		idreservation=#{rid_}
+	</update>
 
 	<delete id="removeReservationContext">
 		DELETE FROM `experiment_context`
@@ -670,9 +790,9 @@
 		context=#{rid_}
 	</select>
 
-	<select id="getAllExperimentContexts"
-		resultType="int">
-		SELECT idreservation FROM (SELECT exp.name,res.idreservation from
+	<select id="getAllExperimentContexts" resultType="int">
+		SELECT
+		idreservation FROM (SELECT exp.name,res.idreservation from
 		`experiment` as exp left join `reservation` as res on
 		exp.idexperiment=res.experiment) as rids where name=#{name_}
 	</select>

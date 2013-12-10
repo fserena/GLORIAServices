@@ -106,8 +106,8 @@ public class ExperimentDBAdapter {
 
 				String type = parameterInfo.getType();
 
-			//	ArrayList<Class<?>> argumentTypes = parameterInfo
-			//			.getParameter().getType().getArgumentTypes();
+				// ArrayList<Class<?>> argumentTypes = parameterInfo
+				// .getParameter().getType().getArgumentTypes();
 
 				type += JSONConverter.toJSON(parameterInfo.getArguments());
 
@@ -219,16 +219,52 @@ public class ExperimentDBAdapter {
 	}
 
 	/**
-	 * @param username
 	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public boolean anyUserReservationActiveNow()
+	public boolean anyReservationActiveNow(String type)
 			throws ExperimentDatabaseException {
 
 		boolean anyActive = false;
 		try {
+			anyActive = service.anyReservationAtByType(type, new Date());
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+
+		return anyActive;
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean anyReservationActiveNow() throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
 			anyActive = service.anyReservationAt(new Date());
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+
+		return anyActive;
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean anyUserReservationActiveNow(String type, String username)
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.anyUserReservationAtByType(type, username,
+					new Date());
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
@@ -267,7 +303,8 @@ public class ExperimentDBAdapter {
 					.getAllReservationsBefore(new Date());
 
 			for (ReservationEntry entry : reservationEntries) {
-				service.removeReservationContext(entry.getIdreservation());
+				service.removeReservationContext(entry.getIdreservation());	
+				service.setReservationStatus(entry.getIdreservation(), "OBSOLETE");
 			}
 
 		} catch (PersistenceException e) {
@@ -288,7 +325,7 @@ public class ExperimentDBAdapter {
 					.getAllReservationsBefore(new Date());
 
 			for (ReservationEntry entry : reservationEntries) {
-				service.removeReservation(entry.getIdreservation());
+				service.removeReservation(entry.getIdreservation());				
 			}
 
 		} catch (PersistenceException e) {
@@ -433,56 +470,6 @@ public class ExperimentDBAdapter {
 		}
 
 		return experiments;
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 * @throws NoReservationsAvailableException
-	 */
-	public List<ReservationInformation> getAllReservationsActiveNow()
-			throws ExperimentDatabaseException,
-			NoReservationsAvailableException {
-
-		List<ReservationInformation> reservations = null;
-
-		try {
-			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsAt(new Date());
-
-			reservations = new ArrayList<ReservationInformation>();
-
-			for (ReservationEntry entry : reservationEntries) {
-				ReservationInformation reservation = new ReservationInformation();
-
-				String experimentName = (service.getExperimentById(entry
-						.getExperiment())).getName();
-				reservation.setExperiment(experimentName);
-
-				List<String> telescopes = service.getAllRTOfReservation(entry
-						.getIdreservation());
-				reservation.setTelescopes(telescopes);
-				reservation.setUser(entry.getUser());
-
-				TimeSlot timeSlot = new TimeSlot();
-				timeSlot.setBegin(entry.getBegin());
-				timeSlot.setEnd(entry.getEnd());
-
-				reservation.setTimeSlot(timeSlot);
-				reservation.setReservationId(entry.getIdreservation());
-
-				reservations.add(reservation);
-			}
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
-		}
-
-		if (reservations == null || reservations.size() == 0) {
-			throw new NoReservationsAvailableException(
-					"No active reservations now");
-		}
-		return reservations;
 	}
 
 	/**
@@ -766,6 +753,7 @@ public class ExperimentDBAdapter {
 								.getIdreservation());
 				reservation.setTelescopes(telescopes);
 				reservation.setUser(reservationEntry.getUser());
+				reservation.setStatus(reservationEntry.getStatus());
 
 				TimeSlot timeSlot = new TimeSlot();
 				timeSlot.setBegin(reservationEntry.getBegin());
@@ -797,49 +785,20 @@ public class ExperimentDBAdapter {
 			String username) throws ExperimentDatabaseException,
 			NoReservationsAvailableException {
 
-		List<ReservationInformation> reservationInfos = null;
 		try {
 			List<ReservationEntry> reservationEntries = service
 					.getUserReservationsFrom(username, new Date());
 
-			if (reservationEntries != null) {
-				reservationInfos = new ArrayList<ReservationInformation>();
-
-				for (ReservationEntry reservationEntry : reservationEntries) {
-					ReservationInformation resInfo = new ReservationInformation();
-
-					ExperimentEntry experimentEntry = service
-							.getExperimentById(reservationEntry.getExperiment());
-
-					resInfo.setExperiment(experimentEntry.getName());
-					TimeSlot timeSlot = new TimeSlot();
-					timeSlot.setBegin(reservationEntry.getBegin());
-					timeSlot.setEnd(reservationEntry.getEnd());
-					resInfo.setTimeSlot(timeSlot);
-					resInfo.setUser(reservationEntry.getUser());
-
-					List<String> telescopes = service
-							.getAllRTOfReservation(reservationEntry
-									.getIdreservation());
-					resInfo.setTelescopes(telescopes);
-					resInfo.setReservationId(reservationEntry
-							.getIdreservation());
-
-					reservationInfos.add(resInfo);
-				}
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("The user '"
+						+ username + "' has no pending reservations");
 			}
+
+			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
-
-		if (reservationInfos == null || reservationInfos.size() == 0) {
-
-			throw new NoReservationsAvailableException("The user '" + username
-					+ "' has no pending reservations");
-		}
-
-		return reservationInfos;
 	}
 
 	/**
@@ -848,53 +807,157 @@ public class ExperimentDBAdapter {
 	 * @throws ExperimentDatabaseException
 	 * @throws NoReservationsAvailableException
 	 */
-	public List<ReservationInformation> getUserPendingReservations()
+	public List<ReservationInformation> getUserPendingReservations(String type,
+			String username) throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getUserReservationsFromByType(type, username, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("The user '"
+						+ username + "' has no pending reservations");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllPendingReservations(String type)
 			throws ExperimentDatabaseException,
 			NoReservationsAvailableException {
 
-		List<ReservationInformation> reservationInfos = null;
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsFromByType(type, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"There are no pending reservations");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllPendingReservations()
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
 		try {
 			List<ReservationEntry> reservationEntries = service
 					.getAllReservationsFrom(new Date());
 
-			if (reservationEntries != null) {
-				reservationInfos = new ArrayList<ReservationInformation>();
-
-				for (ReservationEntry reservationEntry : reservationEntries) {
-					ReservationInformation resInfo = new ReservationInformation();
-
-					ExperimentEntry experimentEntry = service
-							.getExperimentById(reservationEntry.getExperiment());
-
-					resInfo.setExperiment(experimentEntry.getName());
-					TimeSlot timeSlot = new TimeSlot();
-					timeSlot.setBegin(reservationEntry.getBegin());
-					timeSlot.setEnd(reservationEntry.getEnd());
-					resInfo.setTimeSlot(timeSlot);
-					resInfo.setUser(reservationEntry.getUser());
-
-					List<String> telescopes = service
-							.getAllRTOfReservation(reservationEntry
-									.getIdreservation());
-					resInfo.setTelescopes(telescopes);
-					resInfo.setReservationId(reservationEntry
-							.getIdreservation());
-
-					reservationInfos.add(resInfo);
-				}
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"There are no pending reservations");
 			}
+
+			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
+	}
 
-		if (reservationInfos == null || reservationInfos.size() == 0) {
+	private List<ReservationInformation> processReservationEntries(
+			List<ReservationEntry> entries) {
 
-			throw new NoReservationsAvailableException(
-					"There are no pending reservations");
+		List<ReservationInformation> reservations = null;
+
+		reservations = new ArrayList<ReservationInformation>();
+
+		for (ReservationEntry entry : entries) {
+			ReservationInformation reservation = new ReservationInformation();
+
+			String experimentName = (service.getExperimentById(entry
+					.getExperiment())).getName();
+			reservation.setExperiment(experimentName);
+
+			List<String> telescopes = service.getAllRTOfReservation(entry
+					.getIdreservation());
+			reservation.setTelescopes(telescopes);
+			reservation.setUser(entry.getUser());
+			reservation.setStatus(entry.getStatus());
+
+			TimeSlot timeSlot = new TimeSlot();
+			timeSlot.setBegin(entry.getBegin());
+			timeSlot.setEnd(entry.getEnd());
+
+			reservation.setTimeSlot(timeSlot);
+			reservation.setReservationId(entry.getIdreservation());
+
+			reservations.add(reservation);
 		}
 
-		return reservationInfos;
+		return reservations;
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllReservationsActiveNow()
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsAt(new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"No active reservations now");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllReservationsActiveNow(String type)
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsAtByType(type, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"No active reservations now");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
 	}
 
 	/**
@@ -903,50 +966,52 @@ public class ExperimentDBAdapter {
 	 * @throws ExperimentDatabaseException
 	 * @throws NoReservationsAvailableException
 	 */
-	public List<ReservationInformation> getUserReservationActiveNow(
+	public List<ReservationInformation> getUserReservationsActiveNow(
 			String username) throws ExperimentDatabaseException,
 			NoReservationsAvailableException {
 
-		List<ReservationInformation> reservations = null;
-
 		try {
 			List<ReservationEntry> reservationEntries = service
-					.getUserReservationAt(username, new Date());
+					.getUserReservationsAt(username, new Date());
 
-			reservations = new ArrayList<ReservationInformation>();
-
-			for (ReservationEntry entry : reservationEntries) {
-				ReservationInformation reservation = new ReservationInformation();
-
-				String experimentName = (service.getExperimentById(entry
-						.getExperiment())).getName();
-				reservation.setExperiment(experimentName);
-
-				List<String> telescopes = service.getAllRTOfReservation(entry
-						.getIdreservation());
-				reservation.setTelescopes(telescopes);
-				reservation.setUser(entry.getUser());
-
-				TimeSlot timeSlot = new TimeSlot();
-				timeSlot.setBegin(entry.getBegin());
-				timeSlot.setEnd(entry.getEnd());
-
-				reservation.setTimeSlot(timeSlot);
-				reservation.setReservationId(entry.getIdreservation());
-
-				reservations.add(reservation);
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"No active reservations now for the " + "user '"
+								+ username + "'");
 			}
+
+			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
+	}
 
-		if (reservations == null || reservations.size() == 0) {
-			throw new NoReservationsAvailableException(
-					"No active reservations now for the " + "user '" + username
-							+ "'");
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getUserReservationsActiveNow(
+			String type, String username) throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getUserReservationsAtByType(type, username, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException(
+						"No active reservations now for the " + "user '"
+								+ username + "'");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
 		}
-		return reservations;
 	}
 
 	/**
@@ -970,20 +1035,26 @@ public class ExperimentDBAdapter {
 				throw new ExperimentDatabaseException("The reservation '" + rid
 						+ "' does not exists");
 			}
+			String status = reservationEntry.getStatus();
+			
+			if (status == null || !status.equals("READY")) {
+				return false;
+			}
 
 			List<ParameterEntry> parameters = service
 					.getAllExperimentParameters(reservationEntry
 							.getExperiment());
 
-			List<ContextEntry> context = service.getReservationContext(rid);
+			Integer paramsInContext = service.getParametersNumberInContext(rid);
 
-			return context != null && parameters != null
-					&& context.size() == parameters.size();
+			return paramsInContext != null && parameters != null
+					&& paramsInContext == parameters.size();
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
 	}
+	
 
 	/**
 	 * @param experiment
@@ -1024,13 +1095,42 @@ public class ExperimentDBAdapter {
 			throw new ExperimentDatabaseException(e.getMessage());
 		}
 	}
-
+	
 	/**
-	 * @param experiment
-	 * @param description
+	 * @param rid
 	 * @throws ExperimentDatabaseException
-	 * @throws NoSuchExperimentException
 	 */
+	public void setContextReady(int rid)
+			throws ExperimentDatabaseException {
+
+		try {
+			
+			service.setReservationStatus(rid, "READY");
+						
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+
+	
+	/**
+	 * @param rid
+	 * @throws ExperimentDatabaseException
+	 */
+	public void setContextObsolete(int rid)
+			throws ExperimentDatabaseException {
+
+		try {
+			
+			service.setReservationStatus(rid, "OBSOLETE");
+						
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+
 	/**
 	 * @param experiment
 	 * @param description
@@ -1191,15 +1291,6 @@ public class ExperimentDBAdapter {
 		this.operationFactory = factory;
 	}
 
-	/**
-	 * @param experiment
-	 * @param parameter
-	 * @param rid
-	 * @param value
-	 * @throws ExperimentDatabaseException
-	 * @throws NoSuchExperimentException
-	 * @throws ExperimentNotInstantiatedException
-	 */
 	/**
 	 * @param experiment
 	 * @param parameter

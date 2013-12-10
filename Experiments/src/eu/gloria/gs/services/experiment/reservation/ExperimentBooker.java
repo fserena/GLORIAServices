@@ -147,7 +147,7 @@ public class ExperimentBooker {
 		List<ReservationInformation> pendingReservations = null;
 
 		try {
-			pendingReservations = adapter.getUserPendingReservations(username);
+			pendingReservations = adapter.getUserPendingReservations("ONLINE", username);
 		} catch (ExperimentDatabaseException e) {
 			throw e;
 		} catch (NoReservationsAvailableException e) {
@@ -159,6 +159,7 @@ public class ExperimentBooker {
 
 		if (pendingReservations != null) {
 			for (ReservationInformation reservation : pendingReservations) {
+								
 				TimeSlot reservedTimeSlot = reservation.getTimeSlot();
 				msReserved += reservedTimeSlot.getEnd().getTime()
 						- reservedTimeSlot.getBegin().getTime();
@@ -198,7 +199,7 @@ public class ExperimentBooker {
 				List<ReservationInformation> reservations = null;
 				try {
 					reservations = adapter
-							.getUserReservationActiveNow(username);
+							.getUserReservationsActiveNow("OFFLINE", username);
 
 				} catch (NoReservationsAvailableException e) {
 
@@ -242,7 +243,7 @@ public class ExperimentBooker {
 		List<ReservationInformation> reservations;
 		try {
 
-			reservations = adapter.getUserReservationActiveNow(username);
+			reservations = adapter.getUserReservationsActiveNow(username);
 
 			for (ReservationInformation reservation : reservations) {
 				if (reservation.getReservationId() == reservationId) {

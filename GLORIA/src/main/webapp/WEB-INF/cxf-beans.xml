@@ -25,7 +25,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -49,7 +49,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -86,7 +86,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -110,7 +110,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -148,7 +148,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -173,7 +173,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -231,7 +231,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -255,7 +255,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -279,7 +279,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -346,7 +346,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -371,7 +371,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -396,7 +396,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -421,7 +421,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
@@ -446,7 +446,7 @@
 			</bean>
 		</jaxws:implementor>
 		<jaxws:features>
-			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" />-->
 		</jaxws:features>
 		<jaxws:inInterceptors>
 			<bean
