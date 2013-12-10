@@ -86,6 +86,8 @@ public interface ExperimentInterface {
 
 	public List<String> getAllOnlineExperiments() throws ExperimentException;
 
+	//public List<String> getAllExperiments() throws ExperimentException;
+
 	public List<String> getAllOfflineExperiments() throws ExperimentException;
 
 	public boolean containsExperiment(
@@ -95,9 +97,26 @@ public interface ExperimentInterface {
 	public List<ReservationInformation> getMyPendingReservations()
 			throws ExperimentException, NoReservationsAvailableException;
 
+	
+	public List<ReservationInformation> getMyPendingOnlineReservations()
+			throws ExperimentException, NoReservationsAvailableException;
+
+	public List<ReservationInformation> getMyPendingOfflineReservations()
+			throws ExperimentException, NoReservationsAvailableException;
+
 	public boolean anyReservationActiveNow() throws ExperimentException;
 
+	public boolean anyOfflineReservationActiveNow() throws ExperimentException;
+
+	public boolean anyOnlineReservationActiveNow() throws ExperimentException;
+
 	public List<ReservationInformation> getMyCurrentReservations()
+			throws ExperimentException, NoReservationsAvailableException;
+
+	public List<ReservationInformation> getMyCurrentOfflineReservations()
+			throws ExperimentException, NoReservationsAvailableException;
+
+	public List<ReservationInformation> getMyCurrentOnlineReservations()
 			throws ExperimentException, NoReservationsAvailableException;
 
 	public void reserveExperiment(
@@ -177,5 +196,28 @@ public interface ExperimentInterface {
 	public ExperimentFeature getExperimentFeature(
 			@WebParam(name = "featureName") String name)
 			throws ExperimentException;
+
+	/**
+	 * @param reservationId
+	 * @return
+	 * @throws ExperimentException
+	 * @throws ExperimentNotInstantiatedException
+	 * @throws NoSuchReservationException
+	 */
+	ObjectResponse getExperimentContext(
+			@WebParam(name = "reservationId") int reservationId)
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
+
+	/**
+	 * @param reservationId
+	 * @return
+	 * @throws ExperimentException
+	 * @throws ExperimentNotInstantiatedException
+	 * @throws NoSuchReservationException
+	 */
+	boolean isExperimentContextInstantiated(@WebParam(name = "reservationId") int reservationId)
+			throws ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException;
 
 }

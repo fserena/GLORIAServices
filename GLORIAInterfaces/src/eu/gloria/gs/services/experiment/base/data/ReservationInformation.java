@@ -8,6 +8,7 @@ public class ReservationInformation {
 	private int reservationId;
 	private String user;
 	private TimeSlot timeSlot;
+	private String status;
 	private List<String> telescopes;
 
 	public int getReservationId() {
@@ -49,4 +50,14 @@ public class ReservationInformation {
 	public void setTelescopes(List<String> telescopes) {
 		this.telescopes = telescopes;
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
 }
