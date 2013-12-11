@@ -18,6 +18,7 @@ import eu.gloria.gs.services.experiment.base.data.ResultInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
 import eu.gloria.gs.services.experiment.base.models.ExperimentFeature;
+import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
@@ -86,7 +87,7 @@ public interface ExperimentInterface {
 
 	public List<String> getAllOnlineExperiments() throws ExperimentException;
 
-	//public List<String> getAllExperiments() throws ExperimentException;
+	// public List<String> getAllExperiments() throws ExperimentException;
 
 	public List<String> getAllOfflineExperiments() throws ExperimentException;
 
@@ -97,7 +98,6 @@ public interface ExperimentInterface {
 	public List<ReservationInformation> getMyPendingReservations()
 			throws ExperimentException, NoReservationsAvailableException;
 
-	
 	public List<ReservationInformation> getMyPendingOnlineReservations()
 			throws ExperimentException, NoReservationsAvailableException;
 
@@ -142,28 +142,30 @@ public interface ExperimentInterface {
 
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException;
+			throws ExperimentException, InvalidUserContextException;
 
 	public void executeExperimentOperation(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "operation") String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
-			ExperimentParameterException, ExperimentNotInstantiatedException,
-			ExperimentException, NoSuchReservationException,
-			NoSuchExperimentException;
+			ExperimentNotInstantiatedException, ExperimentException,
+			NoSuchReservationException, NoSuchExperimentException,
+			InvalidUserContextException;
 
 	public void setExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter,
 			@WebParam(name = "value") ObjectResponse value)
-			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException;
+			throws ExperimentNotInstantiatedException,
+			NoSuchReservationException, ExperimentParameterException,
+			InvalidUserContextException;
 
 	public ObjectResponse getExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter)
-			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException;
+			throws ExperimentNotInstantiatedException,
+			NoSuchReservationException, ExperimentParameterException,
+			InvalidUserContextException;
 
 	public List<ResultInformation> getContextResults(
 			@WebParam(name = "reservationId") int reservationId)
@@ -203,11 +205,12 @@ public interface ExperimentInterface {
 	 * @throws ExperimentException
 	 * @throws ExperimentNotInstantiatedException
 	 * @throws NoSuchReservationException
+	 * @throws InvalidUserContextException
 	 */
 	ObjectResponse getExperimentContext(
 			@WebParam(name = "reservationId") int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException;
+			NoSuchReservationException, InvalidUserContextException;
 
 	/**
 	 * @param reservationId
@@ -216,7 +219,8 @@ public interface ExperimentInterface {
 	 * @throws ExperimentNotInstantiatedException
 	 * @throws NoSuchReservationException
 	 */
-	boolean isExperimentContextInstantiated(@WebParam(name = "reservationId") int reservationId)
+	boolean isExperimentContextReady(
+			@WebParam(name = "reservationId") int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
 			NoSuchReservationException;
 

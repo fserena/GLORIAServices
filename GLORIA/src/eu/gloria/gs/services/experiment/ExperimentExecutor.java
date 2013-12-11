@@ -66,157 +66,198 @@ public class ExperimentExecutor extends ServerThread {
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);
+		List<ReservationInformation> reservations = null;
 
 		try {
 
-			List<ReservationInformation> reservations = adapter
-					.getAllReservationsActiveNow();
+			reservations = adapter.getAllReservationsActiveNow();
+		} catch (ExperimentDatabaseException | NoReservationsAvailableException e) {
+		} catch (Exception e) {
+		}
 
-			// System.out.println("[ExperimentExecutor] Active reservations: "
-			// + reservations.size());
-
+		if (reservations != null) {
 			for (ReservationInformation reservation : reservations) {
 
-				boolean instantiated = adapter
-						.isReservationContextInstantiated(reservation
-								.getReservationId());
+				boolean errorState = false;
 
-				if (!instantiated) {
+				try {
+					boolean instantiated = adapter
+							.isReservationContextReady(reservation
+									.getReservationId());
 
-					adapter.deleteExperimentContext(reservation
-							.getReservationId());
+					if (!instantiated) {
 
-					ExperimentContext context = manager.getContext(
-							reservation.getUser(),
-							reservation.getReservationId());
-
-					context.instantiate();
-
-					try {
-						alog.registerAction(username, new Date(),
-								"experiments/contexts/instantiate?"
-										+ reservation.getReservationId() + "&"
-										+ reservation.getUser());
-					} catch (ActionLogException e) {
-						System.out.println(e.getMessage());
-					}
-
-					// Notify all telescopes the teleoperation timeslot
-					List<String> telescopes = reservation.getTelescopes();
-
-					if (telescopes != null && telescopes.size() > 0) {
-
-						long duration = (reservation.getTimeSlot().getEnd()
-								.getTime() - reservation.getTimeSlot()
-								.getBegin().getTime()) / 1000;
-
-						for (String rt : telescopes) {
-							genericTeleoperation.notifyTeleoperation(rt,
-									duration);
-						}
-					}
-
-					try {
-						context.init();
-
-						adapter.setContextReady(reservation.getReservationId());
-
-						try {
-							alog.registerAction(
-									username,
-									new Date(),
-									"experiments/contexts/init?"
-											+ reservation.getReservationId()
-											+ "&" + reservation.getUser());
-						} catch (ActionLogException e) {
-							System.out.println(e.getMessage());
-						}
-					} catch (ExperimentOperationException e) {
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
 
-						try {
-							alog.registerAction(
-									username,
-									new Date(),
-									"experiments/contexts/init?"
-											+ reservation.getReservationId()
-											+ "&" + reservation.getUser()
-											+ "->ERROR");
-						} catch (ActionLogException el) {
-							System.out.println(el.getMessage());
-						}
-					}
-
-				} else {
-
-					ExperimentRuntimeInformation runtimeInfo = adapter
-							.getExperimentRuntimeContext(reservation
-									.getReservationId());
-
-					if (runtimeInfo.getRemainingTime() < 10) {
 						ExperimentContext context = manager.getContext(
 								reservation.getUser(),
 								reservation.getReservationId());
-						try {
-							context.end();
 
-							try {
-								alog.registerAction(
-										username,
-										new Date(),
-										"experiments/contexts/end?"
-												+ reservation
-														.getReservationId()
-												+ "&" + reservation.getUser());
+						boolean instantiationDone = false;
 
-							} catch (ActionLogException e1) {
-								e1.printStackTrace();
+						// Notify all telescopes the teleoperation timeslot
+						List<String> telescopes = reservation.getTelescopes();
+
+						if (telescopes != null && telescopes.size() > 0) {
+
+							long duration = (reservation.getTimeSlot().getEnd()
+									.getTime() - reservation.getTimeSlot()
+									.getBegin().getTime()) / 1000;
+
+							for (String rt : telescopes) {
+								genericTeleoperation.notifyTeleoperation(rt,
+										duration);
 							}
+						}
 
-						} catch (ExperimentOperationException e) {
+						try {
+							context.instantiate();
+							instantiationDone = true;
+						} catch (NoSuchExperimentException
+								| ExperimentParameterException e) {
+
+							errorState = true;
+
 							try {
 								alog.registerAction(
 										username,
 										new Date(),
-										"experiments/contexts/init?"
+										"experiments/contexts/instantiate?"
 												+ reservation
 														.getReservationId()
 												+ "&" + reservation.getUser()
 												+ "->ERROR");
+							} catch (ActionLogException el) {
+							}
 
-							} catch (ActionLogException e1) {
-								e1.printStackTrace();
+						}
+
+						if (instantiationDone) {
+
+							try {
+								alog.registerAction(
+										username,
+										new Date(),
+										"experiments/contexts/instantiate?"
+												+ reservation
+														.getReservationId()
+												+ "&" + reservation.getUser());
+							} catch (ActionLogException e) {
+							}
+
+							try {
+								context.init();
+
+								adapter.setContextReady(reservation
+										.getReservationId());
+
+								try {
+									alog.registerAction(
+											username,
+											new Date(),
+											"experiments/contexts/init?"
+													+ reservation
+															.getReservationId()
+													+ "&"
+													+ reservation.getUser());
+								} catch (ActionLogException e) {
+								}
+							} catch (ExperimentOperationException e) {
+
+								errorState = true;
+
+								try {
+									alog.registerAction(
+											username,
+											new Date(),
+											"experiments/contexts/init?"
+													+ reservation
+															.getReservationId()
+													+ "&"
+													+ reservation.getUser()
+													+ "->ERROR");
+								} catch (ActionLogException el) {
+								}
+							}
+						}
+
+					} else {
+
+						ExperimentRuntimeInformation runtimeInfo = adapter
+								.getExperimentRuntimeContext(reservation
+										.getReservationId());
+
+						if (runtimeInfo.getRemainingTime() <= 1) {
+							ExperimentContext context = manager.getContext(
+									reservation.getUser(),
+									reservation.getReservationId());
+							try {
+								context.end();
+
+								try {
+									alog.registerAction(
+											username,
+											new Date(),
+											"experiments/contexts/end?"
+													+ reservation
+															.getReservationId()
+													+ "&"
+													+ reservation.getUser());
+
+								} catch (ActionLogException e1) {
+								}
+
+							} catch (ExperimentOperationException e) {
+
+								errorState = true;
+
+								try {
+									alog.registerAction(
+											username,
+											new Date(),
+											"experiments/contexts/end?"
+													+ reservation
+															.getReservationId()
+													+ "&"
+													+ reservation.getUser()
+													+ "->ERROR");
+
+								} catch (ActionLogException e1) {
+								}
 							}
 						}
 					}
+				} catch (Exception e) {
+
+					errorState = true;
+
+					try {
+
+						alog.registerAction(
+								username,
+								new Date(),
+								"experiments/contexts/error?"
+										+ reservation.getReservationId()
+										+ "->"
+										+ e.getMessage().substring(
+												0,
+												Math.min(e.getMessage()
+														.length(), 40)));
+					} catch (ActionLogException e1) {
+					}
 				}
-			}
 
-		} catch (InvalidExperimentModelException | ExperimentParameterException
-				| ExperimentDatabaseException | InvalidUserContextException
-				| NoSuchExperimentException | NoSuchReservationException
-				| NullPointerException e) {
+				try {
+					if (errorState) {
+						adapter.setContextError(reservation.getReservationId());
 
-			try {
+						adapter.deleteExperimentContext(reservation
+								.getReservationId());
+					}
+				} catch (ExperimentDatabaseException e) {
 
-				alog.registerAction(username, new Date(),
-						"experiments/contexts/error->"
-								+ e.getMessage().substring(0, 40));
-			} catch (ActionLogException e1) {
-				e1.printStackTrace();
-			}
-		} catch (NoReservationsAvailableException
-				| ExperimentNotInstantiatedException e) {
-			System.out.println(e.getMessage());
-		} catch (Exception e) {
-			try {
-
-				alog.registerAction(username, new Date(),
-						"experiments/contexts/error->"
-								+ e.getMessage().substring(0, 40));
-			} catch (ActionLogException e1) {
-				e1.printStackTrace();
+				}
 			}
 		}
 
@@ -228,7 +269,6 @@ public class ExperimentExecutor extends ServerThread {
 				alog.registerAction(username, new Date(),
 						"experiments/contexts/clearObsolete->ERROR");
 			} catch (ActionLogException e1) {
-				e1.printStackTrace();
 			}
 		}
 

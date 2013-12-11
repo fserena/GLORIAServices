@@ -370,7 +370,7 @@ public class Experiment extends GSLogProducerService implements
 							this.getClientUsername());
 				}
 			}
-			
+
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/reservations/anyactive->" + anyActiveNow);
@@ -378,8 +378,6 @@ public class Experiment extends GSLogProducerService implements
 				el.printStackTrace();
 			}
 
-			
-			
 			return anyActiveNow;
 		} catch (ExperimentDatabaseException e) {
 
@@ -393,7 +391,7 @@ public class Experiment extends GSLogProducerService implements
 			throw new ExperimentException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public boolean anyReservationActiveNow() throws ExperimentException {
 
@@ -487,7 +485,7 @@ public class Experiment extends GSLogProducerService implements
 		return this.getCurrentReservations("OFFLINE", adminMode);
 
 	}
-	
+
 	@Override
 	public List<ReservationInformation> getMyCurrentReservations()
 			throws ExperimentException, NoReservationsAvailableException {
@@ -739,9 +737,8 @@ public class Experiment extends GSLogProducerService implements
 	@Override
 	public void executeExperimentOperation(int reservationId, String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
-			ExperimentParameterException, ExperimentNotInstantiatedException,
-			ExperimentException, NoSuchReservationException,
-			NoSuchExperimentException {
+			ExperimentNotInstantiatedException, NoSuchReservationException,
+			InvalidUserContextException {
 
 		ExperimentContext context;
 		try {
@@ -750,9 +747,20 @@ public class Experiment extends GSLogProducerService implements
 
 			context.executeOperation(operation);
 
-		} catch (ExperimentDatabaseException | InvalidExperimentModelException
-				| InvalidUserContextException
+		} catch (NoSuchExperimentException | ExperimentDatabaseException
+				| InvalidExperimentModelException
+				| ExperimentParameterException
 				| UndefinedExperimentParameterException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/execute?" + reservationId + "&"
+								+ operation + "->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+				el.printStackTrace();
+			}
+			throw new ExperimentOperationException(e.getMessage());
+		} catch (InvalidUserContextException e) {
 
 			try {
 				this.logAction(this.getClientUsername(),
@@ -762,7 +770,7 @@ public class Experiment extends GSLogProducerService implements
 			} catch (ActionLogException el) {
 				el.printStackTrace();
 			}
-			throw new ExperimentException(e.getMessage());
+			throw e;
 		}
 
 		try {
@@ -819,20 +827,18 @@ public class Experiment extends GSLogProducerService implements
 						"experiments/contexts/get?" + reservationId
 								+ "->DB_ERROR");
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
 			throw new ExperimentException(e.getMessage());
 		}
 
 		try {
-			if (!adapter.isReservationContextInstantiated(reservationId)) {
+			if (!adapter.isReservationContextReady(reservationId)) {
 
 				try {
 					this.logAction(this.getClientUsername(),
 							"experiments/contexts/get?" + reservationId
 									+ "->NOT_INSTANTIATED");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
 
 				throw new ExperimentNotInstantiatedException(
@@ -966,8 +972,10 @@ public class Experiment extends GSLogProducerService implements
 
 	@Override
 	public void setExperimentParameterValue(int reservationId,
-			String parameter, ObjectResponse input) throws ExperimentException,
-			ExperimentNotInstantiatedException, NoSuchReservationException {
+			String parameter, ObjectResponse input)
+			throws ExperimentParameterException,
+			ExperimentNotInstantiatedException, NoSuchReservationException,
+			InvalidUserContextException {
 
 		String contentStr = String.valueOf(input.content);
 
@@ -985,13 +993,12 @@ public class Experiment extends GSLogProducerService implements
 											Math.min(contentStr.length(), 15))
 									+ "->INACTIVE");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
 
-			if (!adapter.isReservationContextInstantiated(reservationId)) {
+			if (!adapter.isReservationContextReady(reservationId)) {
 				try {
 					this.logAction(
 							this.getClientUsername(),
@@ -1004,7 +1011,6 @@ public class Experiment extends GSLogProducerService implements
 											Math.min(contentStr.length(), 15))
 									+ "->NOT_INSTANTIATED");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
 				throw new ExperimentNotInstantiatedException(
 						"The experiment is not instantiated");
@@ -1031,7 +1037,6 @@ public class Experiment extends GSLogProducerService implements
 			}
 
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
-				| InvalidUserContextException | ExperimentParameterException
 				| UndefinedExperimentParameterException
 				| NoSuchExperimentException | IOException e) {
 			try {
@@ -1046,16 +1051,31 @@ public class Experiment extends GSLogProducerService implements
 										Math.min(contentStr.length(), 15))
 								+ "->" + e.getClass().getSimpleName());
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
-			throw new ExperimentException(e.getMessage());
+			throw new ExperimentParameterException(e.getMessage());
+		} catch (InvalidUserContextException e) {
+			try {
+				this.logAction(
+						this.getClientUsername(),
+						"experiments/contexts/"
+								+ reservationId
+								+ "/parameters/set?"
+								+ parameter
+								+ "&"
+								+ contentStr.substring(0,
+										Math.min(contentStr.length(), 15))
+								+ "->" + e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+			}
+
+			throw e;
 		}
 	}
 
 	@Override
 	public ObjectResponse getExperimentContext(int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException {
+			NoSuchReservationException, InvalidUserContextException {
 
 		boolean adminMode = false;
 
@@ -1091,7 +1111,7 @@ public class Experiment extends GSLogProducerService implements
 						"You have no reservations at this moment");
 			}
 
-			if (!adapter.isReservationContextInstantiated(reservationId)) {
+			if (!adapter.isReservationContextReady(reservationId)) {
 				try {
 					this.logAction(this.getClientUsername(),
 							"experiments/contexts/" + reservationId
@@ -1128,21 +1148,28 @@ public class Experiment extends GSLogProducerService implements
 			return new ObjectResponse(JSONConverter.toJSON(contextValues));
 
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
-				| InvalidUserContextException | ExperimentParameterException
-				| NoSuchExperimentException | IOException e) {
+				| ExperimentParameterException | NoSuchExperimentException
+				| IOException e) {
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/contexts/" + reservationId + "/get?->"
 								+ e.getClass().getSimpleName());
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
 			throw new ExperimentException(e.getMessage());
+		} catch (InvalidUserContextException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId + "/get?->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+			}
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean isExperimentContextInstantiated(int reservationId)
+	public boolean isExperimentContextReady(int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
 			NoSuchReservationException {
 
@@ -1174,13 +1201,14 @@ public class Experiment extends GSLogProducerService implements
 							"experiments/contexts/" + reservationId
 									+ "/get/ready?->INACTIVE");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
+			
+			// OWNER CHECK IS MISSING!
 
-			return adapter.isReservationContextInstantiated(reservationId);
+			return adapter.isReservationContextReady(reservationId);
 
 		} catch (ExperimentDatabaseException e) {
 			try {
@@ -1197,8 +1225,9 @@ public class Experiment extends GSLogProducerService implements
 
 	@Override
 	public ObjectResponse getExperimentParameterValue(int reservationId,
-			String parameter) throws ExperimentException,
-			ExperimentNotInstantiatedException, NoSuchReservationException {
+			String parameter) throws ExperimentParameterException,
+			ExperimentNotInstantiatedException, NoSuchReservationException,
+			InvalidUserContextException {
 
 		boolean adminMode = false;
 
@@ -1229,13 +1258,12 @@ public class Experiment extends GSLogProducerService implements
 									+ "/parameters/get?" + parameter
 									+ "->INACTIVE");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
 				throw new NoSuchReservationException(
 						"You have no reservations at this moment");
 			}
 
-			if (!adapter.isReservationContextInstantiated(reservationId)) {
+			if (!adapter.isReservationContextReady(reservationId)) {
 				try {
 					this.logAction(this.getClientUsername(),
 							"experiments/contexts/" + reservationId
@@ -1270,23 +1298,31 @@ public class Experiment extends GSLogProducerService implements
 								+ valueStr.substring(0,
 										Math.min(valueStr.length(), 15)));
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
 
 			return new ObjectResponse(JSONConverter.toJSON(value));
 
 		} catch (ExperimentDatabaseException | InvalidExperimentModelException
-				| InvalidUserContextException | ExperimentParameterException
-				| NoSuchExperimentException | IOException e) {
+				| ExperimentParameterException | NoSuchExperimentException
+				| IOException e) {
 			try {
 				this.logAction(this.getClientUsername(),
 						"experiments/contexts/" + reservationId
 								+ "/parameters/get?" + parameter + "->"
 								+ e.getClass().getSimpleName());
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
-			throw new ExperimentException(e.getMessage());
+
+			throw new ExperimentParameterException(e.getMessage());
+		} catch (InvalidUserContextException e) {
+			try {
+				this.logAction(this.getClientUsername(),
+						"experiments/contexts/" + reservationId
+								+ "/parameters/get?" + parameter + "->"
+								+ e.getClass().getSimpleName());
+			} catch (ActionLogException el) {
+			}
+			throw e;
 		}
 	}
 
@@ -1304,7 +1340,7 @@ public class Experiment extends GSLogProducerService implements
 	@Override
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException {
+			throws ExperimentException, InvalidUserContextException {
 
 		boolean adminMode = false;
 
@@ -1330,9 +1366,8 @@ public class Experiment extends GSLogProducerService implements
 							"experiments/reservation/get?" + reservationId
 									+ "->OWN_ERROR");
 				} catch (ActionLogException el) {
-					el.printStackTrace();
 				}
-				throw new NoSuchReservationException(
+				throw new InvalidUserContextException(
 						"You have nothing to do with that reservation :)");
 			}
 
@@ -1340,7 +1375,6 @@ public class Experiment extends GSLogProducerService implements
 				this.logAction(this.getClientUsername(),
 						"experiments/reservation/get?" + reservationId);
 			} catch (ActionLogException el) {
-				el.printStackTrace();
 			}
 
 			return reservationInfo;

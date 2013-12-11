@@ -78,13 +78,13 @@ public class RTSResolver implements ServerResolver {
 	}
 
 	@Override
-	public ServerHandler getHandler(String server) {
+	public ServerHandler getHandler(String server) throws ServerNotAvailableException {
 
 		try {
 			ServerKeyData keyData = this.resolve(server);
 			return RTSManager.getReference().getRTS(keyData);
 		} catch (Exception e) {
-			return null;
+			throw new ServerNotAvailableException(e.getMessage());
 		}
 	}
 

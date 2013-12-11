@@ -125,7 +125,6 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 							"images/" + imageInfo.getId() + "/setFITS?"
 									+ url.substring(0, 15) + "...");
 				} catch (ActionLogException e) {
-					System.out.println(e.getMessage());
 				}
 
 			} catch (ImageNotAvailableException e) {
@@ -138,7 +137,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 				if (recoverRetries.containsKey(gid)) {
 					recoverRetries.put(gid, recoverRetries.get(gid) + 1);
 					
-					if (recoverRetries.get(gid) == 20) {
+					if (recoverRetries.get(gid) == 40) {
 						try {
 							adapter.removeImage(imageInfo.getId());
 

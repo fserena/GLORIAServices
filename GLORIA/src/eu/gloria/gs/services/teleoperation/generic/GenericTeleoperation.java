@@ -1,6 +1,7 @@
 package eu.gloria.gs.services.teleoperation.generic;
 
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
+import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.rti.client.RTSHandler;
 
 public class GenericTeleoperation extends AbstractTeleoperation implements
@@ -16,8 +17,9 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 					.getHandler(rt);
 
 			rtHandler.startTeleoperation();
-		} catch (GenericTeleoperationException e) {
+		} catch (GenericTeleoperationException | ServerNotAvailableException e) {
 			this.processException(e.getMessage(), rt);
+			throw new GenericTeleoperationException(e.getMessage());
 		}
 
 		this.processSuccess(rt, "generic", "StartTeleoperation", null, "ok");
@@ -32,8 +34,9 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 					.getHandler(rt);
 
 			rtHandler.notifyTeleoperation(seconds);
-		} catch (GenericTeleoperationException e) {
+		} catch (GenericTeleoperationException | ServerNotAvailableException e) {
 			this.processException(e.getMessage(), rt);
+			throw new GenericTeleoperationException(e.getMessage());
 		}
 
 		this.processSuccess(rt, "generic", "StopTeleoperation", null, "ok");
@@ -48,8 +51,9 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 					.getHandler(rt);
 
 			rtHandler.stopTeleoperation();
-		} catch (GenericTeleoperationException e) {
+		} catch (GenericTeleoperationException | ServerNotAvailableException e) {
 			this.processException(e.getMessage(), rt);
+			throw new GenericTeleoperationException(e.getMessage());
 		}
 
 		this.processSuccess(rt, "generic", "StopTeleoperation", null, "ok");

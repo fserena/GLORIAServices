@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.rmi.ConnectException;
 import java.util.List;
 import java.util.Properties;
+
+import javax.xml.ws.WebServiceException;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
@@ -80,11 +83,9 @@ public class RTSHandler implements ServerHandler {
 		try {
 			urlWsdl = new URL("https://" + host + ":" + port + "/"
 					+ serviceName + "/gloria_rti.wsdl");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // may be file url-->
-			// file:\\c:\\tmp\\gloria_rti.wsdl
+		} catch (MalformedURLException e) {			
+		}
+		
 		URL urlWs = null;
 		try {
 			urlWs = new URL("https://" + host + ":" + port + "/" + serviceName
@@ -171,6 +172,12 @@ public class RTSHandler implements ServerHandler {
 			throw new DeviceNotAvailableException(actionMessage
 					+ "DEVICE_NOT_AVAILABLE");
 		} catch (NullPointerException ne) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		} catch (WebServiceException e) {
+			throw new ServerNotAvailableException(actionMessage
+					+ "SERVER_NOT_AVAILABLE");
+		} catch (Exception e) {
 			throw new ServerNotAvailableException(actionMessage
 					+ "SERVER_NOT_AVAILABLE");
 		}

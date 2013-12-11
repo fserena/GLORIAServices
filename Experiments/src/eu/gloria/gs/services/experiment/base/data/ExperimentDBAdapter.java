@@ -1024,7 +1024,7 @@ public class ExperimentDBAdapter {
 	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public boolean isReservationContextInstantiated(int rid)
+	public boolean isReservationContextReady(int rid)
 			throws ExperimentDatabaseException {
 
 		try {
@@ -1076,6 +1076,7 @@ public class ExperimentDBAdapter {
 			reservationEntry.setUser(username);
 			reservationEntry.setBegin(timeSlot.getBegin());
 			reservationEntry.setEnd(timeSlot.getEnd());
+			reservationEntry.setStatus("SCHEDULED");
 
 			service.saveReservation(reservationEntry);
 
@@ -1112,7 +1113,37 @@ public class ExperimentDBAdapter {
 		}
 	}
 
+	/**
+	 * @param rid
+	 * @throws ExperimentDatabaseException
+	 */
+	public void setContextInit(int rid)
+			throws ExperimentDatabaseException {
 
+		try {
+			
+			service.setReservationStatus(rid, "INIT");
+						
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param rid
+	 * @throws ExperimentDatabaseException
+	 */
+	public void setContextError(int rid)
+			throws ExperimentDatabaseException {
+
+		try {
+			
+			service.setReservationStatus(rid, "ERROR");
+						
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException(e.getMessage());
+		}
+	}
 	
 	/**
 	 * @param rid
