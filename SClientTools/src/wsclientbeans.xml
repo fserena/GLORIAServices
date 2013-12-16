@@ -78,17 +78,24 @@
 		factory-bean="imageRepositoryWSClientFactory" factory-method="create"
 		lazy-init="true" scope="singleton">
 	</bean>
-	
-	<bean id="scheduler"
-		class="eu.gloria.gs.services.scheduler.SchedulerInterface"
+
+	<bean id="scheduler" class="eu.gloria.gs.services.scheduler.SchedulerInterface"
 		factory-bean="schedulerWSClientFactory" factory-method="create"
 		lazy-init="true" scope="singleton">
 	</bean>
 
+	<bean id="hostAddress" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/coreHostAddress" />
+	</bean>
+
+	<bean id="hostPort" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/coreHostPort" />
+	</bean>
+
 	<bean id="WSClientFactory" class="eu.gloria.gs.services.core.client.WSClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="host" value="ws.users.gloria-project.eu"></property>
-		<property name="port" value="443"></property>
+		<property name="host" ref="hostAddress"></property>
+		<property name="port" ref="hostPort"></property>
 	</bean>
 
 	<bean id="ccdTeleoperationWSClientFactory" parent="WSClientFactory">
@@ -138,7 +145,7 @@
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
 	</bean>
-	
+
 	<bean id="weatherTeleoperationWSClientFactory" parent="WSClientFactory">
 		<property name="portName" value="WeatherTeleoperationPort"></property>
 		<property name="serviceClass"
@@ -168,7 +175,7 @@
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"></property>
 	</bean>
-	
+
 	<bean id="schedulerWSClientFactory" parent="WSClientFactory">
 		<property name="portName" value="SchedulerPort"></property>
 		<property name="serviceClass"
