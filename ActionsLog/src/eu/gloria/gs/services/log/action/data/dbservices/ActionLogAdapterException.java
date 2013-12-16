@@ -19,4 +19,7 @@ public class ActionLogAdapterException extends ActionException {
 		action.put("message", message);
 	}
 
+	public ActionLogAdapterException() {		
+		super();
+	}
 }

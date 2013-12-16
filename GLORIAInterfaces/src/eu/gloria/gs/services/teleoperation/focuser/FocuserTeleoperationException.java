@@ -18,6 +18,10 @@ public class FocuserTeleoperationException extends RTSTeleoperationException {
 		this.getAction().put("cause", cause);
 	}
 	
+	public FocuserTeleoperationException() {
+		super();
+	}
+	
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

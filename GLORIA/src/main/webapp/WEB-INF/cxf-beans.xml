@@ -24,6 +24,10 @@
 				<property name="password" ref="actionLogPassword"></property>
 			</bean>
 		</jaxws:implementor>
+		<jaxws:dataBinding>
+			<bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+			</bean>
+		</jaxws:dataBinding>
 		<jaxws:features>
 			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" /> -->
 		</jaxws:features>
@@ -40,9 +44,8 @@
 	<bean id="logStore" class="eu.gloria.gs.services.core.LogStore"
 		scope="singleton">
 	</bean>
-	
-	<bean id="logStoreExecutor"
-		class="eu.gloria.gs.services.log.action.LogStoreExecutor"
+
+	<bean id="logStoreExecutor" class="eu.gloria.gs.services.log.action.LogStoreExecutor"
 		scope="singleton">
 		<property name="logStore" ref="logStore"></property>
 		<property name="actionLog" ref="actionLog"></property>
@@ -61,6 +64,10 @@
 				<property name="logStore" ref="logStore"></property>
 			</bean>
 		</jaxws:implementor>
+		<jaxws:dataBinding>
+			<bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+			</bean>
+		</jaxws:dataBinding>
 		<jaxws:features>
 			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" /> -->
 		</jaxws:features>
@@ -98,6 +105,10 @@
 				<property name="logStore" ref="logStore"></property>
 			</bean>
 		</jaxws:implementor>
+		<jaxws:dataBinding>
+			<bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+			</bean>
+		</jaxws:dataBinding>
 		<jaxws:features>
 			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" /> -->
 		</jaxws:features>
@@ -122,6 +133,10 @@
 				<property name="logStore" ref="logStore"></property>
 			</bean>
 		</jaxws:implementor>
+		<jaxws:dataBinding>
+			<bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+			</bean>
+		</jaxws:dataBinding>
 		<jaxws:features>
 			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" /> -->
 		</jaxws:features>
@@ -160,6 +175,10 @@
 				<property name="userRepository" ref="userRepository"></property>
 			</bean>
 		</jaxws:implementor>
+		<jaxws:dataBinding>
+			<bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+			</bean>
+		</jaxws:dataBinding>
 		<jaxws:features>
 			<!-- <bean class="org.apache.cxf.feature.LoggingFeature" /> -->
 		</jaxws:features>

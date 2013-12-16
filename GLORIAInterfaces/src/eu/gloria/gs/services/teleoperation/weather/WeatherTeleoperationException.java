@@ -18,7 +18,9 @@ public class WeatherTeleoperationException extends RTSTeleoperationException {
 		this.getAction().put("cause", cause);
 	}
 	
-	
+	public WeatherTeleoperationException() {
+		super();
+	}
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

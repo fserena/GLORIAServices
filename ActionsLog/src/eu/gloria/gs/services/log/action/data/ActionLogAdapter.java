@@ -42,6 +42,7 @@ public class ActionLogAdapter {
 		entry.setDate(when);
 		entry.setType(type);
 		entry.setRid(rid);
+		entry.setRt(rt);
 		try {
 			entry.setAction(JSONConverter.toJSON(message));
 			service.save(entry);
@@ -116,6 +117,7 @@ public class ActionLogAdapter {
 			actionInfo.setDate(entry.getDate());
 			actionInfo.setRid(entry.getRid());
 			actionInfo.setRt(entry.getRt());
+			actionInfo.setId(entry.getIdactions_log());
 			try {
 				actionInfo.setAction(JSONConverter.fromJSON(
 						(String) entry.getAction(), Object.class, null));

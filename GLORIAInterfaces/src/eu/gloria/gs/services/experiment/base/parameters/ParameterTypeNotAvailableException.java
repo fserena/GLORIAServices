@@ -10,6 +10,10 @@ public class ParameterTypeNotAvailableException extends ActionException {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public ParameterTypeNotAvailableException() {
+		super();
+	}
+	
 	public ParameterTypeNotAvailableException(String experiment, String name, String type) {
 		super(new LogAction());
 		

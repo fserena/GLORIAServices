@@ -17,4 +17,8 @@ public class NoSuchOperationException extends ActionException {
 		action.put("name", name);
 	}
 
+	public NoSuchOperationException() {
+		super();
+	}
+
 }

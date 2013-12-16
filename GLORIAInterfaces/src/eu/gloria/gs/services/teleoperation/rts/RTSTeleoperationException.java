@@ -8,12 +8,14 @@ public class RTSTeleoperationException extends TeleoperationException {
 	/**
 	 * 
 	 */
-	public RTSTeleoperationException(LogAction action)
-	{
+	public RTSTeleoperationException(LogAction action) {
 		super(action);
 	}
-	
-	
+
+	public RTSTeleoperationException() {
+		super();
+	}
+
 	private static final long serialVersionUID = 5848333110207976076L;
 
 }

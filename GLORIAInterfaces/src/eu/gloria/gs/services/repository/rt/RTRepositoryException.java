@@ -12,6 +12,10 @@ public class RTRepositoryException extends ActionException {
 		super(action);
 	}
 
+	public RTRepositoryException() {
+		super();
+	}
+	
 	private static final long serialVersionUID = 5848333110207976076L;
 
 }

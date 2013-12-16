@@ -16,5 +16,4 @@ public class DuplicateExperimentException extends ActionException {
 		LogAction action = this.getAction();
 		action.put("name", experiment);
 	}
-
 }

@@ -12,11 +12,20 @@ import java.util.Date;
  * 
  */
 public class ActionLogInformation {
+	private int id;
 	private String user;
 	private Date date;
 	private Integer rid;
 	private Object action;
 	private String rt;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getUser() {
 		return user;

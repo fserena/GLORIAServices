@@ -13,6 +13,9 @@ public class ImageURLNotAvailableException extends RTSTeleoperationException {
 		super(action);
 	}
 	
+	public ImageURLNotAvailableException() {
+		super();
+	}
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

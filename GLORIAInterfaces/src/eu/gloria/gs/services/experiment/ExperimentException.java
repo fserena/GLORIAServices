@@ -13,6 +13,11 @@ public class ExperimentException extends ActionException {
 		super(action);
 	}
 	
+	public ExperimentException()
+	{		
+		super();
+	}
+	
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

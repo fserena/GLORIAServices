@@ -30,8 +30,8 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 		return this.resolver;
 	}
 
-	protected void processBadArgs(String rt, String device,
-			String op, ArrayList<Object> args) {
+	protected void processBadArgs(String rt, String device, String op,
+			ArrayList<Object> args) {
 		this.processError(null, rt, device, op, args, "bad arguments");
 	}
 
@@ -49,28 +49,32 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 			String op, ArrayList<Object> args, String cause) {
 
 		LogAction action = new LogAction();
+		LogAction operation = new LogAction();
+		operation.put("name", op);
+		operation.put("args", args);
+		operation.put("device", device);
+		action.put("operation", operation);
 
-		action.put("operation", op);
-		action.put("rt", rt);
-		action.put("device", device);
-		action.put("args", args);
 		action.put("cause", cause);
+
+		if (e != null)
+			action.put("details", e.getAction());
 
 		this.logRtError(this.getClientUsername(), rt, action);
 
-		if (e != null)
-			action.put("more", e.getAction());
+		e.setAction(action);
 	}
 
-	protected void processSuccess(String rt, String device,
-			String op, ArrayList<Object> args, Object result) {
+	protected void processSuccess(String rt, String device, String op,
+			ArrayList<Object> args, Object result) {
 
 		LogAction action = new LogAction();
 
-		action.put("operation", op);
-		action.put("rt", rt);
-		action.put("device", device);
-		action.put("args", args);
+		LogAction operation = new LogAction();
+		operation.put("name", op);
+		operation.put("args", args);
+		operation.put("device", device);
+		action.put("operation", operation);
 
 		if (result != null) {
 			action.put("result", result);
@@ -84,15 +88,17 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 
 		LogAction action = new LogAction();
 
-		action.put("operation", op);
-		action.put("rt", rt);
-		action.put("device", device);
-		action.put("args", args);
+		LogAction operation = new LogAction();
+		operation.put("name", op);
+		operation.put("args", args);
+		operation.put("device", device);
+		action.put("operation", operation);
 		action.put("cause", cause);
+		action.put("details", e.getAction());
 
 		this.logRtWarning(this.getClientUsername(), rt, action);
 
-		action.put("more", e.getAction());
+		e.setAction(action);
 	}
 
 }

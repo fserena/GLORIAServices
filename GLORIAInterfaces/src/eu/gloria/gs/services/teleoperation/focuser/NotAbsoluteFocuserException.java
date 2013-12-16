@@ -18,4 +18,8 @@ public class NotAbsoluteFocuserException extends TeleoperationException {
 
 		action.put("focuser", focuser);		
 	}
+	
+	public NotAbsoluteFocuserException() {
+		super();
+	}
 }

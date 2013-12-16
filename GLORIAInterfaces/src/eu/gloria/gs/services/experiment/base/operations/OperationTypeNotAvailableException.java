@@ -13,13 +13,17 @@ public class OperationTypeNotAvailableException extends ActionException {
 	public OperationTypeNotAvailableException(LogAction action) {
 		super(action);
 	}
-	
+
 	public OperationTypeNotAvailableException(String name) {
 		super(new LogAction());
-		
+
 		LogAction action = this.getAction();
 		action.put("name", name);
 		action.put("phase", "creation");
+	}
+
+	public OperationTypeNotAvailableException() {
+		super();
 	}
 
 }

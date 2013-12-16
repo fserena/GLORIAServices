@@ -13,6 +13,10 @@ public class ExperimentParameterException extends ActionException {
 	public ExperimentParameterException(LogAction action) {
 		super(action);
 	}
+	
+	public ExperimentParameterException() {
+		super();
+	}
 
 	public ExperimentParameterException(String name, String cause) {
 		super(new LogAction());

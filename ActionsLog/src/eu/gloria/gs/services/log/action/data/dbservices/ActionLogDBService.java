@@ -22,7 +22,7 @@ public interface ActionLogDBService {
 	public List<ActionLogEntry> getAllByRid(@Param(value = "rid_") int rid);
 	
 	public List<ActionLogEntry> getAllByRidAndDate(
-			@Param(value = "int_") int rid,
+			@Param(value = "rid_") int rid,
 			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
 	public List<ActionLogEntry> getAllByDate(@Param(value = "from_") Date from,

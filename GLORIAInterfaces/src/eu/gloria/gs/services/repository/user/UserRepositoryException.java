@@ -8,18 +8,20 @@ public class UserRepositoryException extends ActionException {
 	/**
 	 * 
 	 */
-	public UserRepositoryException(LogAction action)
-	{
+	public UserRepositoryException(LogAction action) {
 		super(action);
 	}
-	
+
 	public UserRepositoryException(String cause) {
-		super(new LogAction());
-		
+		super();
+
 		this.getAction().put("cause", cause);
 	}
-	
-	
+
+	public UserRepositoryException() {
+		super();
+	}
+
 	private static final long serialVersionUID = 5848333110207976076L;
 
 }

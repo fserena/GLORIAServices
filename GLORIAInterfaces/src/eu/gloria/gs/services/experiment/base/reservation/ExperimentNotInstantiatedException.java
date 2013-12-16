@@ -20,5 +20,7 @@ public class ExperimentNotInstantiatedException extends ActionException {
 		super(action);
 	}
 	
-	
+	public ExperimentNotInstantiatedException() {
+		super();
+	}
 }

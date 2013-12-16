@@ -13,10 +13,14 @@ public class ExperimentOperationException extends ActionException {
 	public ExperimentOperationException(LogAction action) {
 		super(action);
 	}
-	
+
+	public ExperimentOperationException() {
+		super();
+	}
+
 	public ExperimentOperationException(String name, String cause) {
 		super(new LogAction());
-		
+
 		this.getAction().put("name", name);
 		this.getAction().put("cause", cause);
 	}

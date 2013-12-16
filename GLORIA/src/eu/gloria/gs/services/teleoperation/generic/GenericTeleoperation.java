@@ -17,6 +17,7 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 		LogAction action = new LogAction();
 		action.put("sender", this.getUsername());
 		action.put("operation", operationName);
+		action.put("client", this.getClientUsername());
 		action.put("rt", rt);
 
 		try {
@@ -40,6 +41,8 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 			throw new GenericTeleoperationException(action);
 		}
 
+		this.processSuccess(rt, "generic", operationName, null, null);
+
 	}
 
 	@Override
@@ -51,6 +54,7 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 		LogAction action = new LogAction();
 		action.put("sender", this.getUsername());
 		action.put("operation", operationName);
+		action.put("client", this.getClientUsername());
 		action.put("rt", rt);
 
 		try {
@@ -73,7 +77,7 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 			throw new GenericTeleoperationException(action);
 		}
 
-		this.processSuccess(rt, "generic", "StopTeleoperation", null, "ok");
+		this.processSuccess(rt, "generic", operationName, null, null);
 	}
 
 	@Override
@@ -84,6 +88,7 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 
 		LogAction action = new LogAction();
 		action.put("sender", this.getUsername());
+		action.put("client", this.getClientUsername());
 		action.put("operation", operationName);
 		action.put("rt", rt);
 
@@ -105,6 +110,8 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 			action.put("more", e.getAction());
 			throw new GenericTeleoperationException(action);
 		}
+
+		this.processSuccess(rt, "generic", operationName, null, null);
 	}
 
 }

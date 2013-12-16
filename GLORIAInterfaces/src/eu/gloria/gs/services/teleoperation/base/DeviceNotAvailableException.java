@@ -19,4 +19,8 @@ public class DeviceNotAvailableException extends TeleoperationException {
 		action.put("type", type);
 		action.put("message", message);
 	}
+	
+	public DeviceNotAvailableException() {
+		super();
+	}
 }

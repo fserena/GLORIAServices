@@ -18,7 +18,9 @@ public class MountTeleoperationException extends RTSTeleoperationException {
 		this.getAction().put("cause", cause);
 	}
 	
-	
+	public MountTeleoperationException() {
+		super();
+	}
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

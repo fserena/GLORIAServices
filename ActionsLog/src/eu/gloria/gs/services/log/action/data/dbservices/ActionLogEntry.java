@@ -14,12 +14,21 @@ public class ActionLogEntry implements Serializable {
 	 */
 	private static final long serialVersionUID = 8784408047690730988L;
 
+	private int idactions_log;
 	private String user;
 	private Date date;
 	private String action;
 	private String type;
 	private Integer rid;
 	private String rt;
+
+	public int getIdactions_log() {
+		return idactions_log;
+	}
+
+	public void setIdactions_log(int idactions_log) {
+		this.idactions_log = idactions_log;
+	}
 
 	public String getRt() {
 		return rt;

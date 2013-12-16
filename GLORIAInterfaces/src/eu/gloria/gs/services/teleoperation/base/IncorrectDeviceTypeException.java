@@ -16,4 +16,9 @@ public class IncorrectDeviceTypeException extends TeleoperationException {
 
 		action.put("type", type);		
 	}
+	
+	public IncorrectDeviceTypeException() {
+		super();
+	}
+	
 }

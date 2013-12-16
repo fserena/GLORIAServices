@@ -8,11 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jws.WebParam;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.ExperimentException;
@@ -53,6 +48,7 @@ import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeExcep
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.experiment.reservation.ExperimentBooker;
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.user.UserRepositoryException;
 import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
@@ -92,22 +88,73 @@ public class Experiment extends GSLogProducerService implements
 		this.userRepository = userRepository;
 	}
 
+	private void buildErrorLog(LogAction action, ActionException e,
+			String origin, String... reasons) {
+		LogAction error = new LogAction();
+		action.put("error", error);
+		if (e != null) {
+			error.put("details", e.getAction());
+		}
+		error.put("origin", origin);
+		error.put("reasons", reasons);
+	}
+
+	private void buildWarningLog(LogAction action, ActionException e,
+			String origin, String... reasons) {
+		LogAction warning = new LogAction();
+		action.put("warning", warning);
+		if (e != null) {
+			warning.put("details", e.getAction());
+		}
+		warning.put("origin", origin);
+		warning.put("reasons", reasons);
+	}
+
+	private void buildOperationLog(LogAction action, String operation,
+			Object... args) {
+		LogAction op = new LogAction();
+		action.put("operation", op);
+		op.put("name", operation);
+		op.put("args", args);
+	}
+
+	private void treatUserRepositoryException(LogAction action,
+			ActionException e) {
+		buildWarningLog(action, e, "user repository");
+		this.logWarning(getClientUsername(), action);
+		action.remove("warning");
+	}
+
+	private boolean isAdminMode(LogAction action) {
+		boolean adminMode = false;
+
+		UserInformation userInfo = null;
+		try {
+			userInfo = this.userRepository.getUserInformation(this
+					.getClientUsername());
+			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
+				adminMode = true;
+			}
+		} catch (UserRepositoryException e) {
+			treatUserRepositoryException(action, e);
+		}
+
+		return adminMode;
+	}
+
 	@Override
 	public void createOfflineExperiment(String experiment)
 			throws DuplicateExperimentException, ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "new offline");
-		action.put("name", experiment);
+		buildOperationLog(action, "new offline", experiment);
 
 		try {
 			modelManager.createModel(experiment, this.getClientUsername(),
 					"OFFLINE");
 		} catch (ExperimentDatabaseException e) {
-
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(this.getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -119,17 +166,15 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get experiment info");
-		action.put("name", experiment);
+		buildOperationLog(action, "get experiment info", experiment);
 
 		ExperimentInformation expInfo;
 		try {
 			expInfo = adapter.getExperimentInformation(experiment);
 			return expInfo;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -140,8 +185,7 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get parameter info");
-		action.put("name", experiment);
+		buildOperationLog(action, "get param info", experiment);
 
 		ParameterInformation paramInfo;
 		try {
@@ -149,9 +193,8 @@ public class Experiment extends GSLogProducerService implements
 					.getParameter(parameter);
 			return paramInfo;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -161,22 +204,18 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "set experiment description");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "set experiment description", experiment);
 
 		try {
 			adapter.setExperimentDescription(experiment, description);
 			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(this.getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
 			throw new ExperimentException(action);
 		} catch (NoSuchExperimentException e) {
-			action.put("cause", "experiment does not exist");
+			buildErrorLog(action, e, "database", "experiment does not exist");
 			this.logError(this.getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -186,7 +225,7 @@ public class Experiment extends GSLogProducerService implements
 	public List<String> getAllOnlineExperiments() throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get all online");
+		buildOperationLog(action, "get all online");
 
 		List<String> experiments = null;
 		try {
@@ -194,17 +233,15 @@ public class Experiment extends GSLogProducerService implements
 
 			if (experiments == null || experiments.size() == 0) {
 
-				action.put("cause", "no experiments");
+				buildWarningLog(action, null, "logic", "no experiments");
 				this.logWarning(getClientUsername(), action);
-
 				throw new ExperimentException(action);
 			}
 
 			return experiments;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -214,23 +251,22 @@ public class Experiment extends GSLogProducerService implements
 	public List<String> getAllOfflineExperiments() throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get all online");
+		buildOperationLog(action, "get all offline");
 
 		List<String> experiments = null;
 		try {
 			experiments = adapter.getAllExperiments("OFFLINE");
 
 			if (experiments == null || experiments.size() == 0) {
-				action.put("cause", "no experiments");
+				buildWarningLog(action, null, "logic", "no experiments");
 				this.logWarning(getClientUsername(), action);
 				throw new ExperimentException(action);
 			}
 
 			return experiments;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -241,17 +277,15 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "contains experiment");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "contains experiment");
 
 		try {
 
 			return adapter.containsExperiment(experiment);
 
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -261,31 +295,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get all pending");
+		buildOperationLog(action, "get all pending");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getPendingReservations(null, adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -296,31 +316,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get pending offline");
+		buildOperationLog(action, "get pending offline");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getPendingReservations("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -330,31 +336,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get pending offline");
+		buildOperationLog(action, "get pending online");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getPendingReservations("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -383,7 +375,6 @@ public class Experiment extends GSLogProducerService implements
 
 			return resInfo;
 		} catch (ExperimentDatabaseException e) {
-			this.logError(getClientUsername(), e.getAction());
 			throw new ExperimentException(e.getAction());
 		}
 	}
@@ -411,7 +402,6 @@ public class Experiment extends GSLogProducerService implements
 
 			return anyActiveNow;
 		} catch (ExperimentDatabaseException e) {
-			this.logError(getClientUsername(), e.getAction());
 			throw new ExperimentException(e.getAction());
 		}
 	}
@@ -420,31 +410,17 @@ public class Experiment extends GSLogProducerService implements
 	public boolean anyReservationActiveNow() throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "any active");
+		buildOperationLog(action, "any active");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.anyReservationActiveNow(null, adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -453,31 +429,17 @@ public class Experiment extends GSLogProducerService implements
 	public boolean anyOnlineReservationActiveNow() throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "any online active");
+		buildOperationLog(action, "any online active");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.anyReservationActiveNow("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -486,31 +448,17 @@ public class Experiment extends GSLogProducerService implements
 	public boolean anyOfflineReservationActiveNow() throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "any offline active");
+		buildOperationLog(action, "any online active");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.anyReservationActiveNow("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -520,31 +468,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get active online");
+		buildOperationLog(action, "get active online");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getCurrentReservations("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -555,31 +489,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get active offline");
+		buildOperationLog(action, "get active offline");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getCurrentReservations("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}
@@ -589,31 +509,17 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoReservationsAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get all active");
+		buildOperationLog(action, "get all active");
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
 		try {
 			return this.getCurrentReservations(null, adminMode);
 		} catch (ExperimentException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -643,7 +549,6 @@ public class Experiment extends GSLogProducerService implements
 
 			return reservations;
 		} catch (ExperimentDatabaseException e) {
-			this.logError(getClientUsername(), e.getAction());
 			throw new ExperimentException(e.getAction());
 		}
 	}
@@ -654,17 +559,15 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "apply for");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "apply for", experiment);
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
 		try {
 			experimentBooker.applyFor(experiment, this.getClientUsername());
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -678,27 +581,11 @@ public class Experiment extends GSLogProducerService implements
 			ExperimentReservationArgumentException, MaxReservationTimeException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "reserve");
-		action.put("experiment", experiment);
-		action.put("rts", telescopes);
-		action.put("slot", timeSlot);
+		buildOperationLog(action, "reserve", experiment, telescopes, timeSlot);
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
+		boolean adminMode = this.isAdminMode(action);
 
 		action.put("admin mode", adminMode);
 
@@ -706,9 +593,8 @@ public class Experiment extends GSLogProducerService implements
 			experimentBooker.reserve(experiment, this.getClientUsername(),
 					telescopes, timeSlot, adminMode);
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -721,41 +607,26 @@ public class Experiment extends GSLogProducerService implements
 			ExperimentReservationArgumentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get available");
-		action.put("experiment", experiment);
-		action.put("rts", telescopes);
+		buildOperationLog(action, "get available", experiment, telescopes);
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
-		boolean adminMode = false;
 
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
+
 		try {
 			List<TimeSlot> timeSlots = experimentBooker.getAvailableTimeSlots(
 					experiment, telescopes, adminMode);
 
 			if (timeSlots == null | timeSlots.size() == 0) {
-				action.put("cause", "no timeslots available");
+				buildErrorLog(action, null, "logic", "not available");
 				throw new ExperimentException(action);
 			}
 
 			return timeSlots;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -766,8 +637,7 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoSuchReservationException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "cancel");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "cancel", reservationId);
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
 
@@ -775,14 +645,12 @@ public class Experiment extends GSLogProducerService implements
 			experimentBooker.cancelReservation(this.getClientUsername(),
 					reservationId);
 		} catch (ExperimentDatabaseException e) {
-
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 
-		this.logInfo(getClientUsername(), action);
+		this.logContextInfo(getClientUsername(), reservationId, action);
 	}
 
 	@Override
@@ -792,9 +660,7 @@ public class Experiment extends GSLogProducerService implements
 			InvalidUserContextException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "execute");
-		action.put("rid", reservationId);
-		action.put("name", operation);
+		buildOperationLog(action, "execute", reservationId, operation);
 
 		ExperimentContext context;
 		try {
@@ -805,23 +671,22 @@ public class Experiment extends GSLogProducerService implements
 
 		} catch (ExperimentDatabaseException
 				| UndefinedExperimentParameterException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database", "query problem",
+					"invalid parameter?");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentOperationException(action);
 		} catch (ExperimentParameterException e) {
-			action.put("cause", "parameter problem");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "parameter problem");
+			this.logContextError(getClientUsername(), reservationId, action);
+			action.put("details", e.getAction());
 			throw new ExperimentOperationException(action);
 		} catch (InvalidUserContextException e) {
-			action.put("cause", "invalid user");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "invalid user");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		}
 
-		this.logInfo(getClientUsername(), action);
+		this.logContextInfo(getClientUsername(), reservationId, action);
 	}
 
 	@Override
@@ -831,24 +696,9 @@ public class Experiment extends GSLogProducerService implements
 			InvalidUserContextException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get runtime");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "get runtime", reservationId);
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
 
 		try {
@@ -861,33 +711,27 @@ public class Experiment extends GSLogProducerService implements
 			}
 
 			if (!grantAccess) {
-				action.put("cause", "any active");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "logic", "0 active");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 
 		try {
 			if (!adapter.isReservationContextReady(reservationId)) {
-				action.put("ready", false);
-				action.put("cause", "context not ready");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "logic", "context not ready");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("while", "asking for context ready");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
-
-		action.put("ready", true);
 
 		ExperimentRuntimeInformation context;
 		try {
@@ -895,10 +739,8 @@ public class Experiment extends GSLogProducerService implements
 
 			return context;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("while", "getting runtime");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 	}
@@ -909,26 +751,22 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchExperimentException, NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "add operation");
-		action.put("experiment", experiment);
-		action.put("name", operation.getName());
-		action.put("type", operation.getType());
-		action.put("args", operation.getArguments());
+		buildOperationLog(action, "add operation", experiment,
+				operation.getName(), operation.getType(),
+				operation.getArguments());
 
 		ExperimentInformation expInfo;
 		try {
 			expInfo = adapter.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				action.put("cause", "invalid owner");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "logic", "invalid owner");
+				this.logError(getClientUsername(), action);
 				throw new NoSuchExperimentException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("while", "getting basic info");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
 
@@ -938,10 +776,8 @@ public class Experiment extends GSLogProducerService implements
 			model.buildOperation(operation);
 		} catch (OperationTypeNotAvailableException
 				| ExperimentOperationException | ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("while", "adding operation");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
 
@@ -954,26 +790,22 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchExperimentException, NoSuchParameterException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "add parameter");
-		action.put("experiment", experiment);
-		action.put("name", parameter.getName());
-		action.put("type", parameter.getType());
-		action.put("args", parameter.getArguments());
+		buildOperationLog(action, "add parameter", experiment,
+				parameter.getName(), parameter.getType(),
+				parameter.getArguments());
 
 		try {
 			ExperimentInformation expInfo = adapter
 					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				action.put("cause", "invalid owner");
-				this.logError(getClientPassword(), action);
-				throw new ExperimentException(action);
+				buildErrorLog(action, null, "logic", "invalid owner");
+				this.logError(getClientUsername(), action);
+				throw new NoSuchExperimentException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("while", "getting basic info");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
 
@@ -989,17 +821,15 @@ public class Experiment extends GSLogProducerService implements
 
 				parameter.setArguments(argsArray);
 			} catch (IOException e) {
-				action.put("cause", "args json error");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "json", "arguments conversion");
+				this.logError(getClientUsername(), action);
 				throw new NoSuchParameterException(action);
 			}
 			model.buildParameter(parameter);
 		} catch (ParameterTypeNotAvailableException
 				| ExperimentDatabaseException | ExperimentParameterException e) {
-			action.put("cause", "internal error");
-			action.put("while", "adding parameter");
-			this.logError(getClientPassword(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
 
@@ -1014,10 +844,19 @@ public class Experiment extends GSLogProducerService implements
 			InvalidUserContextException, NoSuchParameterException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "set parameter");
-		action.put("rid", reservationId);
-		action.put("name", parameter);
-		action.put("value", input.content);
+		Object objValue = null;
+		try {
+
+			objValue = JSONConverter.fromJSON((String) input.content,
+					Object.class, null);
+
+		} catch (IOException e) {
+			buildErrorLog(action, null, "json", "value conversion");
+			this.logContextError(getClientUsername(), reservationId, action);
+		}
+
+		buildOperationLog(action, "set value", reservationId, parameter,
+				objValue);
 
 		try {
 			if (!adapter.isReservationIsActiveNowForUser(reservationId,
@@ -1026,52 +865,41 @@ public class Experiment extends GSLogProducerService implements
 				boolean active = adapter.isReservationActiveNow(reservationId);
 
 				if (active) {
-					action.put("cause", "invalid user");
-					this.logError(getClientUsername(), action);
+					buildErrorLog(action, null, "logic", "invalid user");
+					this.logContextError(getClientUsername(), reservationId,
+							action);
 					throw new InvalidUserContextException(action);
 				}
 
-				action.put("cause", "no context");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "no context");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				action.put("ready", false);
-				action.put("cause", "context not ready");
+				buildErrorLog(action, null, "logic", "context not ready");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
-
-			action.put("ready", true);
 
 			ExperimentContext context = contextManager.getContext(
 					this.getClientUsername(), reservationId);
 
-			try {
-				context.setParameterValue(parameter, JSONConverter.fromJSON(
-						(String) input.content, Object.class, null));
-			} catch (IOException e) {
-				action.put("cause", "value json error");
-				this.logError(getClientPassword(), action);
-				throw new NoSuchParameterException(action);
-			}
+			context.setParameterValue(parameter, objValue);
 
-			this.logInfo(getClientUsername(), action);
+			this.logContextInfo(getClientUsername(), reservationId, action);
 
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentParameterException(action);
 		} catch (InvalidUserContextException e) {
-			action.put("cause", "invalid user");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "invalid user");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			action.put("cause", "parameter not valid");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "parameter not valid");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
 	}
@@ -1083,30 +911,14 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchParameterException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get context");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "get context", reservationId);
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
 
 		try {
 
 			boolean active = adapter.isReservationActiveNow(reservationId);
-			action.put("ready", active);
 			boolean grantAccess;
 
 			if (adminMode) {
@@ -1118,18 +930,19 @@ public class Experiment extends GSLogProducerService implements
 
 			if (!grantAccess) {
 				if (active) {
-					action.put("cause", "invalid user");
-					this.logError(getClientUsername(), action);
+					buildErrorLog(action, null, "logic", "invalid user");
+					this.logContextError(getClientUsername(), reservationId,
+							action);
 					throw new InvalidUserContextException(action);
 				}
-				action.put("cause", "no context");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "no context");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				action.put("cause", "not ready");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "context not ready");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
 
@@ -1153,26 +966,24 @@ public class Experiment extends GSLogProducerService implements
 				response = new ObjectResponse(
 						JSONConverter.toJSON(contextValues));
 			} catch (IOException e) {
-				action.put("cause", "value json error");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "json", "value conversion");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentException(action);
 			}
 
 			return response;
 
 		} catch (ExperimentDatabaseException | ExperimentParameterException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		} catch (InvalidUserContextException e) {
-			action.put("cause", "invalid user");
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "invalid user");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			action.put("cause", "parameter not valid");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "parameter not valid");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
 	}
@@ -1183,25 +994,11 @@ public class Experiment extends GSLogProducerService implements
 			NoSuchReservationException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "is context ready");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "is context ready", reservationId);
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
+
 		try {
 
 			boolean grantAccess;
@@ -1213,16 +1010,16 @@ public class Experiment extends GSLogProducerService implements
 			}
 
 			if (!grantAccess) {
-				action.put("cause", "no context");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "no context");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			return adapter.isReservationContextReady(reservationId);
 
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 	}
@@ -1234,24 +1031,9 @@ public class Experiment extends GSLogProducerService implements
 			InvalidUserContextException, NoSuchParameterException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get parameter");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "get value", reservationId);
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
 
 		try {
@@ -1265,20 +1047,16 @@ public class Experiment extends GSLogProducerService implements
 			}
 
 			if (!grantAccess) {
-				action.put("cause", "no context");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "no context");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				action.put("ready", false);
-				action.put("cause", "context not ready");
-				this.logError(getClientUsername(), action);
-
+				buildErrorLog(action, null, "logic", "context not ready");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
-
-			action.put("ready", true);
 
 			ExperimentContext context;
 
@@ -1294,27 +1072,24 @@ public class Experiment extends GSLogProducerService implements
 			try {
 				response = new ObjectResponse(JSONConverter.toJSON(value));
 			} catch (IOException e) {
-				action.put("cause", "value json error");
-				this.logError(getClientPassword(), action);
+				buildErrorLog(action, null, "json", "value conversion");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentParameterException(action);
 			}
 
 			return response;
 
 		} catch (ExperimentDatabaseException | ExperimentParameterException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentParameterException(action);
 		} catch (InvalidUserContextException e) {
-			action.put("cause", "invalid user");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "invalid user");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			action.put("cause", "parameter not valid");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "logic", "parameter not valid");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
 	}
@@ -1325,15 +1100,13 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoSuchExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "remove experiment");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "remove experiment", experiment);
 
 		try {
 			modelManager.removeModel(experiment);
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, e, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -1347,24 +1120,9 @@ public class Experiment extends GSLogProducerService implements
 			ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get rid info");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "get reservation info", reservationId);
 
-		boolean adminMode = false;
-
-		UserInformation userInfo = null;
-		try {
-			userInfo = this.userRepository.getUserInformation(this
-					.getClientUsername());
-			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
-				adminMode = true;
-			}
-		} catch (UserRepositoryException e1) {
-			action.put("cause", "user rep error");
-			this.logWarning(getClientUsername(), action);
-			action.remove("cause");
-		}
-
+		boolean adminMode = this.isAdminMode(action);
 		action.put("admin mode", adminMode);
 
 		try {
@@ -1374,16 +1132,15 @@ public class Experiment extends GSLogProducerService implements
 			if (!adminMode
 					&& !reservationInfo.getUser().equals(
 							this.getClientUsername())) {
-				action.put("cause", "invalid user");
-				this.logError(getClientUsername(), action);
+				buildErrorLog(action, null, "logic", "invalid user");
+				this.logContextError(getClientUsername(), reservationId, action);
 				throw new InvalidUserContextException(action);
 			}
 
 			return reservationInfo;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, e, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 
@@ -1428,24 +1185,20 @@ public class Experiment extends GSLogProducerService implements
 			ParameterTypeNotAvailableException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "add feature");
-		action.put("experiment", experiment);
-		action.put("name", feature.getName());
+		buildOperationLog(action, "add feature", experiment, feature.getName());
 
 		ExperimentInformation expInfo;
 		try {
 			expInfo = adapter.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				action.put("cause", "invalid user");
+				buildErrorLog(action, null, "logic", "invalid user");
 				this.logError(getClientUsername(), action);
 				throw new NoSuchExperimentException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			action.put("while", "getting basic info");
-			action.put("cause", "internal error");
+			buildErrorLog(action, null, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -1457,9 +1210,8 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(getClientUsername(), action);
 
 		} catch (CustomExperimentException | ExperimentDatabaseException e) {
-			action.put("while", "adding feature");
-			action.put("cause", "internal error");
-			action.put("more", e.getAction());
+			buildErrorLog(action, null, "database");
+			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
 	}
@@ -1530,18 +1282,14 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, DuplicateExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "new online");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "new online", experiment);
 
 		try {
 			modelManager.createModel(experiment, this.getClientUsername(),
 					"ONLINE");
 		} catch (ExperimentDatabaseException e) {
-
-			action.put("cause", "internal error");
+			buildErrorLog(action, null, "database");
 			this.logError(getClientUsername(), action);
-
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 
@@ -1561,8 +1309,7 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException, NoSuchReservationException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get context results");
-		action.put("rid", reservationId);
+		buildOperationLog(action, "get context results", reservationId);
 
 		try {
 			List<ResultInformation> results = adapter
@@ -1570,9 +1317,8 @@ public class Experiment extends GSLogProducerService implements
 
 			return results;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			buildErrorLog(action, null, "database");
+			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 	}
@@ -1590,8 +1336,7 @@ public class Experiment extends GSLogProducerService implements
 			throws ExperimentException {
 
 		LogAction action = new LogAction();
-		action.put("operation", "get experiment results");
-		action.put("experiment", experiment);
+		buildOperationLog(action, "get experiment results", experiment);
 
 		try {
 			List<ResultInformation> results = adapter
@@ -1599,9 +1344,8 @@ public class Experiment extends GSLogProducerService implements
 
 			return results;
 		} catch (ExperimentDatabaseException e) {
-			action.put("cause", "internal error");
+			buildErrorLog(action, null, "database");
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new ExperimentException(action);
 		}
 	}

@@ -21,4 +21,9 @@ public class ServerNotAvailableException extends TeleoperationException {
 			action.put("error", error);
 		}
 	}
+	
+
+	public ServerNotAvailableException() {
+		super();
+	}
 }

@@ -20,4 +20,8 @@ public class NoSuchParameterException extends ActionException {
 	public NoSuchParameterException(LogAction action) {
 		super(action);
 	}
+	
+	public NoSuchParameterException() {
+		super();
+	}
 }

@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import eu.gloria.gs.services.utils.JSONConverter;
 
 @XmlRootElement
-@XmlSeeAlso({ Object[].class, LinkedHashMap.class, LogAction.class, Object.class,
-		HashMap.class })
+@XmlSeeAlso({ Object[].class, LinkedHashMap.class, LogAction.class,
+		Object.class, HashMap.class })
 public class ActionException extends Exception {
 
 	/**
@@ -21,7 +21,12 @@ public class ActionException extends Exception {
 	private static final long serialVersionUID = -2113204093482010938L;
 	@XmlElement
 	private LogAction action;
+	@XmlElement
 	private String json;
+
+	public ActionException() {
+		this.action = new LogAction();
+	}
 
 	public ActionException(LogAction action) {
 		this.setAction(action);
@@ -45,11 +50,12 @@ public class ActionException extends Exception {
 	@Override
 	public String getMessage() {
 		try {
-			if (this.action.size() == 0) {
-				this.json =  super.getMessage();
+			if (this.action == null || this.action.size() == 0) {
+				return super.getMessage();
+			} else {
+				this.setJSON();
+				return this.json;
 			}
-			this.setJSON();
-			return this.json;
 		} catch (IOException e) {
 			return null;
 		}
@@ -58,7 +64,7 @@ public class ActionException extends Exception {
 	public void setJSON() throws IOException {
 		this.json = JSONConverter.toJSON(action);
 	}
-	
+
 	public String getJSON() {
 		return this.json;
 	}

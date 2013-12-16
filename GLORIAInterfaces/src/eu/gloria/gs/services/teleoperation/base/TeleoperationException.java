@@ -13,4 +13,8 @@ public abstract class TeleoperationException extends ActionException {
 	public TeleoperationException(LogAction action) {
 		super(action);
 	}
+
+	public TeleoperationException() {
+		super();
+	}
 }

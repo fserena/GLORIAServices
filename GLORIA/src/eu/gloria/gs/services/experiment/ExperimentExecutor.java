@@ -77,6 +77,8 @@ public class ExperimentExecutor extends ServerThread {
 		if (reservations != null) {
 			for (ReservationInformation reservation : reservations) {
 
+				int reservationId = reservation.getReservationId();
+				
 				LogAction action = new LogAction();
 				action.put("sender", "experiments daemon");
 
@@ -84,16 +86,14 @@ public class ExperimentExecutor extends ServerThread {
 				boolean newInstance = false;
 
 				try {
-					int reservationId = reservation.getReservationId();
 					boolean instantiated = adapter
 							.isReservationContextReady(reservationId);
 
 					action.put("rid", reservationId);
-					action.put("owner", reservation.getUser());
-					action.put("instantiated", instantiated);
+					action.put("client", reservation.getUser());
 
 					if (!instantiated) {
-
+						
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
 
@@ -130,11 +130,11 @@ public class ExperimentExecutor extends ServerThread {
 
 						if (instantiationDone) {
 
-							action.put("instance", "success");
+							action.put("instance", "created");
 
 							try {
 								context.init();
-								action.put("init", "success");
+								action.put("init", "done");
 								newInstance = true;
 
 								adapter.setContextReady(reservation
@@ -143,7 +143,7 @@ public class ExperimentExecutor extends ServerThread {
 							} catch (ExperimentOperationException e) {
 
 								errorState = true;
-								action.put("init", "fail");
+								action.put("init", "failed");
 							}
 						}
 
@@ -165,7 +165,7 @@ public class ExperimentExecutor extends ServerThread {
 							} catch (ExperimentOperationException e) {
 
 								errorState = true;
-								action.put("end", "fail");
+								action.put("end", "failed");
 							}
 						}
 					}
@@ -182,14 +182,14 @@ public class ExperimentExecutor extends ServerThread {
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
 
-						this.logError(username, action);
+						this.logError(username, reservationId, action);
 					} else {
 						if (newInstance)
-							this.logInfo(username, action);
+							this.logInfo(username, reservationId, action);
 					}
 				} catch (ExperimentDatabaseException e) {
 					action.put("cause", "internal error");
-					this.logError(username, action);
+					this.logError(username, reservationId, action);
 				}
 			}
 		}
@@ -202,30 +202,32 @@ public class ExperimentExecutor extends ServerThread {
 			action.put("operation", "clear all obsolete contexts");
 			action.put("sender", "experiments daemon");
 			action.put("cause", "internal error");
-			this.logError(username, action);
+			this.logError(username, null, action);
 		}
 
 	}
 
-	private void processLogEntry(LogEntry entry, String username,
+	private void processLogEntry(LogEntry entry, String username, Integer rid, 
 			LogAction action) {
 		entry.setUsername(username);
 		entry.setDate(new Date());
+		if (rid != null)
+			entry.setRid(rid);
 
 		entry.setAction(action);
 		this.logStore.addEntry(entry);
 	}
 
-	private void logError(String username, LogAction action) {
+	private void logError(String username, Integer rid, LogAction action) {
 
 		LogEntry entry = new ErrorLogEntry();
-		this.processLogEntry(entry, username, action);
+		this.processLogEntry(entry, username, rid, action);
 	}
 
-	private void logInfo(String username, LogAction action) {
+	private void logInfo(String username, Integer rid, LogAction action) {
 
 		LogEntry entry = new InfoLogEntry();
-		this.processLogEntry(entry, username, action);
+		this.processLogEntry(entry, username, rid, action);
 	}
 
 	/*private void logWarning(String username, LogAction action) {

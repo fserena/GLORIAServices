@@ -17,6 +17,10 @@ public class DomeTeleoperationException extends RTSTeleoperationException {
 
 		this.getAction().put("cause", cause);
 	}
+	
+	public DomeTeleoperationException() {
+		super();
+	}
 
 	private static final long serialVersionUID = 5848333110207976076L;
 

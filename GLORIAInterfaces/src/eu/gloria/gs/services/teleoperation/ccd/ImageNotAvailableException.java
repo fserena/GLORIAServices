@@ -18,4 +18,6 @@ public class ImageNotAvailableException extends TeleoperationException {
 		action.put("camera", camera);
 		action.put("type", type);
 	}
+	
+	
 }

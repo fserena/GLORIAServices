@@ -53,6 +53,8 @@ public class LogStoreExecutor extends ServerThread {
 			if (entry.getRid() != null) {
 				alog.registerContextInfo(entry.getUsername(), entry.getDate(),
 						entry.getRid(), action);
+			} else if (entry.getRt() != null) {
+				alog.registerRtInfo(entry.getUsername(), entry.getDate(), entry.getRt(), action);				
 			} else {
 				alog.registerInfo(entry.getUsername(), entry.getDate(), action);
 			}
@@ -60,6 +62,8 @@ public class LogStoreExecutor extends ServerThread {
 			if (entry.getRid() != null) {
 				alog.registerContextError(entry.getUsername(), entry.getDate(),
 						entry.getRid(), action);
+			} else if (entry.getRt() != null) {
+				alog.registerRtError(entry.getUsername(), entry.getDate(), entry.getRt(), action);				
 			} else {
 				alog.registerError(entry.getUsername(), entry.getDate(), action);
 			}
@@ -67,9 +71,10 @@ public class LogStoreExecutor extends ServerThread {
 			if (entry.getRid() != null) {
 				alog.registerContextWarning(entry.getUsername(),
 						entry.getDate(), entry.getRid(), action);
+			} else if (entry.getRt() != null) {
+				alog.registerRtWarning(entry.getUsername(), entry.getDate(), entry.getRt(), action);				
 			} else {
-				alog.registerWarning(entry.getUsername(), entry.getDate(),
-						action);
+				alog.registerWarning(entry.getUsername(), entry.getDate(), action);
 			}
 		}
 

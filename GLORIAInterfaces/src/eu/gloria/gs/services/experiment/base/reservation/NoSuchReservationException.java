@@ -15,9 +15,13 @@ public class NoSuchReservationException extends ActionException {
 		LogAction action = this.getAction();
 		action.put("rid", rid);
 	}
-	
+
 	public NoSuchReservationException(LogAction action) {
-		super(action);		
+		super(action);
+	}
+
+	public NoSuchReservationException() {
+		super();
 	}
 
 }

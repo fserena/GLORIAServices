@@ -18,6 +18,9 @@ public class SCamTeleoperationException extends RTSTeleoperationException {
 		this.getAction().put("cause", cause);
 	}
 	
+	public SCamTeleoperationException() {
+		super();
+	}
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

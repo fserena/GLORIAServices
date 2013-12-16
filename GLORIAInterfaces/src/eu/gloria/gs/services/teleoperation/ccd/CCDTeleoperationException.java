@@ -13,6 +13,10 @@ public class CCDTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 	
+	public CCDTeleoperationException() {
+		super();
+	}
+	
 	public CCDTeleoperationException(String cause)
 	{
 		super(new LogAction());

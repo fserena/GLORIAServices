@@ -28,7 +28,7 @@ public abstract class GSLogProducerService extends GSWebService {
 	
 	private void fillAction(LogAction action) {
 		action.put("sender", this.getUsername());
-		action.put("owner", this.getClientUsername());				
+		action.put("client", this.getClientUsername());				
 	}
 
 	protected void logInfo(String username, LogAction action) {

@@ -13,6 +13,9 @@ public class ImageRepositoryException extends ActionException {
 		super(action);
 	}
 	
+	public ImageRepositoryException() {
+		super();
+	}
 	
 	private static final long serialVersionUID = 5848333110207976076L;
 

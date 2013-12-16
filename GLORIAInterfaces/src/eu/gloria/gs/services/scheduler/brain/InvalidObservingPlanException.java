@@ -10,7 +10,7 @@ public class InvalidObservingPlanException extends ActionException {
 	 */
 	public InvalidObservingPlanException()
 	{
-		super(new LogAction());
+		super();
 	}
 		
 	private static final long serialVersionUID = 5848333110207976076L;

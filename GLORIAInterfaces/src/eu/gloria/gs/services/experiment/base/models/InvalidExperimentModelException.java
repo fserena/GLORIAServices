@@ -21,4 +21,8 @@ public class InvalidExperimentModelException extends ActionException {
 		this.getAction().put("cause", cause);
 	}
 	
+	public InvalidExperimentModelException() {
+		super();
+	}
+	
 }

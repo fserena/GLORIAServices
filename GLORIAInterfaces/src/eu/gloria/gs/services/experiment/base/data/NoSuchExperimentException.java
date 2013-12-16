@@ -20,4 +20,8 @@ public class NoSuchExperimentException extends ActionException {
 	public NoSuchExperimentException(LogAction action) {
 		super(action);
 	}
+	
+	public NoSuchExperimentException() {
+		super();
+	}
 }

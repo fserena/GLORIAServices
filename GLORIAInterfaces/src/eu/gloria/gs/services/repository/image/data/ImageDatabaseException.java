@@ -12,7 +12,7 @@ public class ImageDatabaseException extends ActionException {
 	private static final long serialVersionUID = 1L;
 
 	public ImageDatabaseException() {
-		super(new LogAction());
+		super();
 		
 		LogAction action = this.getAction();
 		action.put("cause", "db error");

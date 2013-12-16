@@ -16,4 +16,8 @@ public class NoReservationsAvailableException extends ActionException {
 		action.put("type", type);
 	}
 	
+	public NoReservationsAvailableException() {
+		super();
+	}
+	
 }

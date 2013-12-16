@@ -14,6 +14,10 @@ public class InvalidUserContextException extends ActionException {
 		super(action);
 	}
 	
+	public InvalidUserContextException() {
+		super();
+	}
+	
 	public InvalidUserContextException(String user, int rid) {
 		super(new LogAction());
 		

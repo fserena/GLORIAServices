@@ -20,4 +20,7 @@ public class ContextNotReadyException extends ActionException {
 		this.getAction().put("rid", rid);
 	}
 	
+	public ContextNotReadyException() {
+		super();
+	}
 }
