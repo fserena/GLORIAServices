@@ -1,15 +1,14 @@
 package eu.gloria.gs.services.experiment.base.contexts;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.OperationContext;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
@@ -27,11 +26,11 @@ public class ExperimentContext extends Context {
 		parameterContexts = new HashMap<>();
 		operationContexts = new HashMap<>();
 	}
-	
+
 	public Set<String> getParameterNames() {
 		return parameterContexts.keySet();
 	}
-	
+
 	public Set<String> getOperationNames() {
 		return operationContexts.keySet();
 	}
@@ -154,7 +153,7 @@ public class ExperimentContext extends Context {
 
 	public Object getParameterValue(String parameterName)
 			throws ExperimentParameterException,
-			ExperimentNotInstantiatedException, NoSuchExperimentException {
+			ExperimentNotInstantiatedException, NoSuchParameterException {
 
 		String[] parameterNodes = parameterName.split("\\.");
 
@@ -166,58 +165,15 @@ public class ExperimentContext extends Context {
 						.get(parameterNodes[0]);
 
 				return parameterContext.getValue(parameterNodes);
-
-				/*
-				 * String parentType = parameterContext.getExperimentParameter()
-				 * .getConcreteName();
-				 * 
-				 * if (!parentType.equals("OBJECT")) { throw new
-				 * ExperimentParameterException(
-				 * "Cannot get an attribute of a non-object parameter"); } else
-				 * { return parameterContext.getValue(parameterNodes); }
-				 */
 			}
 		}
 
-		throw new ExperimentParameterException(""); // TODO: Verify and Complete
-													// this
-	}
-
-	public void setParameterValueFromJSON(String parameterName, String value)
-			throws UndefinedExperimentParameterException,
-			NoSuchExperimentException, ExperimentParameterException,
-			ExperimentNotInstantiatedException {
-
-		String[] parameterNodes = parameterName.split("\\.");
-
-		if (this.parameterContexts.containsKey(parameterNodes[0])) {
-
-			/*Class<?> valueType = this.getParameterContext(parameterNodes[0])
-					.getExperimentParameter().getType().getValueType();
-			Class<?> elementType = this.getParameterContext(parameterNodes[0])
-					.getExperimentParameter().getType().getElementType();*/
-
-			ParameterContext parameterContext = this.parameterContexts
-					.get(parameterNodes[0]);
-
-			try {
-				parameterContext.setValue(parameterNodes,
-						JSONConverter.fromJSON(value, Object.class, null));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			throw new NoSuchExperimentException(""); // TODO: Verify and
-														// Complete
-														// this
-		}
+		throw new NoSuchParameterException(parameterName);
 	}
 
 	public void setParameterValue(String parameterName, Object value)
-			throws UndefinedExperimentParameterException,
-			NoSuchExperimentException, ExperimentParameterException,
-			ExperimentNotInstantiatedException {
+			throws ExperimentParameterException, ExperimentNotInstantiatedException,
+			NoSuchParameterException {
 
 		String[] parameterNodes = parameterName.split("\\.");
 
@@ -227,18 +183,16 @@ public class ExperimentContext extends Context {
 
 			parameterContext.setValue(parameterNodes, value);
 		} else {
-			throw new NoSuchExperimentException(""); // TODO: Verify and
-														// Complete
-														// this
+			throw new NoSuchParameterException(parameterName);
 		}
 	}
 
 	public ParameterContext getParameterContext(String parameter)
-			throws NoSuchExperimentException {
+			throws NoSuchParameterException {
 		if (this.parameterContexts.containsKey(parameter)) {
 			return this.parameterContexts.get(parameter);
 		} else {
-			throw new NoSuchExperimentException("");
+			throw new NoSuchParameterException(parameter);
 		}
 	}
 
@@ -247,7 +201,7 @@ public class ExperimentContext extends Context {
 		if (this.operationContexts.containsKey(operation)) {
 			return this.operationContexts.get(operation);
 		} else {
-			throw new NoSuchOperationException("");
+			throw new NoSuchOperationException(operation);
 		}
 	}
 

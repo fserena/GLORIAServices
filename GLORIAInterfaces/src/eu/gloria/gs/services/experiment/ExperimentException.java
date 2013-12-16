@@ -1,13 +1,16 @@
 package eu.gloria.gs.services.experiment;
 
-public class ExperimentException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class ExperimentException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public ExperimentException(String message)
-	{
-		super(message);
+	public ExperimentException(LogAction action)
+	{		
+		super(action);
 	}
 	
 	

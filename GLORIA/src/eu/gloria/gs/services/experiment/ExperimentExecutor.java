@@ -3,6 +3,10 @@ package eu.gloria.gs.services.experiment;
 import java.util.Date;
 import java.util.List;
 
+import eu.gloria.gs.services.core.ErrorLogEntry;
+import eu.gloria.gs.services.core.InfoLogEntry;
+import eu.gloria.gs.services.core.LogEntry;
+import eu.gloria.gs.services.core.LogStore;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.core.tasks.ServerThread;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
@@ -12,22 +16,17 @@ import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.base.models.InvalidExperimentModelException;
-import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
-import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.log.action.ActionLogException;
-import eu.gloria.gs.services.log.action.ActionLogInterface;
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 
 public class ExperimentExecutor extends ServerThread {
 
 	private ExperimentDBAdapter adapter;
 	private ExperimentContextManager manager;
-	private ActionLogInterface alog;
+	private LogStore logStore;
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
@@ -40,8 +39,8 @@ public class ExperimentExecutor extends ServerThread {
 		this.manager = manager;
 	}
 
-	public void setActionLog(ActionLogInterface alog) {
-		this.alog = alog;
+	public void setLogStore(LogStore logStore) {
+		this.logStore = logStore;
 	}
 
 	public void setGenericTeleoperation(GenericTeleoperationInterface gt) {
@@ -78,12 +77,20 @@ public class ExperimentExecutor extends ServerThread {
 		if (reservations != null) {
 			for (ReservationInformation reservation : reservations) {
 
+				LogAction action = new LogAction();
+				action.put("sender", "experiments daemon");
+
 				boolean errorState = false;
+				boolean newInstance = false;
 
 				try {
+					int reservationId = reservation.getReservationId();
 					boolean instantiated = adapter
-							.isReservationContextReady(reservation
-									.getReservationId());
+							.isReservationContextReady(reservationId);
+
+					action.put("rid", reservationId);
+					action.put("owner", reservation.getUser());
+					action.put("instantiated", instantiated);
 
 					if (!instantiated) {
 
@@ -118,67 +125,25 @@ public class ExperimentExecutor extends ServerThread {
 								| ExperimentParameterException e) {
 
 							errorState = true;
-
-							try {
-								alog.registerAction(
-										username,
-										new Date(),
-										"experiments/contexts/instantiate?"
-												+ reservation
-														.getReservationId()
-												+ "&" + reservation.getUser()
-												+ "->ERROR");
-							} catch (ActionLogException el) {
-							}
-
+							action.put("init", "failed");
 						}
 
 						if (instantiationDone) {
 
-							try {
-								alog.registerAction(
-										username,
-										new Date(),
-										"experiments/contexts/instantiate?"
-												+ reservation
-														.getReservationId()
-												+ "&" + reservation.getUser());
-							} catch (ActionLogException e) {
-							}
+							action.put("instance", "success");
 
 							try {
 								context.init();
+								action.put("init", "success");
+								newInstance = true;
 
 								adapter.setContextReady(reservation
 										.getReservationId());
 
-								try {
-									alog.registerAction(
-											username,
-											new Date(),
-											"experiments/contexts/init?"
-													+ reservation
-															.getReservationId()
-													+ "&"
-													+ reservation.getUser());
-								} catch (ActionLogException e) {
-								}
 							} catch (ExperimentOperationException e) {
 
 								errorState = true;
-
-								try {
-									alog.registerAction(
-											username,
-											new Date(),
-											"experiments/contexts/init?"
-													+ reservation
-															.getReservationId()
-													+ "&"
-													+ reservation.getUser()
-													+ "->ERROR");
-								} catch (ActionLogException el) {
-								}
+								action.put("init", "fail");
 							}
 						}
 
@@ -195,57 +160,19 @@ public class ExperimentExecutor extends ServerThread {
 							try {
 								context.end();
 
-								try {
-									alog.registerAction(
-											username,
-											new Date(),
-											"experiments/contexts/end?"
-													+ reservation
-															.getReservationId()
-													+ "&"
-													+ reservation.getUser());
-
-								} catch (ActionLogException e1) {
-								}
+								action.put("end", "success");
 
 							} catch (ExperimentOperationException e) {
 
 								errorState = true;
-
-								try {
-									alog.registerAction(
-											username,
-											new Date(),
-											"experiments/contexts/end?"
-													+ reservation
-															.getReservationId()
-													+ "&"
-													+ reservation.getUser()
-													+ "->ERROR");
-
-								} catch (ActionLogException e1) {
-								}
+								action.put("end", "fail");
 							}
 						}
 					}
 				} catch (Exception e) {
 
 					errorState = true;
-
-					try {
-
-						alog.registerAction(
-								username,
-								new Date(),
-								"experiments/contexts/error?"
-										+ reservation.getReservationId()
-										+ "->"
-										+ e.getMessage().substring(
-												0,
-												Math.min(e.getMessage()
-														.length(), 40)));
-					} catch (ActionLogException e1) {
-					}
+					action.put("grave", e.getClass().getSimpleName());
 				}
 
 				try {
@@ -254,9 +181,15 @@ public class ExperimentExecutor extends ServerThread {
 
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
+
+						this.logError(username, action);
+					} else {
+						if (newInstance)
+							this.logInfo(username, action);
 					}
 				} catch (ExperimentDatabaseException e) {
-
+					action.put("cause", "internal error");
+					this.logError(username, action);
 				}
 			}
 		}
@@ -265,12 +198,39 @@ public class ExperimentExecutor extends ServerThread {
 				// get // and clear its contexts!!!
 			adapter.clearAllObsoleteContexts();
 		} catch (ExperimentDatabaseException e) {
-			try {
-				alog.registerAction(username, new Date(),
-						"experiments/contexts/clearObsolete->ERROR");
-			} catch (ActionLogException e1) {
-			}
+			LogAction action = new LogAction();
+			action.put("operation", "clear all obsolete contexts");
+			action.put("sender", "experiments daemon");
+			action.put("cause", "internal error");
+			this.logError(username, action);
 		}
 
 	}
+
+	private void processLogEntry(LogEntry entry, String username,
+			LogAction action) {
+		entry.setUsername(username);
+		entry.setDate(new Date());
+
+		entry.setAction(action);
+		this.logStore.addEntry(entry);
+	}
+
+	private void logError(String username, LogAction action) {
+
+		LogEntry entry = new ErrorLogEntry();
+		this.processLogEntry(entry, username, action);
+	}
+
+	private void logInfo(String username, LogAction action) {
+
+		LogEntry entry = new InfoLogEntry();
+		this.processLogEntry(entry, username, action);
+	}
+
+	/*private void logWarning(String username, LogAction action) {
+
+		LogEntry entry = new WarningLogEntry();
+		this.processLogEntry(entry, username, action);
+	}*/
 }

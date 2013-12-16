@@ -3,9 +3,6 @@ package eu.gloria.gs.services.teleoperation.ccd.operations;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
 import eu.gloria.gs.services.teleoperation.base.OperationReturn;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
-import eu.gloria.gs.services.teleoperation.base.ServerResolver;
-import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
-import eu.gloria.rti.client.RTSHandler;
 import eu.gloria.rti.client.devices.CCD;
 
 public class SetAutoExposureOperation extends CCDOperation {

@@ -6,7 +6,7 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -47,11 +47,11 @@ public class SelectFilter extends ServiceOperation {
 			this.getFilterWheelTeleoperation()
 					.selectFilter(rtName, fwName, filterName);
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException
 				| FilterWheelTeleoperationException
 				| DeviceOperationFailedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 }

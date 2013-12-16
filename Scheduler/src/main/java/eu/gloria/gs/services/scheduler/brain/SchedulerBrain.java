@@ -55,8 +55,7 @@ public class SchedulerBrain {
 		String user = op.getUser();
 
 		if (this.adapter.getUserActiveSchedulesCount(user) >= 5) {
-			throw new MaxUserSchedulesException("User '" + user
-					+ "' has 1 schedule currently active");
+			throw new MaxUserSchedulesException();
 		}
 
 		return this.adapter.prepareSchedule(user, op);
@@ -68,7 +67,7 @@ public class SchedulerBrain {
 		try {
 			rts = this.rtRepository.getAllBatchRTs();
 		} catch (RTRepositoryException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException();
 		}
 
 		String rt = null;
@@ -136,7 +135,7 @@ public class SchedulerBrain {
 				this.adapter.setState(schInfo.getId(), "ADVERTISED");
 
 			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException(e.getMessage());
+				throw new SchedulerException();
 			} catch (SchServerNotAvailableException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -155,14 +154,14 @@ public class SchedulerBrain {
 				try {
 					this.adapter.setState(schInfo.getId(), "REJECTED");
 				} catch (SchedulerDatabaseException e) {
-					throw new SchedulerException(e.getMessage());
+					throw new SchedulerException();
 				}
 			}
 		} else {
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
 			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException(e.getMessage());
+				throw new SchedulerException();
 			}
 		}
 	}
@@ -179,13 +178,13 @@ public class SchedulerBrain {
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
 			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException(e.getMessage());
+				throw new SchedulerException();
 			}
 		} else {
 			try {
 				this.adapter.setState(schInfo.getId(), "PREPARED");
 			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException(e.getMessage());
+				throw new SchedulerException();
 			}
 		}
 	}
@@ -230,7 +229,7 @@ public class SchedulerBrain {
 				e.printStackTrace();
 			}
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException();
 		} catch (SchServerNotAvailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -347,7 +346,7 @@ public class SchedulerBrain {
 				e.printStackTrace();
 			}
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException();
 		} catch (SchServerNotAvailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

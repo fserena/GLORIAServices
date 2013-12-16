@@ -1,7 +1,7 @@
 package eu.gloria.gs.services.repository.user;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
-import eu.gloria.gs.services.log.action.ActionLogException;
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.user.data.UserInformation;
 import eu.gloria.gs.services.repository.user.data.UserRepositoryAdapter;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserRepositoryAdapterException;
@@ -22,38 +22,43 @@ public class UserRepository extends GSLogProducerService implements
 	@Override
 	public void createUser(String name) throws UserRepositoryException {
 
+		LogAction action = new LogAction();
+
+		action.put("sender", this.getUsername());
+		action.put("operation", "new user");
+		action.put("name", name);
+
 		try {
 			adapter.create(name);
+
+			this.logInfo(this.getClientUsername(), action);
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
+			action.put("cause", e.getAction());
+			this.logError(getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new UserRepositoryException(action);
 		}
-
-		try {
-			this.logAction(this.getClientUsername(), "/repository/user/new?"
-					+ name);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	@Override
 	public void activateUser(String name, String password)
 			throws UserRepositoryException {
 
+		LogAction action = new LogAction();
+
+		action.put("sender", this.getUsername());
+		action.put("operation", "activate user");
+		action.put("name", name);
+
 		try {
 			adapter.activate(name, password);
+			this.logInfo(this.getClientUsername(), action);
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
+			action.put("cause", e.getAction());
+			this.logError(getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new UserRepositoryException(action);
 		}
-
-		try {
-			this.logAction(this.getClientUsername(), "/repository/user/activate?"
-					+ name);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class UserRepository extends GSLogProducerService implements
 			boolean contains = adapter.contains(name);
 			return contains;
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
+			throw new UserRepositoryException(e.getAction());
 		}
 	}
 
@@ -74,14 +79,7 @@ public class UserRepository extends GSLogProducerService implements
 		try {
 			adapter.deactivate(name, password);
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
-		}
-
-		try {
-			this.logAction(this.getClientUsername(), "/repository/user/deactivate?"
-					+ name);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+			throw new UserRepositoryException(e.getAction());
 		}
 
 	}
@@ -90,17 +88,20 @@ public class UserRepository extends GSLogProducerService implements
 	public void changePassword(String name, String password)
 			throws UserRepositoryException {
 
+		LogAction action = new LogAction();
+
+		action.put("sender", this.getUsername());
+		action.put("operation", "change user");
+		action.put("name", name);
+		
 		try {
 			adapter.setPassword(name, password);
+			this.logInfo(getClientUsername(), action);
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
-		}
-
-		try {
-			this.logAction(this.getClientUsername(), "/repository/user/changePassword?"
-					+ name + "&" + password);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+			action.put("cause", e.getAction());
+			this.logError(getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new UserRepositoryException(action);
 		}
 
 	}
@@ -114,7 +115,7 @@ public class UserRepository extends GSLogProducerService implements
 		try {
 			userInfo = adapter.getUserInformation(name);
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
+			throw new UserRepositoryException(e.getAction());
 		}
 
 		return userInfo;
@@ -125,27 +126,23 @@ public class UserRepository extends GSLogProducerService implements
 			throws UserRepositoryException {
 
 		if (password == null)
-			throw new UserRepositoryException("A null password cannot be used");
+			throw new UserRepositoryException("null password cannot be used");
 
 		try {
 
 			if (adapter.contains(name) && adapter.isActivated(name)) {
 				String actualPassword = adapter.getPassword(name);
 
-				boolean result = false;				
+				boolean result = false;
 				result = password.equals(actualPassword);
-				
-				try {
-					this.logAction(this.getClientUsername(), "/repository/user/authenticate?"
-							+ name + "&" + result);
-				} catch (ActionLogException e) {
-					e.printStackTrace();
-				}
-				
+
+				// this.logAction(this.getClientUsername(),
+				// "/repository/user/authenticate?" + name + "&" + result);
+
 				return result;
 			}
 		} catch (UserRepositoryAdapterException e) {
-			throw new UserRepositoryException(e.getMessage());
+			throw new UserRepositoryException(e.getAction());
 		}
 
 		return false;

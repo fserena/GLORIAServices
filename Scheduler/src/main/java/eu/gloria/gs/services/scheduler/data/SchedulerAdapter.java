@@ -40,13 +40,13 @@ public class SchedulerAdapter {
 		try {
 			entry.setPlan(JSONConverter.toJSON(opInfo));
 		} catch (IOException e) {
-			throw new InvalidObservingPlanException(e.getMessage());
+			throw new InvalidObservingPlanException();
 		}
 
 		try {
 			schedulerService.save(entry);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		int id = -1;
@@ -54,7 +54,7 @@ public class SchedulerAdapter {
 		try {
 			id = schedulerService.getLastUserScheduleId(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 		return id;
 	}
@@ -71,14 +71,13 @@ public class SchedulerAdapter {
 		try {
 			schedulerService.save(entry);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 	}
 
 	public void removeSchedule(int id) throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		schedulerService.remove(id);
@@ -87,8 +86,7 @@ public class SchedulerAdapter {
 	public ScheduleInformation getScheduleInformation(int id)
 			throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		ScheduleEntry entry = null;
@@ -96,7 +94,7 @@ public class SchedulerAdapter {
 		try {
 			entry = schedulerService.get(id);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		ScheduleInformation schInfo = this.buildScheduleInfo(entry);
@@ -110,13 +108,12 @@ public class SchedulerAdapter {
 		ScheduleEntry entry = null;
 		try {
 			if (!schedulerService.containsRTLocalId(rt, uuid)) {
-				throw new SchedulerDatabaseException("The schedule '" + uuid
-						+ "' does not exist");
+				throw new SchedulerDatabaseException();
 			}
 
 			entry = schedulerService.getByRTLocalId(rt, uuid);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		ScheduleInformation schInfo = this.buildScheduleInfo(entry);
@@ -131,7 +128,7 @@ public class SchedulerAdapter {
 		try {
 			count = schedulerService.getUserActiveSchedulesCount(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		return count;
@@ -154,21 +151,21 @@ public class SchedulerAdapter {
 					.fromJSON(entry.getPlan(), ObservingPlanInformation.class,
 							null));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		try {
 			schInfo.setCandidates((List<String>) JSONConverter.fromJSON(
 					entry.getCandidates(), List.class, String.class));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		try {
 			schInfo.setResults((List<ImageResult>) JSONConverter.fromJSON(
 					entry.getResults(), List.class, ImageResult.class));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		return schInfo;
@@ -183,7 +180,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getByUser(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {
@@ -206,7 +203,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getUserInactiveSchedules(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {
@@ -228,7 +225,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getUserActiveSchedules(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {
@@ -250,7 +247,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getByRT(rt);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {
@@ -272,7 +269,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getActiveByRT(rt);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {
@@ -287,8 +284,7 @@ public class SchedulerAdapter {
 
 	public void setRT(int id, String rt) throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		schedulerService.setTelescope(id, rt);
@@ -297,21 +293,19 @@ public class SchedulerAdapter {
 	public void setPlan(int id, ObservingPlanInformation plan)
 			throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		try {
 			schedulerService.setPlan(id, JSONConverter.toJSON(plan));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 	}
 
 	public void setUuid(int id, String uuid) throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		schedulerService.setUuid(id, uuid);
@@ -320,8 +314,7 @@ public class SchedulerAdapter {
 	public void setState(int id, String status)
 			throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		schedulerService.setStatus(id, status);
@@ -330,35 +323,32 @@ public class SchedulerAdapter {
 	public void setCandidates(int id, List<String> cands)
 			throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		try {
 			schedulerService.setCandidates(id, JSONConverter.toJSON(cands));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 	}
 
 	public void setResults(int id, List<ImageResult> res)
 			throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		try {
 			schedulerService.setResults(id, JSONConverter.toJSON(res));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 	}
 
 	public void setLastDate(int id, Date ld) throws SchedulerDatabaseException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException("The schedule '" + id
-					+ "' does not exist");
+			throw new SchedulerDatabaseException();
 		}
 
 		schedulerService.setLastDate(id, ld);
@@ -373,7 +363,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getAllActiveSchedules();
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException(e.getMessage());
+			throw new SchedulerDatabaseException();
 		}
 
 		if (entries != null) {

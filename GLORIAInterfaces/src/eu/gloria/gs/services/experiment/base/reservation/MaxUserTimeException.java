@@ -1,13 +1,16 @@
 package eu.gloria.gs.services.experiment.base.reservation;
 
-public class MaxUserTimeException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class MaxUserTimeException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public MaxUserTimeException(String message)
+	public MaxUserTimeException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -53,14 +53,16 @@ public class SaveResult extends ServiceOperation {
 
 				result.save();
 
-			} catch (NoSuchReservationException | ExperimentDatabaseException
-					| IOException e) {
-				throw new ExperimentOperationException(e.getMessage());
+			} catch (NoSuchReservationException | ExperimentDatabaseException e) {
+				throw new ExperimentOperationException(e.getAction());
+			} catch (IOException e) {
+				throw new ExperimentOperationException(this.getContext()
+						.getName(), "json error");
 			}
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
-				| ExperimentNotInstantiatedException e1) {
-			throw new ExperimentOperationException(e1.getMessage());
+		} catch (ExperimentParameterException | NoSuchParameterException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

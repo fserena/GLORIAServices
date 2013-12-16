@@ -6,7 +6,7 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -43,9 +43,9 @@ public class FocusRelativeMove extends ServiceOperation {
 			String stepsParameter = (String) this.getArguments()[2];
 			steps = (Integer) this.getContext().getExperimentContext()
 					.getParameterValue(stepsParameter);
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 
 		try {
@@ -56,7 +56,7 @@ public class FocusRelativeMove extends ServiceOperation {
 					steps);
 
 		} catch (FocuserTeleoperationException | DeviceOperationFailedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 }

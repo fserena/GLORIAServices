@@ -6,7 +6,7 @@ import java.util.List;
 import javax.jws.WebParam;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
-import eu.gloria.gs.services.log.action.ActionLogException;
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.image.data.ImageDatabaseException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter;
@@ -33,18 +33,23 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "target") ImageTargetData target)
 			throws ImageRepositoryException {
 
+		LogAction action = new LogAction();
+
 		try {
+
+			action.put("sender", this.getUsername());
+			action.put("operation", "save image");
+			action.put("rt", rt);
+
 			this.adapter.saveImage(rt, ccd, user, new Date(), lid, target);
 
-			try {
-				this.logAction(this.getClientUsername(), "/images/new?" + user
-						+ "&" + rt + "&" + ccd + "&" + lid);
-			} catch (ActionLogException e) {
-				e.printStackTrace();
-			}
+			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			action.put("cause", "internal error");
+			this.logError(this.getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new ImageRepositoryException(action);
 		}
 	}
 
@@ -57,18 +62,21 @@ public class ImageRepository extends GSLogProducerService implements
 	@Override
 	public void setExperimentReservation(@WebParam(name = "id") int id,
 			@WebParam(name = "rid") int rid) throws ImageRepositoryException {
-		try {
-			this.adapter.setExperimentReservation(id, rid);
+		LogAction action = new LogAction();
 
-			try {
-				this.logAction(this.getClientUsername(), "/images/" + id
-						+ "/setReservation?" + rid);
-			} catch (ActionLogException e) {
-				e.printStackTrace();
-			}
+		try {
+
+			action.put("sender", this.getUsername());
+			action.put("operation", "set rid");
+
+			this.adapter.setExperimentReservation(id, rid);
+			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			action.put("cause", "internal error");
+			this.logError(this.getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new ImageRepositoryException(action);
 		}
 	}
 
@@ -83,18 +91,21 @@ public class ImageRepository extends GSLogProducerService implements
 	public void setUser(@WebParam(name = "id") int id,
 			@WebParam(name = "user") String user)
 			throws ImageRepositoryException {
+		LogAction action = new LogAction();
+
 		try {
+
+			action.put("sender", this.getUsername());
+			action.put("operation", "set user");
+
 			this.adapter.setUser(id, user);
 
-			try {
-				this.logAction(this.getClientUsername(), "/images/" + id
-						+ "/setUser?" + user);
-			} catch (ActionLogException e) {
-				e.printStackTrace();
-			}
-
+			this.logInfo(this.getClientUsername(), action);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			action.put("cause", "internal error");
+			this.logError(this.getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new ImageRepositoryException(action);
 		}
 	}
 
@@ -110,7 +121,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			return this.adapter.getImageInformation(id);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -153,7 +164,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			return this.adapter.getImagesByReservation(rid, 100);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -184,7 +195,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setExperimentReservationByJpg(jpg, rid);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -201,7 +212,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setExperimentReservationByFits(fits, rid);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -219,7 +230,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setUserByJpg(jpg, user);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -237,24 +248,26 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setUserByFits(fits, user);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
-	 * setTargetByRTLocalId(java.lang.String, java.lang.String, java.lang.String)
+	 * setTargetByRTLocalId(java.lang.String, java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public void setTargetByRTLocalId(@WebParam(name = "rt") String rt,
 			@WebParam(name = "localid") String localid,
-			@WebParam(name = "target") ImageTargetData target) throws ImageRepositoryException {
+			@WebParam(name = "target") ImageTargetData target)
+			throws ImageRepositoryException {
 		try {
 			this.adapter.setTargetByRT(rt, localid, target);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -271,7 +284,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setJpgByRT(rt, localid, url);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -289,7 +302,7 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			this.adapter.setFitsByRT(rt, localid, fits);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
@@ -303,18 +316,23 @@ public class ImageRepository extends GSLogProducerService implements
 	@Override
 	public void setJpg(@WebParam(name = "id") int id,
 			@WebParam(name = "jpg") String jpg) throws ImageRepositoryException {
+
+		LogAction action = new LogAction();
+
 		try {
+
+			action.put("sender", this.getUsername());
+			action.put("operation", "set jpg");
+
 			this.adapter.setJpg(id, jpg);
 
-			try {
-				this.logAction(this.getClientUsername(), "/images/" + id
-						+ "/setJpg?" + jpg);
-			} catch (ActionLogException e) {
-				e.printStackTrace();
-			}
+			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			action.put("cause", "internal error");
+			this.logError(this.getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new ImageRepositoryException(action);
 		}
 	}
 
@@ -329,18 +347,21 @@ public class ImageRepository extends GSLogProducerService implements
 	public void setFits(@WebParam(name = "id") int id,
 			@WebParam(name = "fits") String fits)
 			throws ImageRepositoryException {
-		try {
-			this.adapter.setFits(id, fits);
+		LogAction action = new LogAction();
 
-			try {
-				this.logAction(this.getClientUsername(), "/images/" + id
-						+ "/setFits?" + fits);
-			} catch (ActionLogException e) {
-				e.printStackTrace();
-			}
+		try {
+
+			action.put("sender", this.getUsername());
+			action.put("operation", "set fits");
+
+			this.adapter.setFits(id, fits);
+			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			action.put("cause", "internal error");
+			this.logError(this.getClientUsername(), action);
+			action.put("more", e.getAction());
+			throw new ImageRepositoryException(action);			
 		}
 	}
 
@@ -357,12 +378,15 @@ public class ImageRepository extends GSLogProducerService implements
 		try {
 			return this.adapter.getImageInformationByRTLocalId(rt, lid);
 		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getMessage());
+			throw new ImageRepositoryException(e.getAction());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#getAllObjectImages(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
+	 * getAllObjectImages(java.lang.String)
 	 */
 	@Override
 	public List<Integer> getAllObjectImages(
@@ -370,16 +394,18 @@ public class ImageRepository extends GSLogProducerService implements
 			throws ImageRepositoryException {
 		return this.adapter.getAllObjectImages(object);
 	}
-	
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#getAllObjectImagesByDate(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
+	 * getAllObjectImagesByDate(java.lang.String)
 	 */
 	@Override
 	public List<Integer> getAllObjectImagesByDate(
 			@WebParam(name = "object") String object,
 			@WebParam(name = "dateFrom") Date from,
-			@WebParam(name = "dateTo") Date to)
-			throws ImageRepositoryException {
+			@WebParam(name = "dateTo") Date to) throws ImageRepositoryException {
 		return this.adapter.getAllObjectImagesByDate(object, from, to);
 	}
 

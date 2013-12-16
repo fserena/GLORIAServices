@@ -1,13 +1,19 @@
 package eu.gloria.gs.services.log.action;
 
-public class ActionLogException extends Exception {
+public class ActionLogException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public ActionLogException(String message)
+	public ActionLogException(LogAction action)
 	{
-		super(message);
+		super(action);
+	}
+	
+	public ActionLogException(String cause) {
+		super(new LogAction());
+		
+		this.getAction().put("cause", cause);
 	}
 	
 	

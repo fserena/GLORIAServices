@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.teleoperation.focuser;
 
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
 
 public class FocuserTeleoperationException extends RTSTeleoperationException {
@@ -7,9 +8,14 @@ public class FocuserTeleoperationException extends RTSTeleoperationException {
 	/**
 	 * 
 	 */
-	public FocuserTeleoperationException(String message)
-	{
-		super(message);
+	public FocuserTeleoperationException(LogAction action) {
+		super(action);
+	}
+
+	public FocuserTeleoperationException(String cause) {
+		super(new LogAction());
+
+		this.getAction().put("cause", cause);
 	}
 	
 	

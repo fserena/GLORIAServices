@@ -6,7 +6,6 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 
 public class ExperimentOperation {
 
-	//private OperationType type;
 	private String name;
 	private Map<String, String[]> behaviour;
 
@@ -27,14 +26,6 @@ public class ExperimentOperation {
 
 		return this.parameterTypes.length;
 	}
-
-	/*public OperationType getType() {
-		return this.type;
-	}
-
-	public void setType(OperationType type) {
-		this.type = type;
-	}*/
 
 	public String getName() {
 		return name;

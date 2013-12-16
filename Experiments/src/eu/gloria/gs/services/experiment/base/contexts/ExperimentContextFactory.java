@@ -11,7 +11,6 @@ import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.base.models.InvalidExperimentModelException;
 import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.OperationContext;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
@@ -28,8 +27,7 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 
 	public ExperimentContext createExperimentContext(String username, int rid)
 			throws InvalidUserContextException, ExperimentDatabaseException,
-			NoSuchReservationException, InvalidExperimentModelException,
-			NoSuchExperimentException {
+			NoSuchReservationException {
 
 		ExperimentContext context = null;
 
@@ -43,29 +41,38 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 		}
 
 		if (!resInfo.getUser().equals(username)) {
-			throw new InvalidUserContextException("Username : " + username);
+			throw new InvalidUserContextException(username, rid);
 		}
 
-		ExperimentInformation experimentInfo = this.adapter
-				.getExperimentInformation(resInfo.getExperiment());
+		ExperimentInformation experimentInfo = null;
+		try {
+			experimentInfo = this.adapter.getExperimentInformation(resInfo
+					.getExperiment());
 
-		context = new ExperimentContext();
-		context.setExperimentName(resInfo.getExperiment());
-		context.setReservation(rid);
+			context = new ExperimentContext();
+			context.setExperimentName(resInfo.getExperiment());
+			context.setReservation(rid);
 
-		for (ParameterInformation paramInfo : experimentInfo.getParameters()) {
-			ParameterContext parameterContext = null;
+			for (ParameterInformation paramInfo : experimentInfo
+					.getParameters()) {
+				ParameterContext parameterContext = null;
 
-			parameterContext = this.createParameterContext(paramInfo, context);
-			context.addParameter(paramInfo.getName(), parameterContext);
-		}
+				parameterContext = this.createParameterContext(paramInfo,
+						context);
+				context.addParameter(paramInfo.getName(), parameterContext);
+			}
 
-		for (OperationInformation opInfo : experimentInfo.getOperations()) {
-			OperationContext operationContext = null;
+			for (OperationInformation opInfo : experimentInfo.getOperations()) {
+				OperationContext operationContext = null;
 
-			operationContext = this.createOperationContext(opInfo, context);
-			context.addOperation(opInfo.getName(), operationContext);
+				operationContext = this.createOperationContext(opInfo, context);
+				context.addOperation(opInfo.getName(), operationContext);
 
+			}
+		} catch (NoSuchExperimentException e) {
+			ExperimentDatabaseException ex = new ExperimentDatabaseException();
+			ex.getAction().put("experiment not found", e.getAction());
+			throw ex;
 		}
 
 		return context;

@@ -28,12 +28,16 @@ public class ExperimentModelManager {
 	}
 
 	public CustomExperimentModel getModel(String experiment)
-			throws InvalidExperimentModelException, NoSuchExperimentException,
+			throws NoSuchExperimentException,
 			ExperimentDatabaseException {
 		CustomExperimentModel model = null;
 
 		if (adapter.containsExperiment(experiment)) {
-			model = factory.loadCustomExperiment(experiment);
+			try {
+				model = factory.loadCustomExperiment(experiment);
+			} catch (InvalidExperimentModelException e) {
+				throw new ExperimentDatabaseException(e.getMessage());
+			}
 		}
 
 		return model;

@@ -35,7 +35,7 @@ public interface CCDTeleoperationInterface {
 	public long getGain(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
-	public void setBinningX(String rt, String ccd, long value)
+	public void setBiningX(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public long getBiningX(String rt, String ccd)

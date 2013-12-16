@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.repository.user.data;
 
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserDBService;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserEntry;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserRepositoryAdapterException;
@@ -31,71 +32,71 @@ public class UserRepositoryAdapter {
 	public UserRepositoryAdapter() {
 
 	}
-	
+
 	public void setImageRepositoryUsername(String user) {
 		this.IMAGE_REPOSITORY_NAME = user;
 	}
-	
+
 	public void setImageRepositoryPassword(String pass) {
 		this.IMAGE_REPOSITORY_PWD = pass;
 	}
-	
+
 	public void setRTRepositoryUsername(String user) {
 		this.RT_REPOSITORY_NAME = user;
 	}
-	
+
 	public void setRTRepositoryPassword(String pass) {
 		this.RT_REPOSITORY_PWD = pass;
 	}
-	
+
 	public void setUserRepositoryUsername(String user) {
 		this.USER_REPOSITORY_NAME = user;
 	}
-	
+
 	public void setUserRepositoryPassword(String pass) {
 		this.USER_REPOSITORY_PWD = pass;
 	}
-	
+
 	public void setExperimentUsername(String user) {
 		this.EXPERIMENT_NAME = user;
 	}
-	
+
 	public void setExperimentPassword(String pass) {
 		this.EXPERIMENT_PWD = pass;
 	}
-	
+
 	public void setTeleoperationUsername(String user) {
 		this.TELEOPERATION_NAME = user;
 	}
-	
+
 	public void setTeleoperationPassword(String pass) {
 		this.TELEOPERATION_PWD = pass;
 	}
-	
+
 	public void setActionLogUsername(String user) {
 		this.ACTION_LOG_NAME = user;
 	}
-	
+
 	public void setActionLogPassword(String pass) {
 		this.ACTION_LOG_PWD = pass;
 	}
-	
+
 	public void setAdminUsername(String user) {
 		this.ADMIN_NAME = user;
 	}
-	
+
 	public void setAdminPassword(String pass) {
 		this.ADMIN_PWD = pass;
 	}
-	
+
 	public void setSchedulerUsername(String user) {
 		this.SCHEDULER_NAME = user;
 	}
-	
+
 	public void setSchedulerPassword(String pass) {
 		this.SCHEDULER_PWD = pass;
 	}
-	
+
 	public void setUserDBService(UserDBService service) {
 		this.userService = service;
 	}
@@ -134,13 +135,18 @@ public class UserRepositoryAdapter {
 		this.createUser(EXPERIMENT_NAME, EXPERIMENT_PWD, UserRole.WEB_SERVICE);
 		this.createUser(IMAGE_REPOSITORY_NAME, IMAGE_REPOSITORY_PWD,
 				UserRole.WEB_SERVICE);
-		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD,
-				UserRole.WEB_SERVICE);
+		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD, UserRole.WEB_SERVICE);
 	}
 
 	public void create(String name) throws UserRepositoryAdapterException {
-		if (name == null)
-			throw new UserRepositoryAdapterException("The user cannot be null");
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		
+		if (name == null) {
+			action.put("cause", "user is null");
+			throw new UserRepositoryAdapterException(action);
+		}
 
 		boolean previouslyContained = false;
 
@@ -155,14 +161,17 @@ public class UserRepositoryAdapter {
 			userService.save(entry);
 		}
 
-		if (previouslyContained)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' already exists");
+		if (previouslyContained) {
+			action.put("cause", "user already exists");
+			throw new UserRepositoryAdapterException(action);
+		}
 	}
 
 	public void activate(String name, String password)
 			throws UserRepositoryAdapterException {
 
+		LogAction action = new LogAction();
+		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyActivated = false;
 
@@ -177,18 +186,22 @@ public class UserRepositoryAdapter {
 				previouslyActivated = true;
 		}
 
-		if (!previouslyContained)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' does not exist");
+		if (!previouslyContained) {
+			action.put("cause", "user does not exists");
+			throw new UserRepositoryAdapterException(action);
+		}
 
-		if (previouslyActivated)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' was already activated");
+		if (previouslyActivated) {
+			action.put("cause", "user already activated");
+			throw new UserRepositoryAdapterException(action);
+		}
 	}
 
 	public void deactivate(String name, String password)
 			throws UserRepositoryAdapterException {
 
+		LogAction action = new LogAction();
+		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyDeactivated = false;
 
@@ -203,13 +216,15 @@ public class UserRepositoryAdapter {
 				previouslyDeactivated = true;
 		}
 
-		if (!previouslyContained)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' does not exist");
+		if (!previouslyContained) {
+			action.put("cause", "user does not exists");
+			throw new UserRepositoryAdapterException(action);
+		}
 
-		if (previouslyDeactivated)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' was already deactivated");
+		if (previouslyDeactivated) {
+			action.put("cause", "user already deactivated");
+			throw new UserRepositoryAdapterException(action);
+		}
 	}
 
 	public boolean isActivated(String name)
@@ -286,25 +301,30 @@ public class UserRepositoryAdapter {
 	public String getPassword(String name)
 			throws UserRepositoryAdapterException {
 
+		LogAction action = new LogAction();
+		action.put("name", name);
 		UserEntry entry = userService.get(name);
 
 		if (entry != null) {
 			String password = entry.getPassword();
 
-			if (password == null)
-				throw new UserRepositoryAdapterException("The user '" + name
-						+ "' is not activated");
-			else
+			if (password == null) {
+				action.put("cause", "user not activated");
+				throw new UserRepositoryAdapterException(action);
+			} else
 				return password;
-		} else
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' does not exist");
+		} else {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
 
 	}
 
 	public void setPassword(String name, String password)
 			throws UserRepositoryAdapterException {
 
+		LogAction action = new LogAction();
+		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyActivated = true;
 
@@ -319,13 +339,15 @@ public class UserRepositoryAdapter {
 				previouslyActivated = false;
 		}
 
-		if (!previouslyContained)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' does not exist");
+		if (!previouslyContained) {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
 
-		if (!previouslyActivated)
-			throw new UserRepositoryAdapterException("The user '" + name
-					+ "' was not activated");
+		if (!previouslyActivated) {
+			action.put("cause", "user not activated");
+			throw new UserRepositoryAdapterException(action);
+		}
 	}
 
 	public UserInformation getUserInformation(String name)

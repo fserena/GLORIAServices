@@ -27,6 +27,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	public String getImageURL(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
 
+		String operationName = "get image url";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -38,26 +40,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetImageURLOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getImageURL/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			String url = (String) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getImageURL", null, url);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					url);
 
 			return url;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -65,6 +67,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setExposureTime(String rt, String scam, double value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "set exposure";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -78,23 +83,22 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			operation = new SetExposureTimeOperation(args);
 
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setExposureTime/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, scam, "setExposure",
-					new Object[] { value }, null);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -102,6 +106,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public double getExposureTime(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "get exposure";
+		
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -113,26 +121,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetExposureTimeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getExposureTime/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double exposure = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getExposure", null, exposure);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					exposure);
 
 			return exposure;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -140,6 +148,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setBrightness(String rt, String scam, long value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "set brightness";
+		
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -152,23 +164,22 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetBrightnessOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setBrightness/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, scam, "setBrightness",
-					new Object[] { value }, null);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -176,6 +187,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public long getBrightness(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "get brightness";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -187,26 +201,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetBrightnessOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getBrightness/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long brightness = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getBrightness", null, brightness);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					brightness);
 
 			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -214,6 +228,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setContrast(String rt, String scam, long value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "set contrast";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -226,23 +243,22 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetContrastOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setContrast/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, scam, "setContrast",
-					new Object[] { value }, null);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -250,6 +266,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public long getContrast(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "get contrast";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -261,26 +280,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetContrastOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getContrast/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long contrast = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getContrast", null, contrast);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					contrast);
 
 			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -288,6 +307,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setGain(String rt, String scam, long value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "set gain";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -300,23 +322,22 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetGainOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setGain/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, scam, "setGain", new Object[] { value },
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
 					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -324,6 +345,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public long getGain(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "get gain";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -335,26 +359,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetGainOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getGain/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long gain = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getContrast", null, gain);
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					gain);
 
 			return gain;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}
@@ -362,6 +386,9 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public SCamState getState(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
+		
+		String operationName = "get state";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -373,26 +400,26 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetStateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getState/Bad args", rt);
+			this.processBadArgs(rt, scam, operationName, args.getArguments());
 
 			throw new SCamTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			SCamState state = (SCamState) returns.getReturns().get(0);
 
-			this.processSuccess(rt, scam, "getState", null, state.name());
+			this.processSuccess(rt, scam, operationName, args.getArguments(),
+					state);
 
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, scam, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, scam, operationName, args.getArguments());
 			throw new SCamTeleoperationException(e.getMessage());
 		}
 	}

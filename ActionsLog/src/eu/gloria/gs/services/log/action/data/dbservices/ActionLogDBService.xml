@@ -14,9 +14,16 @@
 		NULL,
 		`user` varchar(40) DEFAULT
 		NULL,
-		`action` varchar(1000) DEFAULT
+		`rid` int(11) DEFAULT
 		NULL,
-		PRIMARY KEY (`idactions_log`),
+		`rt`
+		varchar(20) DEFAULT
+		NULL,
+		`action` text,
+		`type` varchar(10) NOT
+		NULL,
+		PRIMARY
+		KEY (`idactions_log`),
 		UNIQUE KEY `idactions_log_UNIQUE`
 		(`idactions_log`),
 		KEY `username`
@@ -24,12 +31,14 @@
 		KEY `user_fk` (`user`),
 		CONSTRAINT `user_fk` FOREIGN KEY
 		(`user`) REFERENCES `user` (`name`)
-		ON DELETE
+		ON
+		DELETE
 		CASCADE ON UPDATE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		)
+		ENGINE=InnoDB DEFAULT CHARSET=utf8
 	</update>
 
-	<select id="get"
+	<select id="getAllByUser"
 		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
 		SELECT * FROM
 		`actions_log`
@@ -37,15 +46,143 @@
 		user=#{user_}
 	</select>
 
+	<select id="getAllByUserAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		user=#{user_} AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getAllByRid"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_}
+	</select>
+
+	<select id="getAllByRidAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_} AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getAllByDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		date &gt;= #{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getAllByRt"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_}
+	</select>
+
+	<select id="getAllByRtAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_} AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getByUserAndType"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		user=#{user_} AND
+		type=#{type_}
+	</select>
+
+	<select id="getByUserTypeAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		user=#{user_} AND
+		type=#{type_} AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getByRidAndType"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_} AND
+		type=#{type_}
+	</select>
+
+	<select id="getByRidTypeAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_} AND
+		type=#{type_} AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getByRtAndType"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_} AND
+		type=#{type_}
+	</select>
+
+	<select id="getByRtTypeAndDate"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_} AND
+		type=#{type_}
+		AND date &gt;=
+		#{from_} AND date
+		&lt;= #{to_}
+	</select>
+
+	<select id="getByDateAndType"
+		resultType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
+		SELECT * FROM
+		`actions_log`
+		WHERE
+		date &gt;= #{from_} AND date
+		&lt;= #{to_} AND type=#{type_}
+	</select>
+
 	<insert id="save"
 		parameterType="eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry">
 		INSERT INTO
 		`actions_log`
 		(user, date,
-		action)
-		VALUE ( #{user}, #{date},
-		#{action} )
+		action, type, rid,
+		rt)
+		VALUE (
+		#{user}, #{date},
+		#{action}, #{type}, #{rid}, #{rt} )
 	</insert>
+
 
 	<delete id="removeByUser">
 		DELETE FROM `actions_log`
@@ -53,10 +190,79 @@
 		user=#{user_}
 	</delete>
 
-	<select id="contains" resultType="boolean">
+	<delete id="removeByRid">
+		DELETE FROM `actions_log`
+		WHERE
+		rid=#{rid_}
+	</delete>
+
+	<delete id="removeByRt">
+		DELETE FROM `actions_log`
+		WHERE
+		rt=#{rt_}
+	</delete>
+
+	<delete id="removeByDate">
+		DELETE FROM `actions_log`
+		WHERE
+		date &gt;= #{from_} AND
+		date
+		&lt;= #{to_}
+	</delete>
+
+	<select id="containsRid" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_}
+	</select>
+
+	<select id="containsRidByDate" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		rid=#{rid_} date &gt;= #{from_} AND
+		date
+		&lt;= #{to_}
+	</select>
+
+	<select id="containsRt" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_}
+	</select>
+
+	<select id="containsRtByDate" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		rt=#{rt_} date &gt;= #{from_} AND
+		date
+		&lt;= #{to_}
+	</select>
+
+	<select id="containsUser" resultType="boolean">
 		SELECT count(*)>0 FROM
 		`actions_log`
 		WHERE
 		user=#{user_}
+	</select>
+
+	<select id="containsUserByDate" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		user=#{user_} date &gt;= #{from_} AND
+		date
+		&lt;= #{to_}
+	</select>
+
+	<select id="containsDate" resultType="boolean">
+		SELECT count(*)>0 FROM
+		`actions_log`
+		WHERE
+		date &gt;= #{from_} AND date
+		&lt;= #{to_}
 	</select>
 </mapper>

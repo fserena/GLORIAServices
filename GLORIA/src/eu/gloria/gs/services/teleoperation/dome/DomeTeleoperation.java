@@ -24,6 +24,8 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 	public DomeOpeningState getState(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 
+		String operationName = "get state";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -36,11 +38,10 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetStateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getDomeState/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
@@ -48,16 +49,17 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			DomeOpeningState state = (DomeOpeningState) returns.getReturns()
 					.get(0);
 
-			this.processSuccess(rt, dome, "getState", null, state.name());
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					state);
 
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
@@ -65,6 +67,8 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 	public void setTracking(String rt, String dome, boolean mode)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 
+		String operationName = "set tracking";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -78,31 +82,33 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetTrackingOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setTracking/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, dome, "setTracking", new Object[] { mode },
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public boolean isTrackingEnabled(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
+		
+		String operationName = "tracking enabled";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -115,33 +121,36 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new IsTrackingEnabledOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/isTrackingEnabled/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			boolean mode = (Boolean) returns.getReturns().get(0);
 
-			this.processSuccess(rt, dome, "isTrackingEnabled", null, mode);
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					mode);
 
 			return mode;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public double getAzimuth(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
+		
+		String operationName = "get azimuth";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -154,33 +163,35 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetAzimuthOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getAzimuth/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double azimuth = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, dome, "getAzimuth", null, azimuth);
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					azimuth);
 
 			return azimuth;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void open(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
+		
+		String operationName = "open";
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -193,29 +204,33 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new OpenOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/openDome/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, dome, "open", null, null);
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					null);
+
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void close(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
+		
+		String operationName = "close";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -228,29 +243,32 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new CloseOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/closeDome/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
-			this.processSuccess(rt, dome, "close", null, null);
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void park(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
+		
+		String operationName = "park";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -263,23 +281,24 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new ParkOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/parkDome/Bad args", rt);
+			this.processBadArgs(rt, dome, operationName, args.getArguments());
 
 			throw new DomeTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, dome, "park", null, null);
+			this.processSuccess(rt, dome, operationName, args.getArguments(),
+					null);
+
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, dome, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new DomeTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, dome, operationName, args.getArguments());
+			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
 }

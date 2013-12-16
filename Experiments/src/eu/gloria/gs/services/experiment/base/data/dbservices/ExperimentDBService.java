@@ -140,14 +140,12 @@ public interface ExperimentDBService {
 	public boolean isReservationContextInstantiated(
 			@Param(value = "rid_") int rid);
 
-	
 	/**
 	 * @param rid
 	 * @return
 	 */
-	public int getParametersNumberInContext(
-			@Param(value = "rid_") int rid);
-	
+	public int getParametersNumberInContext(@Param(value = "rid_") int rid);
+
 	/**
 	 * @param opid
 	 * @return
@@ -330,6 +328,24 @@ public interface ExperimentDBService {
 	 * @return
 	 */
 	public boolean anyReservationAtByType(@Param(value = "type_") String type,
+			@Param(value = "when_") Date when);
+
+	/**
+	 * @param rid
+	 * @param when
+	 * @return
+	 */
+	public boolean isReservationActiveNow(@Param(value = "rid_") int rid,
+			@Param(value = "when_") Date when);
+
+	/**
+	 * @param rid
+	 * @param user
+	 * @param when
+	 * @return
+	 */
+	public boolean isReservationActiveNowForUser(@Param(value = "rid_") int rid,
+			@Param(value = "user_") String user,
 			@Param(value = "when_") Date when);
 
 	/**

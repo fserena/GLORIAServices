@@ -18,6 +18,9 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 	public long getPosition(String rt, String focuser)
 			throws DeviceOperationFailedException,
 			FocuserTeleoperationException {
+		
+		String operationName = "get position";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -29,27 +32,27 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetPositionOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getPosition/Bad args", rt);
+			this.processBadArgs(rt, focuser, operationName, args.getArguments());
 
 			throw new FocuserTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long position = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, focuser, "getPosition", null, position);
+			this.processSuccess(rt, focuser, operationName, args.getArguments(),
+					position);
 
 			return position;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, focuser, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new FocuserTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, focuser, operationName, args.getArguments());
+			throw new FocuserTeleoperationException(e.getAction());
 		}
 	}
 
@@ -57,6 +60,9 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 	public void moveAbsolute(String rt, String focuser, long position)
 			throws DeviceOperationFailedException,
 			FocuserTeleoperationException {
+		
+		String operationName = "move absolute";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -69,24 +75,24 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveAbsoluteOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveAbsolute/Bad args", rt);
+			this.processBadArgs(rt, focuser, operationName, args.getArguments());
 
 			throw new FocuserTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, focuser, "moveAbsolute",
-					new Object[] { position }, null);
+			this.processSuccess(rt, focuser, operationName, args.getArguments(),
+					null);
+
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, focuser, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new FocuserTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, focuser, operationName, args.getArguments());
+			throw new FocuserTeleoperationException(e.getAction());
 		}
 	}
 
@@ -94,6 +100,9 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 	public void moveRelative(String rt, String focuser, long steps)
 			throws DeviceOperationFailedException,
 			FocuserTeleoperationException {
+		
+		String operationName = "move relative";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -106,24 +115,24 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveRelativeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveRelative/Bad args", rt);
+			this.processBadArgs(rt, focuser, operationName, args.getArguments());
 
 			throw new FocuserTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, focuser, "moveRelative",
-					new Object[] { steps }, null);
+			this.processSuccess(rt, focuser, operationName, args.getArguments(),
+					null);
+
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, focuser, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new FocuserTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, focuser, operationName, args.getArguments());
+			throw new FocuserTeleoperationException(e.getAction());
 		}
 	}
 }

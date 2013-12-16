@@ -18,6 +18,9 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 	public List<String> getFilters(String rt, String filterWheel)
 			throws DeviceOperationFailedException,
 			FilterWheelTeleoperationException {
+
+		String operationName = "get filters";
+
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -29,28 +32,31 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetFiltersOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getFilters/Bad args", rt);
+			this.processBadArgs(rt, filterWheel, operationName,
+					args.getArguments());
 
 			throw new FilterWheelTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			// TODO: improve this...
-			List<String> filters= (List<String>) returns.getReturns().get(0);
+			List<String> filters = (List<String>) returns.getReturns().get(0);
 
-			this.processSuccess(rt, filterWheel, "getFilters", null, filters);
+			this.processSuccess(rt, filterWheel, operationName, args.getArguments(),
+					filters);
 
 			return filters;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, filterWheel, operationName,
+					args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new FilterWheelTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, filterWheel, operationName,
+					args.getArguments());
+			throw new FilterWheelTeleoperationException(e.getAction());
 		}
 	}
 
@@ -58,6 +64,9 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 	public void selectFilter(String rt, String filterWheel, String filter)
 			throws DeviceOperationFailedException,
 			FilterWheelTeleoperationException {
+		
+		String operationName = "select filter";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -70,24 +79,27 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SelectFilterOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/selectFilter/Bad args", rt);
+			this.processBadArgs(rt, filterWheel, operationName,
+					args.getArguments());
 
 			throw new FilterWheelTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, filterWheel, "selectFilter",
-					new Object[] { filter }, null);
+			this.processSuccess(rt, filterWheel, operationName, args.getArguments(),
+					null);
+
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, filterWheel, operationName,
+					args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new FilterWheelTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, filterWheel, operationName,
+					args.getArguments());
+			throw new FilterWheelTeleoperationException(e.getAction());
 		}
 	}
 }

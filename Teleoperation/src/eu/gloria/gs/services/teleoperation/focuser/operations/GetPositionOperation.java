@@ -15,7 +15,7 @@ public class GetPositionOperation extends FocuserOperation {
 	protected void operateFocuser(Focuser focuser, OperationReturn returns)
 			throws TeleoperationException {
 
-		long position = focuser.getPosition();
+	//	long position = focuser.getPosition();
 		
 		// TODO: it is incomplete!
 	}

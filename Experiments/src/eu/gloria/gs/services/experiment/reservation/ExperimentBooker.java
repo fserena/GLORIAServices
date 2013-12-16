@@ -9,6 +9,7 @@ import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationAr
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.log.action.LogAction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,8 +47,8 @@ public class ExperimentBooker {
 			throws ExperimentReservationArgumentException,
 			ExperimentDatabaseException {
 
-		testAndThrowIfNull(experiment, "Experiment name cannot be null");
-		testAndThrowIfNull(telescopes, "Telescope list name cannot be null");
+		testAndThrowIfNull(experiment, "experiment name cannot be null");
+		testAndThrowIfNull(telescopes, "telescope list name cannot be null");
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -88,12 +89,8 @@ public class ExperimentBooker {
 			}
 
 			if (available) {
-				try {
-					available = !adapter.anyRTReservationBetween(telescopes,
-							timeSlot);
-				} catch (ExperimentDatabaseException e) {
-					throw e;
-				}
+				available = !adapter.anyRTReservationBetween(telescopes,
+						timeSlot);
 			}
 
 			if (available) {
@@ -116,14 +113,14 @@ public class ExperimentBooker {
 			ExperimentReservationArgumentException,
 			MaxReservationTimeException, ExperimentDatabaseException {
 
-		testAndThrowIfNull(experiment, "Experiment name cannot be null");
-		testAndThrowIfNull(telescopes, "Telescope list name cannot be null");
-		testAndThrowIfNull(username, "Username cannot be null");
-		testAndThrowIfNull(timeSlot, "Reservation time slot cannot be null");
+		testAndThrowIfNull(experiment, "experiment name cannot be null");
+		testAndThrowIfNull(telescopes, "telescope list name cannot be null");
+		testAndThrowIfNull(username, "username cannot be null");
+		testAndThrowIfNull(timeSlot, "reservation time slot cannot be null");
 
 		if (timeSlot.getEnd().before(new Date())) {
 			throw new ExperimentReservationArgumentException(
-					"Cannot make a reservation on the past");
+					"cannot make a reservation on the past");
 		}
 
 		Calendar calendar = Calendar.getInstance();
@@ -133,21 +130,21 @@ public class ExperimentBooker {
 
 		if (timeSlot.getEnd().after(calendar.getTime())) {
 			throw new ExperimentReservationArgumentException(
-					"Reservation is not possible beyond " + RESERVATION_DAYS
+					"reservation is not possible beyond " + RESERVATION_DAYS
 							+ " days");
 		}
 
 		if (!adminMode) {
 			if (!rtBooker.available(telescopes, timeSlot))
 				throw new ExperimentReservationArgumentException(
-						"The reservation is incompatible with the availability "
-								+ "of at least one telescope");
+						"one or more telescopes are not available");
 		}
 
 		List<ReservationInformation> pendingReservations = null;
 
 		try {
-			pendingReservations = adapter.getUserPendingReservations("ONLINE", username);
+			pendingReservations = adapter.getUserPendingReservations("ONLINE",
+					username);
 		} catch (ExperimentDatabaseException e) {
 			throw e;
 		} catch (NoReservationsAvailableException e) {
@@ -159,7 +156,7 @@ public class ExperimentBooker {
 
 		if (pendingReservations != null) {
 			for (ReservationInformation reservation : pendingReservations) {
-								
+
 				TimeSlot reservedTimeSlot = reservation.getTimeSlot();
 				msReserved += reservedTimeSlot.getEnd().getTime()
 						- reservedTimeSlot.getBegin().getTime();
@@ -174,13 +171,13 @@ public class ExperimentBooker {
 							timeSlot);
 				} else {
 					throw new NoReservationsAvailableException(
-							"No time available for reservation on at least one "
-									+ "telescope");
+							"one or more telescopes are not available");
 				}
 			} else {
-				throw new MaxReservationTimeException(
-						"The reservation exceeds the amount of time available "
-								+ "to the user '" + username + "'");
+				MaxReservationTimeException ex = new MaxReservationTimeException(
+						msReserved, MILLISECONDS_PER_30MIN, username);
+
+				throw ex;
 			}
 		} catch (ExperimentDatabaseException e) {
 			throw e;
@@ -198,8 +195,8 @@ public class ExperimentBooker {
 
 				List<ReservationInformation> reservations = null;
 				try {
-					reservations = adapter
-							.getUserReservationsActiveNow("OFFLINE", username);
+					reservations = adapter.getUserReservationsActiveNow(
+							"OFFLINE", username);
 
 				} catch (NoReservationsAvailableException e) {
 
@@ -208,9 +205,12 @@ public class ExperimentBooker {
 				if (reservations != null) {
 					for (ReservationInformation resInfo : reservations) {
 						if (resInfo.getExperiment().equals(experiment)) {
-							throw new NoReservationsAvailableException(
-									"You already have a context of "
-											+ experiment);
+							NoReservationsAvailableException ex = new NoReservationsAvailableException(
+									"offline");
+							ex.getAction().put("cause", "already applied");
+							ex.getAction().put("experiment", experiment);
+
+							throw ex;
 						}
 					}
 				}
@@ -230,7 +230,7 @@ public class ExperimentBooker {
 				timeSlot.setEnd(calendar.getTime());
 				adapter.makeReservation(experiment, null, username, timeSlot);
 			} else {
-				throw new NoSuchExperimentException("The experiment " + experiment + " cannot be applied");
+				throw new NoSuchExperimentException(experiment);
 			}
 		}
 	}
@@ -261,8 +261,10 @@ public class ExperimentBooker {
 			reservation = adapter.getReservationInformation(reservationId);
 
 			if (!reservation.getUser().equals(username)) {
-				throw new NoSuchReservationException(
-						"The reservation that you are trying to cancel is not yours");
+				LogAction action = new LogAction();
+				action.put("user", username);
+				action.put("cause", "invalid user");
+				throw new NoSuchReservationException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
 			throw e;
@@ -277,8 +279,10 @@ public class ExperimentBooker {
 				throw e;
 			}
 		} else {
-			throw new NoSuchReservationException(
-					"Cannot cancel a reservation while it is active");
+			LogAction action = new LogAction();
+			action.put("user", username);
+			action.put("cause", "context active");
+			throw new NoSuchReservationException(action);
 		}
 	}
 }

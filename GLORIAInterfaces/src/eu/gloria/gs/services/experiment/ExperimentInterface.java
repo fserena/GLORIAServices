@@ -22,14 +22,17 @@ import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
+import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.ObjectResponse;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.utils.ObjectResponse;
 
 @WebService(name = "ExperimentInterface", targetNamespace = "http://experiment.services.gs.gloria.eu/")
 public interface ExperimentInterface {
@@ -54,7 +57,8 @@ public interface ExperimentInterface {
 	public void addExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException,
+			OperationTypeNotAvailableException, ParameterTypeNotAvailableException;
 
 	public boolean testExperimentFeature(
 			@WebParam(name = "experiment") String experiment,
@@ -69,7 +73,7 @@ public interface ExperimentInterface {
 	public void addExperimentParameter(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "operation") ParameterInformation parameter)
-			throws ExperimentException, NoSuchExperimentException;
+			throws ExperimentException, NoSuchExperimentException, NoSuchParameterException;
 
 	public ExperimentInformation getExperimentInformation(
 			@WebParam(name = "experiment") String experiment)
@@ -142,7 +146,8 @@ public interface ExperimentInterface {
 
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException, InvalidUserContextException;
+			throws InvalidUserContextException, NoSuchReservationException,
+			ExperimentException;
 
 	public void executeExperimentOperation(
 			@WebParam(name = "reservationId") int reservationId,
@@ -158,14 +163,14 @@ public interface ExperimentInterface {
 			@WebParam(name = "value") ObjectResponse value)
 			throws ExperimentNotInstantiatedException,
 			NoSuchReservationException, ExperimentParameterException,
-			InvalidUserContextException;
+			InvalidUserContextException, NoSuchParameterException;
 
 	public ObjectResponse getExperimentParameterValue(
 			@WebParam(name = "reservationId") int reservationId,
 			@WebParam(name = "parameter") String parameter)
 			throws ExperimentNotInstantiatedException,
 			NoSuchReservationException, ExperimentParameterException,
-			InvalidUserContextException;
+			InvalidUserContextException, NoSuchParameterException;
 
 	public List<ResultInformation> getContextResults(
 			@WebParam(name = "reservationId") int reservationId)
@@ -179,7 +184,7 @@ public interface ExperimentInterface {
 	public ExperimentRuntimeInformation getExperimentRuntimeInformation(
 			@WebParam(name = "reservationId") int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException;
+			NoSuchReservationException, InvalidUserContextException;
 
 	public Set<String> getAllExperimentParameters() throws ExperimentException;
 
@@ -206,11 +211,13 @@ public interface ExperimentInterface {
 	 * @throws ExperimentNotInstantiatedException
 	 * @throws NoSuchReservationException
 	 * @throws InvalidUserContextException
+	 * @throws NoSuchParameterException
 	 */
-	ObjectResponse getExperimentContext(
+	public ObjectResponse getExperimentContext(
 			@WebParam(name = "reservationId") int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
-			NoSuchReservationException, InvalidUserContextException;
+			NoSuchReservationException, InvalidUserContextException,
+			NoSuchParameterException;
 
 	/**
 	 * @param reservationId

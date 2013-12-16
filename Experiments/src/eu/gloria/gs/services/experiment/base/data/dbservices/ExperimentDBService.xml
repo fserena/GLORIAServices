@@ -391,6 +391,31 @@
 		rid=#{rid_}
 	</select>
 
+	<select id="isReservationActiveNow" resultType="boolean">
+		SELECT
+		count(*) >
+		0
+		FROM
+		`reservation`
+		WHERE
+		idreservation=#{rid_} AND begin &lt;=
+		#{when_}
+		AND end &gt;=
+		#{when_}
+	</select>
+
+	<select id="isReservationActiveNowForUser" resultType="boolean">
+		SELECT
+		count(*) >
+		0
+		FROM
+		`reservation`
+		WHERE
+		idreservation=#{rid_} AND begin &lt;=
+		#{when_} AND end &gt;=
+		#{when_} AND user=#{user_}
+	</select>
+
 	<select id="getOperationArguments"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry">
 		SELECT *
@@ -506,7 +531,8 @@
 		ON
 		(reservation.experiment=experiment.idexperiment)
 		WHERE type =
-		#{type_} AND (begin
+		#{type_}
+		AND (begin
 		&gt;=#{from_} OR end
 		&gt; #{from_}) ORDER BY begin
 	</select>
@@ -578,7 +604,8 @@
 		ON
 		(reservation.experiment=experiment.idexperiment)
 		WHERE
-		type=#{type_} AND begin &lt;=
+		type=#{type_} AND
+		begin &lt;=
 		#{when_} AND end
 		&gt;=
 		#{when_}

@@ -3,7 +3,6 @@ package eu.gloria.gs.services.experiment.base.data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -27,6 +26,7 @@ import eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ResultEntry;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationFactory;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
@@ -76,11 +76,10 @@ public class ExperimentDBAdapter {
 				service.saveExperimentOperation(entry);
 
 			} else
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
+				throw new NoSuchExperimentException(experiment);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -106,46 +105,16 @@ public class ExperimentDBAdapter {
 
 				String type = parameterInfo.getType();
 
-				// ArrayList<Class<?>> argumentTypes = parameterInfo
-				// .getParameter().getType().getArgumentTypes();
-
 				type += JSONConverter.toJSON(parameterInfo.getArguments());
-
-				// int i = 0;
-				// Object[] concreteArguments = new Object[parameterInfo
-				// .getArguments().length];
-
-				/*
-				 * for (Object argStr : parameterInfo.getArguments()) {
-				 * 
-				 * //if (argumentTypes.get(0).equals(String.class)) { //
-				 * concreteArguments[i] = argStr; //} else {
-				 * concreteArguments[i] = JSONConverter.fromJSON((String)argStr,
-				 * argumentTypes.get(0), null); //}
-				 * 
-				 * i++; }
-				 */
-
-				// type += JSONConverter.toJSON(parameterInfo.getArguments());
-
-				/*
-				 * type += "["; int i = 0; for (String argument :
-				 * parameterInfo.getArguments()) { type += argument; if (i <
-				 * parameterInfo.getArguments().length - 1) { type += ","; }
-				 * i++; }
-				 * 
-				 * type += "]";
-				 */
 
 				entry.setType(type);
 				service.saveExperimentParameter(entry);
 
 			} else
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
+				throw new NoSuchExperimentException(experiment);
 
 		} catch (PersistenceException | IOException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -176,17 +145,19 @@ public class ExperimentDBAdapter {
 
 					service.saveParameterContext(entry);
 
-				} else
-					throw new ExperimentDatabaseException("The experiment '"
-							+ experiment
-							+ "' does not contain a parameter named '"
-							+ parameter + "'");
+				} else {
+					ExperimentDatabaseException ex = new ExperimentDatabaseException(
+							"parameter does not exist");
+					ex.getAction().put("name", parameter);
+					ex.getAction().put("rid", rid);
+
+					throw ex;
+				}
 			} else
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
+				throw new NoSuchExperimentException(experiment);
 
 		} catch (PersistenceException e) {
-			throw new NoSuchExperimentException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -212,10 +183,47 @@ public class ExperimentDBAdapter {
 				}
 			}
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return !available;
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean isReservationActiveNow(int rid)
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.isReservationActiveNow(rid, new Date());
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+
+		return anyActive;
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean isReservationIsActiveNowForUser(int rid, String user)
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.isReservationActiveNowForUser(rid, user,
+					new Date());
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+
+		return anyActive;
 	}
 
 	/**
@@ -230,7 +238,7 @@ public class ExperimentDBAdapter {
 			anyActive = service.anyReservationAtByType(type, new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return anyActive;
@@ -247,7 +255,7 @@ public class ExperimentDBAdapter {
 			anyActive = service.anyReservationAt(new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return anyActive;
@@ -267,7 +275,7 @@ public class ExperimentDBAdapter {
 					new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return anyActive;
@@ -286,7 +294,7 @@ public class ExperimentDBAdapter {
 			anyActive = service.anyUserReservationAt(username, new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return anyActive;
@@ -303,12 +311,13 @@ public class ExperimentDBAdapter {
 					.getAllReservationsBefore(new Date());
 
 			for (ReservationEntry entry : reservationEntries) {
-				service.removeReservationContext(entry.getIdreservation());	
-				service.setReservationStatus(entry.getIdreservation(), "OBSOLETE");
+				service.removeReservationContext(entry.getIdreservation());
+				service.setReservationStatus(entry.getIdreservation(),
+						"OBSOLETE");
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 	}
@@ -325,11 +334,11 @@ public class ExperimentDBAdapter {
 					.getAllReservationsBefore(new Date());
 
 			for (ReservationEntry entry : reservationEntries) {
-				service.removeReservation(entry.getIdreservation());				
+				service.removeReservation(entry.getIdreservation());
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -346,7 +355,7 @@ public class ExperimentDBAdapter {
 		try {
 			alreadyContained = service.containsExperiment(experiment);
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return alreadyContained;
@@ -364,7 +373,7 @@ public class ExperimentDBAdapter {
 			ExperimentEntry expEntry = service.getExperiment(experiment);
 			return expEntry.getType();
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -392,12 +401,11 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		if (alreadyContained) {
-			throw new DuplicateExperimentException("The experiment '"
-					+ experiment + "' already exists");
+			throw new DuplicateExperimentException(experiment);
 		}
 	}
 
@@ -413,11 +421,10 @@ public class ExperimentDBAdapter {
 			if (service.containsExperiment(experiment)) {
 				service.removeExperiment(experiment);
 			} else {
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
+				throw new NoSuchExperimentException(experiment);
 			}
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 	}
@@ -433,7 +440,7 @@ public class ExperimentDBAdapter {
 
 			service.removeReservationContext(rid);
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 	}
@@ -449,7 +456,7 @@ public class ExperimentDBAdapter {
 			service.removeReservation(rid);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -466,10 +473,39 @@ public class ExperimentDBAdapter {
 			experiments = service.getAllTypeExperiments(type);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		return experiments;
+	}
+
+	/**
+	 * @param experiment
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoSuchExperimentException
+	 */
+	public ExperimentInformation getBasicExperimentInformation(String experiment)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			ExperimentEntry entry = service.getExperiment(experiment);
+
+			if (entry != null) {
+				ExperimentInformation expInfo = new ExperimentInformation();
+				expInfo.setName(entry.getName());
+				expInfo.setAuthor(entry.getAuthor());
+				expInfo.setDescription(entry.getDescription());
+				expInfo.setType(ExperimentType.ONLINE);
+
+				return expInfo;
+			}
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+
+		throw new NoSuchExperimentException(experiment);
 	}
 
 	/**
@@ -598,7 +634,8 @@ public class ExperimentDBAdapter {
 
 					} else {
 						throw new ParameterTypeNotAvailableException(
-								"The type pattern is incorrect: " + typePattern);
+								experiment, parameterEntry.getParameter(),
+								typePattern);
 					}
 
 					paramInfo.setType(parameterType);
@@ -611,14 +648,14 @@ public class ExperimentDBAdapter {
 
 				return expInfo;
 			}
-		} catch (PersistenceException | ParameterTypeNotAvailableException
+		} catch (PersistenceException | IOException
+				| ParameterTypeNotAvailableException
 				| ExperimentParameterException
-				| OperationTypeNotAvailableException | IOException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+				| OperationTypeNotAvailableException e) {
+			throw new ExperimentDatabaseException();
 		}
 
-		throw new NoSuchExperimentException("The experiment '" + experiment
-				+ "' does not exist.");
+		throw new NoSuchExperimentException(experiment);
 	}
 
 	/**
@@ -634,34 +671,10 @@ public class ExperimentDBAdapter {
 		try {
 
 			if (!service.isReservationContextInstantiated(rid)) {
-				throw new ExperimentNotInstantiatedException(
-						"The reservation '" + rid
-								+ "' is not yet instantiated or is invalid");
+				throw new ExperimentNotInstantiatedException(rid);
 			}
-
-			List<ContextEntry> context = service.getReservationContext(rid);
 
 			ExperimentRuntimeInformation runtimeContext = new ExperimentRuntimeInformation();
-
-			HashMap<String, Object> parameterValues = new HashMap<String, Object>();
-			runtimeContext.setParameterValues(parameterValues);
-
-			for (ContextEntry entry : context) {
-
-				try {
-					ParameterEntry parameterEntry = service
-							.getParameterById(entry.getPid());
-
-					parameterValues.put(parameterEntry.getParameter(),
-							entry.getValue());
-
-				} catch (NullPointerException e) {
-					throw new ExperimentDatabaseException(
-							"The parameter '"
-									+ entry.getPid()
-									+ "' referenced by experiment context does not exist");
-				}
-			}
 
 			ReservationEntry reservationEntry = service.getReservationById(rid);
 			Date beginDate = reservationEntry.getBegin();
@@ -676,7 +689,7 @@ public class ExperimentDBAdapter {
 			return runtimeContext;
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -689,23 +702,19 @@ public class ExperimentDBAdapter {
 	 * @throws NoSuchExperimentException
 	 * @throws ExperimentNotInstantiatedException
 	 */
-	public Object getParameterContextValue(String experiment, String parameter,
-			int rid) throws ExperimentDatabaseException,
-			NoSuchExperimentException, ExperimentNotInstantiatedException {
+	public Object getParameterContextValue(String parameter, int rid)
+			throws ExperimentDatabaseException, NoSuchParameterException,
+			ExperimentNotInstantiatedException {
 
 		try {
 
-			if (!service.containsExperiment(experiment)) {
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
-			}
-
 			if (!service.isReservationContextInstantiated(rid)) {
-				throw new ExperimentNotInstantiatedException(
-						"The reservation '" + rid + "' is not yet instantiated");
+				throw new ExperimentNotInstantiatedException(rid);
 			}
 
-			int experimentId = service.getExperimentId(experiment);
+			ReservationEntry resEntry = service.getReservationById(rid);
+
+			int experimentId = resEntry.getExperiment();
 
 			ParameterEntry parameterEntry = service.getExperimentParameter(
 					experimentId, parameter);
@@ -715,13 +724,11 @@ public class ExperimentDBAdapter {
 						parameterEntry.getIdparameter(), rid);
 
 			} else {
-				throw new ExperimentDatabaseException("The experiment '"
-						+ experiment + "' does not contain a parameter named '"
-						+ parameter + "'");
+				throw new ExperimentDatabaseException("parameter problem");
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -765,12 +772,11 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		if (reservation == null)
-			throw new NoSuchReservationException(
-					"No reservation registered for id '" + rid + "'");
+			throw new NoSuchReservationException(rid);
 
 		return reservation;
 	}
@@ -790,14 +796,13 @@ public class ExperimentDBAdapter {
 					.getUserReservationsFrom(username, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("The user '"
-						+ username + "' has no pending reservations");
+				throw new NoReservationsAvailableException("pending");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -816,14 +821,13 @@ public class ExperimentDBAdapter {
 					.getUserReservationsFromByType(type, username, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("The user '"
-						+ username + "' has no pending reservations");
+				throw new NoReservationsAvailableException("pending");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -842,14 +846,13 @@ public class ExperimentDBAdapter {
 					.getAllReservationsFromByType(type, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"There are no pending reservations");
+				throw new NoReservationsAvailableException("pending");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -868,14 +871,13 @@ public class ExperimentDBAdapter {
 					.getAllReservationsFrom(new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"There are no pending reservations");
+				throw new NoReservationsAvailableException("pending");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -926,13 +928,12 @@ public class ExperimentDBAdapter {
 					.getAllReservationsAt(new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"No active reservations now");
+				throw new NoReservationsAvailableException("active");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -950,13 +951,12 @@ public class ExperimentDBAdapter {
 					.getAllReservationsAtByType(type, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"No active reservations now");
+				throw new NoReservationsAvailableException("active");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -975,15 +975,13 @@ public class ExperimentDBAdapter {
 					.getUserReservationsAt(username, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"No active reservations now for the " + "user '"
-								+ username + "'");
+				throw new NoReservationsAvailableException("active");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1002,15 +1000,13 @@ public class ExperimentDBAdapter {
 					.getUserReservationsAtByType(type, username, new Date());
 
 			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException(
-						"No active reservations now for the " + "user '"
-								+ username + "'");
+				throw new NoReservationsAvailableException("active");
 			}
 
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1023,20 +1019,20 @@ public class ExperimentDBAdapter {
 	 * @param rid
 	 * @return
 	 * @throws ExperimentDatabaseException
+	 * @throws NoSuchReservationException
 	 */
 	public boolean isReservationContextReady(int rid)
-			throws ExperimentDatabaseException {
+			throws ExperimentDatabaseException, NoSuchReservationException {
 
 		try {
 
 			ReservationEntry reservationEntry = service.getReservationById(rid);
 
 			if (reservationEntry == null) {
-				throw new ExperimentDatabaseException("The reservation '" + rid
-						+ "' does not exists");
+				throw new NoSuchReservationException(rid);
 			}
 			String status = reservationEntry.getStatus();
-			
+
 			if (status == null || !status.equals("READY")) {
 				return false;
 			}
@@ -1051,10 +1047,9 @@ public class ExperimentDBAdapter {
 					&& paramsInContext == parameters.size();
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
-	
 
 	/**
 	 * @param experiment
@@ -1093,23 +1088,22 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
-	
+
 	/**
 	 * @param rid
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setContextReady(int rid)
-			throws ExperimentDatabaseException {
+	public void setContextReady(int rid) throws ExperimentDatabaseException {
 
 		try {
-			
+
 			service.setReservationStatus(rid, "READY");
-						
+
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1117,15 +1111,14 @@ public class ExperimentDBAdapter {
 	 * @param rid
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setContextInit(int rid)
-			throws ExperimentDatabaseException {
+	public void setContextInit(int rid) throws ExperimentDatabaseException {
 
 		try {
-			
+
 			service.setReservationStatus(rid, "INIT");
-						
+
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1133,34 +1126,31 @@ public class ExperimentDBAdapter {
 	 * @param rid
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setContextError(int rid)
-			throws ExperimentDatabaseException {
+	public void setContextError(int rid) throws ExperimentDatabaseException {
 
 		try {
-			
+
 			service.setReservationStatus(rid, "ERROR");
-						
+
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
-	
+
 	/**
 	 * @param rid
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setContextObsolete(int rid)
-			throws ExperimentDatabaseException {
+	public void setContextObsolete(int rid) throws ExperimentDatabaseException {
 
 		try {
-			
+
 			service.setReservationStatus(rid, "OBSOLETE");
-						
+
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
-
 
 	/**
 	 * @param experiment
@@ -1182,12 +1172,11 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 		if (!alreadyContained) {
-			throw new NoSuchExperimentException("The experiment '" + experiment
-					+ "' does not exist.");
+			throw new NoSuchExperimentException(experiment);
 		}
 	}
 
@@ -1213,7 +1202,7 @@ public class ExperimentDBAdapter {
 			service.createExperimentContextTable();
 			service.createExperimentResultsTable();
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1230,10 +1219,11 @@ public class ExperimentDBAdapter {
 	 * @param arguments
 	 * @throws ExperimentDatabaseException
 	 * @throws NoSuchExperimentException
+	 * @throws NoSuchParameterException
 	 */
 	public void setOperationArguments(String experiment, String operation,
 			String[] arguments) throws ExperimentDatabaseException,
-			NoSuchExperimentException {
+			NoSuchExperimentException, NoSuchParameterException {
 
 		try {
 
@@ -1266,11 +1256,7 @@ public class ExperimentDBAdapter {
 
 						if (parameterEntry == null && argOpEntry == null) {
 
-							throw new ExperimentDatabaseException(
-									"The experiment '"
-											+ experiment
-											+ "' does not contain a parameter nor operation named '"
-											+ actualArgument + "'");
+							throw new NoSuchParameterException(actualArgument);
 						}
 
 						ArgumentEntry entry = new ArgumentEntry();
@@ -1306,11 +1292,10 @@ public class ExperimentDBAdapter {
 							+ operation + "'");
 				}
 			} else {
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
+				throw new NoSuchExperimentException(experiment);
 			}
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 
 	}
@@ -1330,24 +1315,27 @@ public class ExperimentDBAdapter {
 	 * @throws ExperimentDatabaseException
 	 * @throws NoSuchExperimentException
 	 * @throws ExperimentNotInstantiatedException
+	 * @throws NoSuchParameterException
 	 */
-	public void setParameterContextValue(String experiment, String parameter,
-			int rid, Object value) throws ExperimentDatabaseException,
-			NoSuchExperimentException, ExperimentNotInstantiatedException {
+	public void setParameterContextValue(String parameter, int rid, Object value)
+			throws ExperimentDatabaseException,
+			ExperimentNotInstantiatedException, NoSuchParameterException {
 
 		try {
 
-			if (!service.containsExperiment(experiment)) {
-				throw new NoSuchExperimentException("The experiment '"
-						+ experiment + "' does not exist");
-			}
+			/*
+			 * if (!service.containsExperiment(experiment)) { throw new
+			 * NoSuchExperimentException("The experiment '" + experiment +
+			 * "' does not exist"); }
+			 */
 
 			if (!service.isReservationContextInstantiated(rid)) {
-				throw new ExperimentNotInstantiatedException(
-						"The reservation '" + rid + "' is not yet instantiated");
+				throw new ExperimentNotInstantiatedException(rid);
 			}
 
-			int experimentId = service.getExperimentId(experiment);
+			ReservationEntry resEntry = service.getReservationById(rid);
+
+			int experimentId = resEntry.getExperiment();
 
 			ParameterEntry parameterEntry = service.getExperimentParameter(
 					experimentId, parameter);
@@ -1358,13 +1346,11 @@ public class ExperimentDBAdapter {
 						parameterEntry.getIdparameter(), rid, value);
 
 			} else {
-				throw new ExperimentDatabaseException("The experiment '"
-						+ experiment + "' does not contain a parameter named '"
-						+ parameter + "'");
+				throw new NoSuchParameterException(parameter);
 			}
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1394,7 +1380,7 @@ public class ExperimentDBAdapter {
 			service.saveResult(entry);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1426,7 +1412,7 @@ public class ExperimentDBAdapter {
 
 			return results;
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 
@@ -1443,8 +1429,7 @@ public class ExperimentDBAdapter {
 			ReservationEntry resEntry = service.getReservationById(context);
 
 			if (resEntry == null) {
-				throw new NoSuchReservationException("The context " + context
-						+ " does not exist");
+				throw new NoSuchReservationException(context);
 			}
 
 			int expId = resEntry.getExperiment();
@@ -1463,7 +1448,7 @@ public class ExperimentDBAdapter {
 
 			return results;
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException(e.getMessage());
+			throw new ExperimentDatabaseException();
 		}
 	}
 }

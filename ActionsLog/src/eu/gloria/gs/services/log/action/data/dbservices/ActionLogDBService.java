@@ -1,49 +1,94 @@
 package eu.gloria.gs.services.log.action.data.dbservices;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public interface ActionLogDBService {
 
 	public void create();
 
-	public ActionLogEntry get(@Param(value = "name_") String name);
+	public List<ActionLogEntry> getAllByUser(@Param(value = "user_") String user);
+
+	public List<ActionLogEntry> getAllByUserAndDate(
+			@Param(value = "user_") String user,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+
+	public List<ActionLogEntry> getAllByRid(@Param(value = "rid_") int rid);
+	
+	public List<ActionLogEntry> getAllByRidAndDate(
+			@Param(value = "int_") int rid,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+
+	public List<ActionLogEntry> getAllByDate(@Param(value = "from_") Date from,
+			@Param(value = "to_") Date to);
+
+	public List<ActionLogEntry> getAllByRt(@Param(value = "rt_") String rt);
+
+	public List<ActionLogEntry> getAllByRtAndDate(
+			@Param(value = "rt_") String rt,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+	
+	public List<ActionLogEntry> getByUserAndType(
+			@Param(value = "user_") String user,
+			@Param(value = "type_") String type);
+
+	public List<ActionLogEntry> getByUserTypeAndDate(
+			@Param(value = "user_") String user,
+			@Param(value = "type_") String type,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+
+	public List<ActionLogEntry> getByRidAndType(@Param(value = "rid_") int rid,
+			@Param(value = "type_") String type);
+
+	public List<ActionLogEntry> getByRidTypeAndDate(
+			@Param(value = "rid_") int rid,
+			@Param(value = "type_") String type,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
+
+	public List<ActionLogEntry> getByDateAndType(
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to,
+			@Param(value = "type_") String type);
+
+	public List<ActionLogEntry> getByRtAndType(@Param(value = "rt_") String rt,
+			@Param(value = "type_") String type);
+
+	public List<ActionLogEntry> getByRtTypeAndDate(
+			@Param(value = "rt_") String rt,
+			@Param(value = "type_") String type,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
 	public void save(ActionLogEntry entry);
 
-	public boolean contains(@Param(value = "name_") String name);
+	public boolean containsUser(@Param(value = "user_") String user);
 
-	public String getOwner(@Param(value = "name_") String name);
+	public boolean containsUserByDate(@Param(value = "user_") String user,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
-	public void setDescription(@Param(value = "name_") String name,
-			@Param(value = "description_") String description);
+	public boolean containsRid(@Param(value = "rid_") int rid);
 
-	public String getDescription(@Param(value = "name_") String name);
+	public boolean containsRidByDate(@Param(value = "rid_") int rid,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
-	public void setPublicKey(@Param(value = "name_") String name,
-			@Param(value = "pk_") String pk);
+	public boolean containsRt(@Param(value = "rt_") String rt);
 
-	public String getPublicKey(@Param(value = "name_") String name);
+	public boolean containsRtByDate(@Param(value = "rt_") String rt,
+			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
-	public void setCoordinates(@Param(value = "name_") String name,
-			@Param(value = "lat_") double latitude,
-			@Param(value = "long_") double longitude);
+	public boolean containsDate(@Param(value = "from_") Date from,
+			@Param(value = "to_") Date to);
 
-	public double getLongitude(@Param(value = "name_") String name);
+	public void removeByUser(@Param(value = "user_") String user);
 
-	public double getLatitude(@Param(value = "name_") String name);
+	public void removeByRid(@Param(value = "rid_") int rid);
 
-	public void setObservatory(@Param(value = "name_") String name,
-			@Param(value = "oid_") int oid);
+	public void removeByRt(@Param(value = "rt_") String rt);
 
-	public int getObservatory(@Param(value = "name_") String name);
-
-	public List<String> getByObservatoryId(@Param(value = "oid_") int oid);
-
-	public void remove(@Param(value = "name_") String name);
+	public void removeByDate(@Param(value = "from_") Date from,
+			@Param(value = "to_") Date to);
 }

@@ -33,9 +33,7 @@ public class ExperimentParameterFactory implements ApplicationContextAware {
 				.getBean(parameterName);
 
 		if (parameter == null) {
-			throw new ParameterTypeNotAvailableException(
-					"The experiment parameter '" + parameterName
-							+ "' does not exist");
+			throw new ParameterTypeNotAvailableException(parameterName);
 		}
 
 		return parameter;

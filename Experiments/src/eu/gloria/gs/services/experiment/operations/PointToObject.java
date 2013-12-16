@@ -8,7 +8,7 @@ package eu.gloria.gs.services.experiment.operations;
 import java.util.List;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -54,7 +54,7 @@ public class PointToObject extends ServiceOperation {
 				domes = this.getRTRepository().getRTDeviceNames(rtName,
 						DeviceType.DOME);
 			} catch (RTRepositoryException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(e.getAction());
 			}
 
 			if (domes != null && domes.size() > 0) {
@@ -70,7 +70,7 @@ public class PointToObject extends ServiceOperation {
 						this.getDomeTeleoperation().open(rtName, domeName);
 					}
 				} catch (DomeTeleoperationException e) {
-					throw new ExperimentOperationException(e.getMessage());
+					throw new ExperimentOperationException(e.getAction());
 				} catch (DeviceOperationFailedException e) {
 				}
 			}
@@ -98,19 +98,21 @@ public class PointToObject extends ServiceOperation {
 							mountName, object);
 
 				} catch (MountTeleoperationException e) {
-					throw new ExperimentOperationException(e.getMessage());
+					throw new ExperimentOperationException(e.getAction());
 				} catch (DeviceOperationFailedException e) {
 				}
 			}
 
 			else {
-				throw new ExperimentOperationException(
-						"No mount available on the '" + rtName + "' RT");
+				ExperimentOperationException ex = new ExperimentOperationException(
+						this.getContext().getName(), "no mount available");
+				ex.getAction().put("rt", rtName);
+				throw ex;
 			}
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

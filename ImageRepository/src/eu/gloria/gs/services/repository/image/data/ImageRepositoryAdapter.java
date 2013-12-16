@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageDBService;
 import eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry;
 
@@ -47,7 +45,7 @@ public class ImageRepositoryAdapter {
 		try {
 			entry.setTarget(JSONConverter.toJSON(target));
 		} catch (IOException e) {
-			throw new ImageDatabaseException(e.getMessage());
+			throw new ImageDatabaseException();
 		}
 
 		imageService.save(entry);
@@ -55,8 +53,11 @@ public class ImageRepositoryAdapter {
 
 	public void removeImage(int id) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image '" + id
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.remove(id);
@@ -65,8 +66,10 @@ public class ImageRepositoryAdapter {
 	public void setExperimentReservation(int id, int rid)
 			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image '" + id
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setReservation(id, rid);
@@ -75,8 +78,10 @@ public class ImageRepositoryAdapter {
 	public void setExperimentReservationByJpg(String jpg, int rid)
 			throws ImageDatabaseException {
 		if (!imageService.containsJpg(jpg)) {
-			throw new ImageDatabaseException("The image with URL= '" + jpg
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("jpg", jpg);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.getByJpg(jpg);
@@ -86,8 +91,10 @@ public class ImageRepositoryAdapter {
 	public void setExperimentReservationByFits(String fits, int rid)
 			throws ImageDatabaseException {
 		if (!imageService.containsJpg(fits)) {
-			throw new ImageDatabaseException("The image with URL= '" + fits
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("fits", fits);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.getByJpg(fits);
@@ -96,8 +103,10 @@ public class ImageRepositoryAdapter {
 
 	public void setJpg(int id, String jpg) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image with URL= '" + jpg
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setJpg(id, jpg);
@@ -105,8 +114,10 @@ public class ImageRepositoryAdapter {
 
 	public void setFits(int id, String fits) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image with URL= '" + fits
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setFits(id, fits);
@@ -115,8 +126,11 @@ public class ImageRepositoryAdapter {
 	public void setJpgByRT(String rt, String lid, String jpg)
 			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image with URL= '" + jpg
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setJpgByRTLocalId(rt, lid, jpg);
@@ -125,8 +139,11 @@ public class ImageRepositoryAdapter {
 	public void setFitsByRT(String rt, String lid, String fits)
 			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image with URL= '" + fits
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setFitsByRTLocalId(rt, lid, fits);
@@ -135,22 +152,31 @@ public class ImageRepositoryAdapter {
 	public void setTargetByRT(String rt, String lid, ImageTargetData target)
 			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image with URL= '"
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		try {
 			imageService.setTargetByRTLocalId(rt, lid,
 					JSONConverter.toJSON(target));
 		} catch (IOException e) {
-			throw new ImageDatabaseException(e.getMessage());
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "json error");
+			throw new ImageDatabaseException(action);
 		}
 	}
 
 	public void setUser(int id, String user) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image '" + id
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		imageService.setUser(id, user);
@@ -159,8 +185,10 @@ public class ImageRepositoryAdapter {
 	public void setUserByJpg(String jpg, String user)
 			throws ImageDatabaseException {
 		if (!imageService.containsJpg(jpg)) {
-			throw new ImageDatabaseException("The image with URL= '" + jpg
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("jpg", jpg);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.getByJpg(jpg);
@@ -170,8 +198,10 @@ public class ImageRepositoryAdapter {
 	public void setUserByFits(String fits, String user)
 			throws ImageDatabaseException {
 		if (!imageService.containsJpg(fits)) {
-			throw new ImageDatabaseException("The image with URL= '" + fits
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("fits", fits);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.getByJpg(fits);
@@ -181,8 +211,10 @@ public class ImageRepositoryAdapter {
 	public ImageInformation getImageInformation(int id)
 			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
-			throw new ImageDatabaseException("The image '" + id
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.get(id);
@@ -202,7 +234,10 @@ public class ImageRepositoryAdapter {
 			imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
 					entry.getTarget(), ImageTargetData.class, null));
 		} catch (IOException e) {
-			throw new ImageDatabaseException(e.getMessage());
+			LogAction action = new LogAction();
+			action.put("id", id);
+			action.put("cause", "json error");
+			throw new ImageDatabaseException(action);
 		}
 
 		return imageInfo;
@@ -211,8 +246,11 @@ public class ImageRepositoryAdapter {
 	public ImageInformation getImageInformationByRTLocalId(String rt, String lid)
 			throws ImageDatabaseException {
 		if (!imageService.containsRTLocalId(rt, lid)) {
-			throw new ImageDatabaseException("The image '" + lid
-					+ "' does not exist");
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "image does not exist");
+			throw new ImageDatabaseException(action);
 		}
 
 		ImageEntry entry = imageService.getByRTLocalId(rt, lid);
@@ -232,7 +270,11 @@ public class ImageRepositoryAdapter {
 			imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
 					entry.getTarget(), ImageTargetData.class, null));
 		} catch (IOException e) {
-			throw new ImageDatabaseException(e.getMessage());
+			LogAction action = new LogAction();
+			action.put("rt", rt);
+			action.put("lid", lid);
+			action.put("cause", "json error");
+			throw new ImageDatabaseException(action);
 		}
 		return imageInfo;
 	}
@@ -261,7 +303,10 @@ public class ImageRepositoryAdapter {
 							.fromJSON(entry.getTarget(), ImageTargetData.class,
 									null));
 				} catch (IOException e) {
-					throw new ImageDatabaseException(e.getMessage());
+					LogAction action = new LogAction();
+					action.put("rid", rid);					
+					action.put("cause", "json error");
+					throw new ImageDatabaseException(action);
 				}
 				imageInfos.add(imageInfo);
 			}
@@ -289,7 +334,10 @@ public class ImageRepositoryAdapter {
 				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
 						entry.getTarget(), ImageTargetData.class, null));
 			} catch (IOException e) {
-				throw new ImageDatabaseException(e.getMessage());
+				LogAction action = new LogAction();
+				action.put("entry", entry.getIdimage());
+				action.put("cause", "json error");
+				throw new ImageDatabaseException(action);
 			}
 			imageInfos.add(imageInfo);
 		}

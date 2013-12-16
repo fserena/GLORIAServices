@@ -5,22 +5,24 @@
  */
 package eu.gloria.gs.services.experiment.operations;
 
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
 import eu.gloria.gs.services.experiment.base.operations.OperationContext;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class Iteration extends ServiceOperation {
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
 	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
@@ -32,8 +34,8 @@ public class Iteration extends ServiceOperation {
 			int cursorInit = (Integer) this.getContext().getExperimentContext()
 					.getParameterValue(cursorNameParameter);
 			int maxIterations = (Integer) this.getContext()
-					.getExperimentContext().getParameterValue(
-							maxIterationsNameParameter);
+					.getExperimentContext()
+					.getParameterValue(maxIterationsNameParameter);
 
 			for (int i = cursorInit; i < maxIterations; i++) {
 				OperationContext subContext = null;
@@ -41,18 +43,17 @@ public class Iteration extends ServiceOperation {
 					subContext = this.getContext().getExperimentContext()
 							.getOperation(operationName);
 				} catch (NoSuchOperationException e) {
-					throw new ExperimentOperationException(e.getMessage());
+					throw new ExperimentOperationException(e.getAction());
 				}
 				subContext.execute();
 
-				this.getContext().getExperimentContext().setParameterValue(
-						cursorNameParameter, i + 1);
+				this.getContext().getExperimentContext()
+						.setParameterValue(cursorNameParameter, i + 1);
 			}
 
-		} catch (NoSuchExperimentException | ExperimentParameterException
-				| ExperimentNotInstantiatedException
-				| UndefinedExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+		} catch (NoSuchParameterException | ExperimentParameterException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.teleoperation.rts;
 
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 
 public class RTSTeleoperationException extends TeleoperationException {
@@ -7,9 +8,9 @@ public class RTSTeleoperationException extends TeleoperationException {
 	/**
 	 * 
 	 */
-	public RTSTeleoperationException(String message)
+	public RTSTeleoperationException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

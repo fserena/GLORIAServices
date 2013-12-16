@@ -8,12 +8,7 @@
 		class="eu.gloria.gs.services.experiment.base.operations.BeanExperimentOperation"
 		scope="singleton">
 	</bean>
-
-	<bean id="OPERATION_TYPE"
-		class="eu.gloria.gs.services.experiment.base.operations.OperationType"
-		scope="singleton">
-	</bean>
-
+	
 	<bean id="SetParameter" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>

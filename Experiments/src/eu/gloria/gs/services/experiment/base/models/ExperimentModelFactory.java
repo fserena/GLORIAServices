@@ -57,9 +57,9 @@ public class ExperimentModelFactory {
 		try {
 			expInfo = adapter.getExperimentInformation(experiment);
 		} catch (ExperimentDatabaseException e) {
-			throw new NoSuchExperimentException("Experiment: '" + experiment);
+			throw new NoSuchExperimentException(experiment);
 		} catch (NoSuchExperimentException e) {
-			throw new NoSuchExperimentException("Experiment: '" + experiment);
+			throw new NoSuchExperimentException(experiment);
 		}
 
 		model = new CustomExperimentModel();
@@ -83,14 +83,14 @@ public class ExperimentModelFactory {
 							.createParameter(parameterInfo.getType());
 				} catch (ParameterTypeNotAvailableException
 						| ExperimentParameterException e) {
-					throw new InvalidExperimentModelException(e.getMessage());
+					throw new InvalidExperimentModelException(e.getAction());
 				}
 
 				try {
-					model.addParameter(parameterInfo.getName(),
-							expParameter, parameterInfo.getArguments());
+					model.addParameter(parameterInfo.getName(), expParameter,
+							parameterInfo.getArguments());
 				} catch (ExperimentParameterException e) {
-					throw new InvalidExperimentModelException(e.getMessage());
+					throw new InvalidExperimentModelException(e.getAction());
 				}
 
 			} else {
@@ -108,13 +108,13 @@ public class ExperimentModelFactory {
 						.createParameter(parameterInfo.getType());
 			} catch (ParameterTypeNotAvailableException
 					| ExperimentParameterException e) {
-				throw new InvalidExperimentModelException(e.getMessage());
+				throw new InvalidExperimentModelException(e.getAction());
 			}
 
 			Map<Integer, ExperimentOperation> operationDependencies = expParameter
 					.getOperationDependencies();
 
-			String[] paramArgs = (String[])parameterInfo.getArguments();
+			String[] paramArgs = (String[]) parameterInfo.getArguments();
 
 			for (Integer order : operationDependencies.keySet()) {
 
@@ -126,14 +126,11 @@ public class ExperimentModelFactory {
 				OperationInformation actualOperationInfo = expInfo
 						.getOperation(opName);
 
-				if (depOperation == null
-				// || !depOperation.getName().equals(
-				// actualOperationInfo.getOperation().getName())
-				) {
-					throw new InvalidExperimentModelException(
-							"The operation dependent parameter '"
-									+ parameterInfo.getName()
-									+ "' is not well-defined");
+				if (depOperation == null) {
+					InvalidExperimentModelException ex = new InvalidExperimentModelException(
+							parameterInfo.getName(), "not well defined");
+					ex.getAction().put("op-dependent", true);
+					throw ex;
 				}
 
 				try {
@@ -142,7 +139,7 @@ public class ExperimentModelFactory {
 							actualOperationInfo.getArguments());
 					preCreatedOperations.add(actualOperationInfo);
 				} catch (ExperimentOperationException e) {
-					throw new InvalidExperimentModelException(e.getMessage());
+					throw new InvalidExperimentModelException(e.getAction());
 				}
 
 			}
@@ -151,7 +148,7 @@ public class ExperimentModelFactory {
 				model.addParameter(parameterInfo.getName(), expParameter,
 						parameterInfo.getArguments());
 			} catch (ExperimentParameterException e) {
-				throw new InvalidExperimentModelException(e.getMessage());
+				throw new InvalidExperimentModelException(e.getAction());
 			}
 		}
 
@@ -165,7 +162,7 @@ public class ExperimentModelFactory {
 					expOperation = operationFactory.createOperation(operation
 							.getType());
 				} catch (OperationTypeNotAvailableException e) {
-					throw new InvalidExperimentModelException(e.getMessage());
+					throw new InvalidExperimentModelException(e.getAction());
 
 				}
 
@@ -173,7 +170,7 @@ public class ExperimentModelFactory {
 					model.addOperation(operation.getName(), expOperation,
 							operation.getArguments());
 				} catch (ExperimentOperationException e) {
-					throw new InvalidExperimentModelException(e.getMessage());
+					throw new InvalidExperimentModelException(e.getAction());
 				}
 			}
 		}
@@ -184,23 +181,13 @@ public class ExperimentModelFactory {
 		return model;
 	}
 
-	public void createCustomExperiment(String experiment, String author, String type)
-			throws DuplicateExperimentException, ExperimentDatabaseException {
-		try {
-			if (adapter.containsExperiment(experiment)) {
-				throw new DuplicateExperimentException("Experiment: "
-						+ experiment);
-			}
-		} catch (ExperimentDatabaseException e) {
-			throw e;
+	public void createCustomExperiment(String experiment, String author,
+			String type) throws DuplicateExperimentException,
+			ExperimentDatabaseException {
+		if (adapter.containsExperiment(experiment)) {
+			throw new DuplicateExperimentException(experiment);
 		}
-
-		try {
-			adapter.createExperiment(experiment, author, type);
-		} catch (ExperimentDatabaseException e) {
-			throw e;
-		}
-
+		adapter.createExperiment(experiment, author, type);
 	}
 
 	public Map<String, ExperimentParameter> getAllExperimentParameters() {

@@ -46,6 +46,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			ImageExtensionFormat format) throws ImageNotAvailableException,
 			CCDTeleoperationException {
 
+		String operationName = "get image url";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -59,34 +61,38 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetImageURLOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getImageURL/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			String url = (String) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getImageURL",
-					new Object[] { imageId }, url.substring(0, 15) + "...");
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					url);
 
 			return url;
 
 		} catch (ImageNotAvailableException e) {
+			this.processWarning(e, rt, ccd, operationName, args.getArguments(),
+					"not available");
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
 
-			throw new CCDTeleoperationException(e.getMessage());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setExposureTime(String rt, String ccd, double value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set exposure";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -99,25 +105,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetExposureTimeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setExposureTime/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setExposure", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -125,6 +130,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public double getExposureTime(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "get exposure";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -136,32 +143,35 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetExposureTimeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getExposureTime/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double exposure = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getExposure", null, exposure);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					exposure);
 
 			return exposure;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setBrightness(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set brightness";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -174,25 +184,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetBrightnessOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setBrightness/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setBrightness",
-					new Object[] { value }, null);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -200,6 +209,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public long getBrightness(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "get brightness";
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -211,33 +221,36 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetBrightnessOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getBrightness/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long brightness = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getBrightness", null, brightness);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					brightness);
 
 			return brightness;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setContrast(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set contrast";
+		
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -249,25 +262,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetContrastOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setContrast/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setContrast", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -275,6 +287,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public long getContrast(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "set contrast";
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -286,33 +299,36 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetContrastOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getBrightness/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long contrast = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getContrast", null, contrast);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					contrast);
 
 			return contrast;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setGain(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set gain";
+		
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -324,25 +340,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetGainOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setGain/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setGain", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -350,6 +365,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public long getGain(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "get gain";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -361,32 +378,35 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetGainOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getGain/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long gain = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getGain", null, gain);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					gain);
 
 			return gain;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public CCDState getState(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "get state";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -398,24 +418,28 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetStateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getState/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 
 			OperationReturn returns = this.executeOperation(operation);
-			return (CCDState) returns.getReturns().get(0);
+			CCDState state = (CCDState) returns.getReturns().get(0);
+			
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					state);
+			
+			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -423,6 +447,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public String startExposure(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "start exposure";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -434,11 +460,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new StartExposureOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/startExposure/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
@@ -449,20 +474,21 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			target.setDec(null);
 			target.setRa(null);
 			target.setObject(null);
-			
+
 			imageRepository.saveImage(this.getClientUsername(), rt, ccd,
 					imageId, target);
 
-			this.processSuccess(rt, ccd, "startExposure", null, imageId);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					imageId);
 
 			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException | ImageRepositoryException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -470,6 +496,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	public String startContinueMode(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 
+		String operationName = "start continue";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -481,11 +509,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new StartContinueModeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/startContinueMode/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
@@ -493,22 +520,26 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			OperationReturn returns = this.executeOperation(operation);
 			String imageId = (String) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "startContinueMode", null, imageId);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					imageId);
 
 			return imageId;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void stopContinueMode(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+
+		String operationName = "stop continue";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -520,30 +551,32 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new StopContinueModeOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/stopContinueMode/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "stopContinueMode", null, null);
+			this.processSuccess(rt, ccd, operationName, null, null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setGamma(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set gamma";
+		
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -555,31 +588,33 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetGammaOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setGamma/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setGamma", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public long getGamma(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "get gamma";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -591,26 +626,26 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetGammaOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getGamma/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			long gain = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getGamma", null, gain);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					gain);
 
 			return gain;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -622,8 +657,11 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	 * (java.lang.String, java.lang.String, long)
 	 */
 	@Override
-	public void setBinningX(String rt, String ccd, long value)
+	public void setBiningX(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set bining x";
+		
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -635,25 +673,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetBiningXOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setBiningX/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setBiningX", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -667,6 +704,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public long getBiningX(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "get bining x";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -678,26 +718,26 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetBiningXOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getBiningX/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			long gain = (Long) returns.getReturns().get(0);
+			long bin = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getBiningX", null, gain);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					bin);
 
-			return gain;
+			return bin;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -711,6 +751,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setBinningY(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "set bining y";
+		
 		OperationArgs args = new OperationArgs();
 		args.setArguments(new ArrayList<Object>());
 		args.getArguments().add(rt);
@@ -722,25 +765,24 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetBiningYOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setBiningY/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, ccd, "setBiningY", new Object[] { value },
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					null);
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
@@ -754,6 +796,9 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public long getBiningY(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
+		
+		String operationName = "get bining y";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -765,26 +810,26 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetBiningYOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getBiningY/Bad args", rt);
+			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
 			throw new CCDTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
-			long gain = (Long) returns.getReturns().get(0);
+			long bin = (Long) returns.getReturns().get(0);
 
-			this.processSuccess(rt, ccd, "getBiningY", null, gain);
+			this.processSuccess(rt, ccd, operationName, args.getArguments(),
+					bin);
 
-			return gain;
+			return bin;
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, ccd, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new CCDTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
+			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 }

@@ -33,10 +33,10 @@ public class OperationContextService extends ExperimentContextService {
 			Class<?> serviceClass = Class
 					.forName("eu.gloria.gs.services.experiment.operations."
 							+ operation);
-			
+
 			try {
-				service = (ServiceOperation)serviceClass.newInstance();
-				
+				service = (ServiceOperation) serviceClass.newInstance();
+
 				this.makeUpService(service);
 
 				service.setContext(operationContext);
@@ -44,16 +44,13 @@ public class OperationContextService extends ExperimentContextService {
 
 				service.execute();
 			} catch (InstantiationException | IllegalAccessException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(
+						operationContext.getName(), "operation class problem");
 			}
 
-			/*service = (ServiceOperation) this.applicationContext.getBean(Class
-					.forName("eu.gloria.gs.services.experiment.operations."
-							+ operation));*/
-
-			
 		} catch (ClassNotFoundException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(operationContext.getName(),
+					"operation class not found");
 		}
-	}				
+	}
 }

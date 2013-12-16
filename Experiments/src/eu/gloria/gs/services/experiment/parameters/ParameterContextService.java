@@ -6,11 +6,10 @@ import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextService;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
@@ -24,10 +23,8 @@ public class ParameterContextService extends ExperimentContextService {
 		try {
 
 			parameterContext.setValue(null, operationArguments[0]);
-		} catch (UndefinedExperimentParameterException
-				| NoSuchExperimentException
-				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentParameterException(e.getMessage());
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException e) {
+			throw new ExperimentParameterException(e.getAction());
 		}
 	}
 
@@ -60,10 +57,11 @@ public class ParameterContextService extends ExperimentContextService {
 					.getParameterValue(rtParameter);
 
 			if (rtName == null) {
-				throw new ContextNotReadyException(rtParameter);
+				throw new ContextNotReadyException(parameterContext
+						.getExperimentContext().getReservation());
 			}
-		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException e) {
-			throw new ExperimentParameterException(e.getMessage());
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException e) {
+			throw new ExperimentParameterException(e.getAction());
 		}
 
 		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
@@ -74,17 +72,15 @@ public class ParameterContextService extends ExperimentContextService {
 			deviceNames = this.getRTRepository().getRTDeviceNames(rtName,
 					deviceType);
 		} catch (RTRepositoryException e) {
-			throw new ExperimentParameterException(e.getMessage());
+			throw new ExperimentParameterException(e.getAction());
 		}
 
 		String deviceName = deviceNames.get(deviceOrder);
 
 		try {
 			parameterContext.setValue(null, deviceName);
-		} catch (UndefinedExperimentParameterException
-				| NoSuchExperimentException
-				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentParameterException(e.getMessage());
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException e) {
+			throw new ExperimentParameterException(e.getAction());
 		}
 
 	}
@@ -98,7 +94,7 @@ public class ParameterContextService extends ExperimentContextService {
 		try {
 			resInfo = this.getAdapter().getReservationInformation(rid);
 		} catch (ExperimentDatabaseException | NoSuchReservationException e) {
-			throw new ExperimentParameterException(e.getMessage());
+			throw new ExperimentParameterException(e.getAction());
 		}
 
 		List<String> telescopes = resInfo.getTelescopes();
@@ -106,10 +102,8 @@ public class ParameterContextService extends ExperimentContextService {
 
 		try {
 			parameterContext.setValue(null, telescopeName);
-		} catch (UndefinedExperimentParameterException
-				| NoSuchExperimentException
-				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentParameterException(e.getMessage());
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException e) {
+			throw new ExperimentParameterException(e.getAction());
 		}
 
 	}

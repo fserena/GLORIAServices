@@ -8,6 +8,7 @@ import javax.jws.WebParam;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.rt.data.dbservices.DeviceDBService;
 import eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry;
 import eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryDBService;
@@ -53,17 +54,17 @@ public class RTRepositoryAdapter {
 	private void registerRT(String rt, String owner, String url, String port, String user,
 			String password, String type) throws RTRepositoryAdapterException {
 		if (rt == null)
-			throw new RTRepositoryAdapterException("The RT name cannot be null");
+			throw new RTRepositoryAdapterException("rt name cannot be null");
 		if (owner == null)
 			throw new RTRepositoryAdapterException(
-					"The owner name cannot be null");
+					"owner name cannot be null");
 		if (url == null)
-			throw new RTRepositoryAdapterException("The URL cannot be null");
+			throw new RTRepositoryAdapterException("url cannot be null");
 		if (user == null)
-			throw new RTRepositoryAdapterException("The user cannot be null");
+			throw new RTRepositoryAdapterException("user cannot be null");
 		if (password == null)
 			throw new RTRepositoryAdapterException(
-					"The password cannot be null");
+					"password cannot be null");
 
 		boolean previouslyContained = false;
 
@@ -86,9 +87,13 @@ public class RTRepositoryAdapter {
 			rtService.setEndingAvailability(rt, new Date());
 		}
 
-		if (previouslyContained)
-			throw new RTRepositoryAdapterException("The robotic telescope '"
-					+ rt + "' already exists");
+		if (previouslyContained) {
+			LogAction action = new LogAction();
+			action.put("cause", "already exists");
+			action.put("name", rt);
+			action.put("type", type);
+			throw new RTRepositoryAdapterException(action);
+		}
 	}
 
 	public void registerBatchRT(String rt, String owner, String url, String port,
@@ -112,9 +117,12 @@ public class RTRepositoryAdapter {
 
 		}
 
-		if (!previouslyContained)
-			throw new RTRepositoryAdapterException("The telescope '" + rt
-					+ "' does not exist");
+		if (!previouslyContained) {
+			LogAction action = new LogAction();
+			action.put("cause", "rt does not already exist");
+			action.put("name", rt);			
+			throw new RTRepositoryAdapterException(action);
+		}
 	}
 
 	public boolean containsRT(String rt) throws RTRepositoryAdapterException {
@@ -140,8 +148,11 @@ public class RTRepositoryAdapter {
 		try {
 			devEntry = devService.get(type.name(), model);
 		} catch (NullPointerException e) {
-			throw new RTRepositoryAdapterException("The device model '" + model
-					+ "' and type '" + type.name() + "' does not exist");
+			LogAction action = new LogAction();
+			action.put("cause", "device model does not already exist");
+			action.put("rt", rt);			
+			action.put("device", name);
+			throw new RTRepositoryAdapterException(action);
 		}
 
 		if (devEntry != null) {

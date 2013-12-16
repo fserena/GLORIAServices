@@ -6,10 +6,9 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
@@ -40,9 +39,9 @@ public class LoadMountStatus extends ServiceOperation {
 			mountName = (String) this.getContext().getExperimentContext()
 					.getParameterValue(mountNameParameter);
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 
 		String mountStatusParameter = (String) this.getArguments()[2];
@@ -58,10 +57,9 @@ public class LoadMountStatus extends ServiceOperation {
 			this.getContext().getExperimentContext()
 					.setParameterValue(mountStatusParameter, mountStatus);
 		} catch (MountTeleoperationException | DeviceOperationFailedException
-				| UndefinedExperimentParameterException
-				| NoSuchExperimentException | ExperimentParameterException
+				| NoSuchParameterException | ExperimentParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

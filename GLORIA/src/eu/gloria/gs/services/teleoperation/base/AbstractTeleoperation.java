@@ -1,7 +1,10 @@
 package eu.gloria.gs.services.teleoperation.base;
 
+import java.util.ArrayList;
+
 import eu.gloria.gs.services.core.GSLogProducerService;
-import eu.gloria.gs.services.log.action.ActionLogException;
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
 
 public abstract class AbstractTeleoperation extends GSLogProducerService
 		implements Teleoperation {
@@ -27,47 +30,69 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 		return this.resolver;
 	}
 
-	protected void processException(String message, String rt) {
-		try {
-			this.logAction(this.getClientUsername(), rt + "/" + message);
-		} catch (ActionLogException e) {
-			e.printStackTrace();
-		}
+	protected void processBadArgs(String rt, String device,
+			String op, ArrayList<Object> args) {
+		this.processError(null, rt, device, op, args, "bad arguments");
 	}
 
-	protected void processSuccess(String rt, String device, String op,
-			Object[] args, Object result) {
-		try {
+	protected void processDeviceFailure(ActionException e, String rt,
+			String device, String op, ArrayList<Object> args) {
+		this.processError(e, rt, device, op, args, "device failure");
+	}
 
-			String message = rt + "/" + device + "/" + op;
+	protected void processInternalError(ActionException e, String rt,
+			String device, String op, ArrayList<Object> args) {
+		this.processError(e, rt, device, op, args, "internal error");
+	}
 
-			boolean first = true;
+	protected void processError(ActionException e, String rt, String device,
+			String op, ArrayList<Object> args, String cause) {
 
-			if (args != null) {
+		LogAction action = new LogAction();
 
-				message += "?";
+		action.put("operation", op);
+		action.put("rt", rt);
+		action.put("device", device);
+		action.put("args", args);
+		action.put("cause", cause);
 
-				for (Object arg : args) {
+		this.logRtError(this.getClientUsername(), rt, action);
 
-					if (!first) {
-						message += "&";
-					}
+		if (e != null)
+			action.put("more", e.getAction());
+	}
 
-					message += String.valueOf(arg);
+	protected void processSuccess(String rt, String device,
+			String op, ArrayList<Object> args, Object result) {
 
-					first = false;
-				}
-			}
+		LogAction action = new LogAction();
 
-			if (result != null) {
-				message += "->" + String.valueOf(result);
-			}
+		action.put("operation", op);
+		action.put("rt", rt);
+		action.put("device", device);
+		action.put("args", args);
 
-			this.logAction(this.getClientUsername(), message);
-
-		} catch (ActionLogException e) {
-			e.printStackTrace();
+		if (result != null) {
+			action.put("result", result);
 		}
+
+		this.logRtInfo(this.getClientUsername(), rt, action);
+	}
+
+	protected void processWarning(ActionException e, String rt, String device,
+			String op, ArrayList<Object> args, String cause) {
+
+		LogAction action = new LogAction();
+
+		action.put("operation", op);
+		action.put("rt", rt);
+		action.put("device", device);
+		action.put("args", args);
+		action.put("cause", cause);
+
+		this.logRtWarning(this.getClientUsername(), rt, action);
+
+		action.put("more", e.getAction());
 	}
 
 }

@@ -30,8 +30,9 @@ public class RTSResolver implements ServerResolver {
 			if (!urlTable.containsKey(server)) {
 
 				ServerKeyData keyData = new ServerKeyData();
+				RTInformation rtInfo = null;
 				try {
-					RTInformation rtInfo = repository.getRTInformation(server);
+					rtInfo = repository.getRTInformation(server);
 
 					keyData.setUrl(rtInfo.getUrl());
 					keyData.setPort(rtInfo.getPort());
@@ -40,7 +41,14 @@ public class RTSResolver implements ServerResolver {
 					rtCredentials.setPassword(rtInfo.getPassword());
 					keyData.setCredentials(rtCredentials);
 				} catch (Exception e) {
-					throw new ServerNotAvailableException(server);
+					if (rtInfo != null) {
+						throw new ServerNotAvailableException(rtInfo.getUrl(),
+								rtInfo.getPort(), e.getMessage());
+					}
+
+					throw new ServerNotAvailableException(server, null,
+							"not found");
+
 				}
 				urlTable.put(server, keyData);
 				dateTable.put(server, new Date());
@@ -57,7 +65,13 @@ public class RTSResolver implements ServerResolver {
 				try {
 					rtInfo = repository.getRTInformation(server);
 				} catch (Exception e) {
-					throw new ServerNotAvailableException(server);
+					if (rtInfo != null) {
+						throw new ServerNotAvailableException(rtInfo.getUrl(),
+								rtInfo.getPort(), e.getMessage());
+					}
+
+					throw new ServerNotAvailableException(server, null,
+							"not found");
 				}
 
 				ServerKeyData keyData = new ServerKeyData();
@@ -78,13 +92,20 @@ public class RTSResolver implements ServerResolver {
 	}
 
 	@Override
-	public ServerHandler getHandler(String server) throws ServerNotAvailableException {
+	public ServerHandler getHandler(String server)
+			throws ServerNotAvailableException {
 
+		ServerKeyData keyData = null;
 		try {
-			ServerKeyData keyData = this.resolve(server);
+			keyData = this.resolve(server);
 			return RTSManager.getReference().getRTS(keyData);
 		} catch (Exception e) {
-			throw new ServerNotAvailableException(e.getMessage());
+			if (keyData != null) {
+				throw new ServerNotAvailableException(keyData.getUrl(),
+						keyData.getPort(), e.getMessage());
+			}
+
+			throw new ServerNotAvailableException(server, null, "not found");
 		}
 	}
 

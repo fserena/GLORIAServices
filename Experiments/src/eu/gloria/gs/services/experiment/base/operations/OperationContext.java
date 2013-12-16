@@ -52,6 +52,7 @@ public class OperationContext extends Context {
 
 	public void execute() throws ExperimentOperationException {
 		this.manageOperationsExecution(this.operation.getBehaviour());
+		//this.manageOperationsExecution();
 		
 	}
 

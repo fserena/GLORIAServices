@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
@@ -30,6 +27,7 @@ import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailabl
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 
 public class CustomExperimentModel extends ExperimentModel {
@@ -61,51 +59,42 @@ public class CustomExperimentModel extends ExperimentModel {
 
 	public void buildOperation(OperationInformation operationInfo)
 			throws OperationTypeNotAvailableException,
-			CustomExperimentException, NoSuchExperimentException,
-			ExperimentOperationException {
+			ExperimentOperationException, ExperimentDatabaseException {
 
 		ExperimentOperation operation = null;
 
-		try {
-			operation = operationFactory.createOperation(operationInfo
-					.getType());
-		} catch (OperationTypeNotAvailableException e) {
-			throw e;
-		}
+		operation = operationFactory.createOperation(operationInfo.getType());
 
 		this.addOperation(operationInfo.getName(), operation,
 				operationInfo.getArguments());
 
 		try {
 			adapter.addExperimentOperation(this.getName(), operationInfo);
-		} catch (ExperimentDatabaseException e) {
-			throw new CustomExperimentException(e.getMessage());
 		} catch (NoSuchExperimentException e) {
-			throw e;
+			throw new ExperimentDatabaseException(e.getMessage());
 		}
 
 		try {
 			adapter.setOperationArguments(this.getName(),
 					operationInfo.getName(), operationInfo.getArguments());
-		} catch (ExperimentDatabaseException e) {
-			throw new CustomExperimentException(e.getMessage());
+		} catch (NoSuchExperimentException e) {
+			ExperimentDatabaseException ex = new ExperimentDatabaseException();
+			ex.getAction().put("experiment not found", e.getAction());
+			throw ex;
+		} catch (NoSuchParameterException e) {
+			ExperimentDatabaseException ex = new ExperimentDatabaseException();
+			ex.getAction().put("parameter not found", e.getAction());
+			throw ex;
 		}
 	}
 
 	public void buildParameter(ParameterInformation parameterInfo)
-			throws CustomExperimentException,
-			ParameterTypeNotAvailableException, NoSuchExperimentException,
-			ExperimentParameterException {
+			throws ParameterTypeNotAvailableException,
+			ExperimentParameterException, ExperimentDatabaseException {
 
 		ExperimentParameter parameter = null;
 
-		try {
-			parameter = parameterFactory.createParameter(parameterInfo
-					.getType());
-		} catch (ParameterTypeNotAvailableException
-				| ExperimentParameterException e) {
-			throw new CustomExperimentException(e.getMessage());
-		}
+		parameter = parameterFactory.createParameter(parameterInfo.getType());
 
 		parameterInfo.setParameter(parameter);
 
@@ -114,10 +103,10 @@ public class CustomExperimentModel extends ExperimentModel {
 
 		try {
 			adapter.addExperimentParameter(this.getName(), parameterInfo);
-		} catch (ExperimentDatabaseException e) {
-			throw new CustomExperimentException(e.getMessage());
 		} catch (NoSuchExperimentException e) {
-			throw e;
+			ExperimentDatabaseException ex = new ExperimentDatabaseException();
+			ex.getAction().put("experiment not found", e.getAction());
+			throw ex;
 		}
 	}
 
@@ -142,7 +131,9 @@ public class CustomExperimentModel extends ExperimentModel {
 	}
 
 	public void buildFeature(FeatureInformation featureInfo)
-			throws CustomExperimentException, NoSuchExperimentException {
+			throws CustomExperimentException, ExperimentDatabaseException,
+			OperationTypeNotAvailableException,
+			ParameterTypeNotAvailableException {
 
 		ExperimentFeature feature = null;
 
@@ -192,9 +183,11 @@ public class CustomExperimentModel extends ExperimentModel {
 		String[] operationNames = operations.keySet().toArray(new String[0]);
 		String[] parameterNames = parameters.keySet().toArray(new String[0]);
 
-		if (parameterNames.length == 0) allParametersCreated = true;
-		if (operationNames.length == 0) allOperationsCreated = true;
-		
+		if (parameterNames.length == 0)
+			allParametersCreated = true;
+		if (operationNames.length == 0)
+			allOperationsCreated = true;
+
 		while (!allParametersCreated || !allOperationsCreated) {
 
 			if (!allParametersCreated) {
@@ -224,8 +217,6 @@ public class CustomExperimentModel extends ExperimentModel {
 											.fromJSON(paramArg, String.class,
 													null);
 								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
 								}
 
 								if (!createdOperations
@@ -306,8 +297,6 @@ public class CustomExperimentModel extends ExperimentModel {
 									Arrays.toString(processedArguments),
 									Object[].class, null);
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
 						}
 
 						paramInfo.setArguments(argsArray);
@@ -319,12 +308,13 @@ public class CustomExperimentModel extends ExperimentModel {
 							addedParameters++;
 							createdParameters.add(paramName);
 
-						} catch (ParameterTypeNotAvailableException e) {
-							throw new CustomExperimentException(e.getMessage());
 						} catch (ExperimentParameterException e) {
-							if (!e.getMessage().contains("already")) {
+
+							String cause = (String) e.getAction().get("cause");
+
+							if (cause == null || !cause.contains("already")) {
 								throw new CustomExperimentException(
-										e.getMessage());
+										e.getAction());
 							}
 
 							addedParameters++;
@@ -358,7 +348,8 @@ public class CustomExperimentModel extends ExperimentModel {
 
 						String dependencyName = relation.split("\\.")[0];
 						if (!this.containsParameter(dependencyName)
-								&& !createdParameters.contains(dependencyName) && !this.containsOperation(dependencyName)) {
+								&& !createdParameters.contains(dependencyName)
+								&& !this.containsOperation(dependencyName)) {
 							allowCreate = false;
 							break;
 						}
@@ -381,8 +372,7 @@ public class CustomExperimentModel extends ExperimentModel {
 						int i = 0;
 						for (String relation : relations) {
 
-							argumentRelations[i] = relation;// concreteParamNames
-							// .get(relation.split("\\.")[0]);
+							argumentRelations[i] = relation;
 							i++;
 						}
 
@@ -394,15 +384,15 @@ public class CustomExperimentModel extends ExperimentModel {
 							createdOperations.add(opName);
 							addedOperations++;
 						} catch (ExperimentOperationException e) {
-							if (!e.getMessage().contains("already")) {
+							String cause = (String) e.getAction().get("cause");
+
+							if (cause == null || !cause.contains("already")) {
 								throw new CustomExperimentException(
-										e.getMessage());
+										e.getAction());
 							}
 
 							createdOperations.add(opName);
 							addedOperations++;
-						} catch (OperationTypeNotAvailableException e) {
-							throw new CustomExperimentException(e.getMessage());
 						}
 
 						allOperationsCreated = addedOperations == totalOperations;
@@ -518,7 +508,7 @@ public class CustomExperimentModel extends ExperimentModel {
 		try {
 			expInfo = this.adapter.getExperimentInformation(this.getName());
 		} catch (ExperimentDatabaseException | NoSuchExperimentException e) {
-			throw new CustomExperimentException(e.getMessage());
+			throw new CustomExperimentException(e.getAction());
 		}
 
 		compliantInfo.setExperiment(expInfo.getName());
@@ -593,8 +583,7 @@ public class CustomExperimentModel extends ExperimentModel {
 			}
 
 			if (!parameterMatch) {
-				throw new CustomExperimentException(
-						"The model is not compatible with that feature");
+				throw new CustomExperimentException("incompatible model");
 			}
 		}
 
@@ -648,8 +637,7 @@ public class CustomExperimentModel extends ExperimentModel {
 			}
 
 			if (!operationMatch) {
-				throw new CustomExperimentException(
-						"The model is not compatible with that feature");
+				throw new CustomExperimentException("incompatible model");
 			}
 		}
 

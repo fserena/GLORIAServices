@@ -22,6 +22,9 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 	public double getPressure(String rt, String barometer)
 			throws DeviceOperationFailedException,
 			WeatherTeleoperationException {
+		
+		String operationName = "get pressure";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -33,27 +36,27 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetPressureOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getPressure/Bad args", rt);
+			this.processBadArgs(rt, barometer, operationName, args.getArguments());
 
 			throw new WeatherTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double pressure = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, barometer, "getPressure", null, pressure);
+			this.processSuccess(rt, barometer, operationName, args.getArguments(),
+					pressure);
 
 			return pressure;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, barometer, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new WeatherTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, barometer, operationName, args.getArguments());
+			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
 	
@@ -61,6 +64,8 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 	public double getTemperature(String rt, String tempSensor)
 			throws DeviceOperationFailedException,
 			WeatherTeleoperationException {
+		String operationName = "get temperature";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -72,27 +77,27 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetTemperatureOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getTemperature/Bad args", rt);
+			this.processBadArgs(rt, tempSensor, operationName, args.getArguments());
 
 			throw new WeatherTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double temperature = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, tempSensor, "getTemperature", null, temperature);
+			this.processSuccess(rt, tempSensor, operationName, args.getArguments(),
+					temperature);
 
 			return temperature;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, tempSensor, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new WeatherTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, tempSensor, operationName, args.getArguments());
+			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
 
@@ -103,6 +108,9 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 	public double getWindSpeed(String rt, String windSensor)
 			throws DeviceOperationFailedException,
 			WeatherTeleoperationException {
+		
+		String operationName = "get wind speed";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -114,27 +122,27 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetWindSpeedOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getWindSpeed/Bad args", rt);
+			this.processBadArgs(rt, windSensor, operationName, args.getArguments());
 
 			throw new WeatherTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double windSpeed = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, windSensor, "getWindSpeed", null, windSpeed);
+			this.processSuccess(rt, windSensor, operationName, args.getArguments(),
+					windSpeed);
 
 			return windSpeed;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, windSensor, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new WeatherTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, windSensor, operationName, args.getArguments());
+			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
 
@@ -145,6 +153,9 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 	public double getRelativeHumidity(String rt, String rhSensor)
 			throws DeviceOperationFailedException,
 			WeatherTeleoperationException {
+		
+		String operationName = "get relative humidity";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -156,27 +167,27 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetRelativeHumidityOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getRelativeHumidity/Bad args", rt);
+			this.processBadArgs(rt, rhSensor, operationName, args.getArguments());
 
 			throw new WeatherTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double humidity = (Double) returns.getReturns().get(0);
 
-			this.processSuccess(rt, rhSensor, "getRelativeHumidity", null, humidity);
+			this.processSuccess(rt, rhSensor, operationName, args.getArguments(),
+					humidity);
 
 			return humidity;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, rhSensor, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new WeatherTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, rhSensor, operationName, args.getArguments());
+			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
 }

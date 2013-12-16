@@ -6,10 +6,9 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationException;
@@ -45,11 +44,10 @@ public class GetStream extends ServiceOperation {
 			this.getContext().getExperimentContext().setParameterValue(
 					urlParameter, url);
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException
-				| SCamTeleoperationException | DeviceOperationFailedException
-				| UndefinedExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+				| SCamTeleoperationException | DeviceOperationFailedException e) {
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

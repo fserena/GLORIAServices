@@ -3,7 +3,6 @@ package eu.gloria.gs.services.experiment.base.parameters;
 import java.util.Map;
 
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
-import eu.gloria.gs.services.experiment.base.operations.OperationType;
 
 public class ExperimentParameter {
 
@@ -31,14 +30,6 @@ public class ExperimentParameter {
 		return null;
 	}
 
-/*	public OperationType getOperationArgumentType(int order) {
-		if (this.argumentIsParameter(order)) {
-			return operationDependencies.get(order).getType();
-		}
-
-		return null;
-	}*/
-
 	public Class<?> getValueArgumentType(int order) {
 		return this.type.getArgumentTypes().get(order);
 	}
@@ -65,7 +56,6 @@ public class ExperimentParameter {
 
 	protected void parseArgument(int order, String arg)
 			throws IllegalArgumentException {
-
 	}
 
 	public Map<Integer, ExperimentParameter> getParameterDependencies() {

@@ -1,6 +1,7 @@
 package eu.gloria.gs.services.teleoperation.mount;
 
 import java.util.ArrayList;
+
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.OperationArgs;
@@ -28,6 +29,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public MountState getState(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "get state";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -39,32 +43,35 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetStateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getMountState/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			MountState state = (MountState) returns.getReturns().get(0);
-			this.processSuccess(rt, mount, "getState", null, state.name());
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					state);
 
 			return state;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void moveNorth(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "move north";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -76,29 +83,32 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveNorthOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveNorth/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 
 			this.executeOperation(operation);
-			this.processSuccess(rt, mount, "moveNorth", null, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void moveSouth(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "move south";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -110,28 +120,31 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveSouthOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveSouth/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
-			this.processSuccess(rt, mount, "moveSouth", null, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void moveEast(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "move east";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -143,28 +156,31 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveEastOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveEast/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
-			this.processSuccess(rt, mount, "moveEast", null, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void moveWest(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "move west";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -176,28 +192,31 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new MoveWestOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/moveWest/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
-			this.processSuccess(rt, mount, "moveWest", null, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setSlewRate(String rt, String mount, String rate)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "set slew rate";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -210,30 +229,32 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetSlewRateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setSlewRate/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 
 			this.executeOperation(operation);
-			this.processSuccess(rt, mount, "setSlewRate",
-					new Object[] { rate }, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void slewToObject(String rt, String mount, String object)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "slew to object";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -246,31 +267,33 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SlewToObjectOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/slewToObject/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, mount, "slewToObject",
-					new Object[] { object }, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 	
 	@Override
 	public void slewToCoordinates(String rt, String mount, double ra, double dec)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "slew to coordinates";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -284,31 +307,33 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SlewToCoordinatesOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/slewToCoordinates/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, mount, "slewToCoordinates",
-					new Object[] { ra, dec }, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void park(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "park";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -320,29 +345,32 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new ParkOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/parkMount/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, mount, "park", null, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setTrackingRate(String rt, String mount, TrackingRate rate)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "set tracking rate";
+			
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -355,30 +383,32 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetTrackingRateOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setTrackingRate/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, mount, "setTrackingRate",
-					new Object[] { rate.name() }, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
 	public void setTracking(String rt, String mount, boolean mode)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "set tracking";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -391,24 +421,23 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new SetTrackingOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/setTracking/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			this.executeOperation(operation);
 
-			this.processSuccess(rt, mount, "setTracking",
-					new Object[] { mode }, null);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					null);
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
@@ -418,6 +447,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public double getRA(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "get ra";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -429,26 +461,26 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetRAOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getRA/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double ra = (Double) returns.getReturns().get(0);
-			this.processSuccess(rt, mount, "getRA", null, ra);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					ra);
 
 			return ra;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 
@@ -458,6 +490,9 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public double getDEC(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
+		
+		String operationName = "get dec";
+		
 		OperationArgs args = new OperationArgs();
 
 		args.setArguments(new ArrayList<Object>());
@@ -469,26 +504,26 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 		try {
 			operation = new GetDECOperation(args);
 		} catch (Exception e) {
-			this.processException(e.getClass().getSimpleName()
-					+ "/getDEC/Bad args", rt);
+			this.processBadArgs(rt, mount, operationName, args.getArguments());
 
 			throw new MountTeleoperationException(
-					"DEBUG: Bad teleoperation request");
+					"bad request");
 		}
 
 		try {
 			OperationReturn returns = this.executeOperation(operation);
 			double dec = (Double) returns.getReturns().get(0);
-			this.processSuccess(rt, mount, "getDEC", null, dec);
+			this.processSuccess(rt, mount, operationName, args.getArguments(),
+					dec);
 
 			return dec;
 
 		} catch (DeviceOperationFailedException e) {
-			this.processException(e.getMessage(), rt);
+			this.processDeviceFailure(e, rt, mount, operationName, args.getArguments());
 			throw e;
 		} catch (TeleoperationException e) {
-			this.processException(e.getMessage(), rt);
-			throw new MountTeleoperationException(e.getMessage());
+			this.processInternalError(e, rt, mount, operationName, args.getArguments());
+			throw new MountTeleoperationException(e.getAction());
 		}
 	}
 }

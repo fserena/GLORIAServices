@@ -1,6 +1,5 @@
 package eu.gloria.gs.services.experiment.base.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -38,8 +37,7 @@ public abstract class ExperimentModel {
 			String[] arguments) throws ExperimentOperationException {
 
 		if (operations.containsKey(name)) {
-			throw new ExperimentOperationException("The operation '" + name
-					+ " already exists in the current model");
+			throw new ExperimentOperationException(name, "already exists");
 		}
 
 		this.setOperationArguments(operation, arguments);
@@ -52,30 +50,31 @@ public abstract class ExperimentModel {
 			Object[] arguments) throws ExperimentParameterException {
 
 		if (parameters.containsKey(name)) {
-			throw new ExperimentParameterException("The parameter '" + name
-					+ " already exists in the current model");
+			throw new ExperimentParameterException(name, "already exists");
 		}
 
 		int order = 0;
 
 		if (parameter.getArgumentsNumber() == arguments.length) {
 
-			ArrayList<Class<?>> parameterValueTypes = parameter.getType()
-					.getArgumentTypes();
-
 			for (Object argument : arguments) {
 				try {
 
 					if (parameter.argumentIsOperation(order)) {
 						if (!this.containsOperation((String) argument)) {
-							throw new ExperimentParameterArgumentException(
-									"The operation referenced is not contained on the current model");
+							ExperimentParameterArgumentException ex = new ExperimentParameterArgumentException(
+									name, (String) argument,
+									"operation does not exist");
+							ex.getAction().put("op-argument", true);
+							throw ex;
 						}
 					} else {
 						if (parameter.argumentIsParameter(order)) {
 							if (!this.containsParameter((String) argument)) {
-								throw new ExperimentParameterArgumentException(
-										"The parameter referenced is not contained on the current model");
+								ExperimentParameterArgumentException ex = new ExperimentParameterArgumentException(
+										name, (String) argument,
+										"parameter does not exist");
+								throw ex;
 							}
 
 							ExperimentParameter experimentParameter = this
@@ -86,38 +85,24 @@ public abstract class ExperimentModel {
 									.equals(experimentParameter.getName())) {
 
 								throw new ExperimentParameterArgumentException(
-										"The type of the referenced parameter is not valid");
+										name, (String) argument,
+										"type is invalid");
 							}
 
-						} /*
-						 * else {
-						 * 
-						 * 
-						 * 
-						 * if (parameterValueTypes.get(order).equals(
-						 * Double.class)) { try { Double.parseDouble(argument);
-						 * } catch (NumberFormatException e) { throw new
-						 * ExperimentParameterArgumentException(
-						 * e.getMessage()); } } else if
-						 * (parameterValueTypes.get(order).equals(
-						 * Integer.class)) { try { Integer.parseInt(argument); }
-						 * catch (NumberFormatException e) { throw new
-						 * ExperimentParameterArgumentException(
-						 * e.getMessage()); } } }
-						 */
+						}
 					}
 
 				} catch (UndefinedExperimentParameterException e) {
 					throw new ExperimentParameterArgumentException(
-							e.getMessage());
+							e.getAction());
 				}
 
 				order++;
 			}
 
 		} else
-			throw new ExperimentParameterArgumentException(
-					"Bad arguments number for parameter '" + name + "'");
+			throw new ExperimentParameterArgumentException(name, null,
+					"bad arguments");
 
 		this.parameters.put(name, parameter);
 	}
@@ -141,27 +126,28 @@ public abstract class ExperimentModel {
 				ExperimentParameter experimentParameter = this
 						.getParameter(actualArgument);
 
-				if (!parameterTypes[order].getName().equals("OBJECT")
+				if (!(parameterTypes[order].getType().getValueType() == Object.class)
 						&& (!experimentParameter.getName().equals(
 								parameterTypes[order].getName()) || !argument
 								.equals(actualArgument))) {
 
-					throw new ExperimentOperationArgumentException("Argument "
-							+ order + " (" + actualArgument
-							+ ") of operation '" + operation.getName()
-							+ "' is incorrect");
+					throw new ExperimentOperationArgumentException(
+							operation.getName(), actualArgument,
+							"incorrect type");
 				}
 
 			} catch (UndefinedExperimentParameterException e) {
 
 				if (this.containsOperation(actualArgument)) {
-					if (!parameterTypes[order].getName().equals("POINTER")) {
+					if (!parameterTypes[order].getType().isOperationDependent()) {
 						throw new ExperimentOperationArgumentException(
-								e.getMessage());
+								operation.getName(), actualArgument,
+								"incorrect type");
 					}
 				} else {
 					throw new ExperimentOperationArgumentException(
-							e.getMessage());
+							operation.getName(), actualArgument,
+							"operation arg does not exist");
 				}
 			}
 
@@ -188,8 +174,7 @@ public abstract class ExperimentModel {
 			return operations.get(name);
 		}
 
-		throw new NoSuchOperationException("The operation '" + name
-				+ "' is not included on the experiment model");
+		throw new NoSuchOperationException(name);
 	}
 
 	public boolean containsOperation(String name) {
@@ -206,7 +191,6 @@ public abstract class ExperimentModel {
 			return parameters.get(name);
 		}
 
-		throw new UndefinedExperimentParameterException("The parameter '"
-				+ name + "' is not included on the experiment model");
+		throw new UndefinedExperimentParameterException(name);
 	}
 }

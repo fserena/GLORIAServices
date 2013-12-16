@@ -3,12 +3,11 @@
  * Organization: Ciclope Group (UPM)
  * Project: GLORIA
  */
-package eu.gloria.gs.services.experiment.base.parameters;
+package eu.gloria.gs.services.utils;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,7 +18,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * 
  */
 @XmlRootElement
-@XmlSeeAlso({ Tuple.class, Object[].class, LinkedHashMap.class })
+@XmlSeeAlso({ Object[].class, LinkedHashMap.class })
 public class ObjectResponse implements Serializable {
 
 	/**

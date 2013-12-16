@@ -1,13 +1,16 @@
 package eu.gloria.gs.services.repository.image;
 
-public class ImageRepositoryException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class ImageRepositoryException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public ImageRepositoryException(String message)
+	public ImageRepositoryException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

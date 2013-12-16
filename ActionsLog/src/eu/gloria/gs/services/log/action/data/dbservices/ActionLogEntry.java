@@ -17,6 +17,17 @@ public class ActionLogEntry implements Serializable {
 	private String user;
 	private Date date;
 	private String action;
+	private String type;
+	private Integer rid;
+	private String rt;
+
+	public String getRt() {
+		return rt;
+	}
+
+	public void setRt(String rt) {
+		this.rt = rt;
+	}
 
 	public String getUser() {
 		return user;
@@ -40,5 +51,21 @@ public class ActionLogEntry implements Serializable {
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Integer getRid() {
+		return rid;
+	}
+
+	public void setRid(Integer rid) {
+		this.rid = rid;
 	}
 }

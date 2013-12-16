@@ -6,7 +6,7 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -41,7 +41,9 @@ public class SetTrackingRate extends ServiceOperation {
 					.getParameterValue(rateParameter);
 			
 			if (rate == null) {
-				throw new ExperimentOperationException("Tracking rate cannot be null");
+				ExperimentOperationException ex = new ExperimentOperationException(
+						this.getContext().getName(), "tracking rate cannot be null");
+				throw ex;
 			}
 
 			GSClientProvider.setCredentials(this.getUsername(),
@@ -52,9 +54,9 @@ public class SetTrackingRate extends ServiceOperation {
 			this.getMountTeleoperation().setTracking(rtName, mountName, true);
 
 		} catch (DeviceOperationFailedException | MountTeleoperationException
-				| ExperimentParameterException | NoSuchExperimentException
+				| ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

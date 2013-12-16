@@ -1,13 +1,22 @@
 package eu.gloria.gs.services.repository.user;
 
-public class UserRepositoryException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class UserRepositoryException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public UserRepositoryException(String message)
+	public UserRepositoryException(LogAction action)
 	{
-		super(message);
+		super(action);
+	}
+	
+	public UserRepositoryException(String cause) {
+		super(new LogAction());
+		
+		this.getAction().put("cause", cause);
 	}
 	
 	

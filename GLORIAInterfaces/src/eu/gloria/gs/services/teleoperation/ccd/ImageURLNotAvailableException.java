@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.teleoperation.ccd;
 
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.teleoperation.rts.RTSTeleoperationException;
 
 public class ImageURLNotAvailableException extends RTSTeleoperationException {
@@ -7,9 +8,9 @@ public class ImageURLNotAvailableException extends RTSTeleoperationException {
 	/**
 	 * 
 	 */
-	public ImageURLNotAvailableException(String message)
+	public ImageURLNotAvailableException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

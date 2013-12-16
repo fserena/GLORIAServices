@@ -7,17 +7,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
-import eu.gloria.gs.services.experiment.base.operations.OperationType;
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 
 public class ExperimentOperationFactory implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
-
-	/*public OperationType getParameterType(String name) {
-
-		return (OperationType) applicationContext.getBean(name);
-	}*/
 
 	public ExperimentOperation createOperation(String operationName)
 			throws OperationTypeNotAvailableException {
@@ -27,8 +21,7 @@ public class ExperimentOperationFactory implements ApplicationContextAware {
 				.getBean(operationName);
 
 		if (operation == null) {
-			throw new OperationTypeNotAvailableException("Operation: "
-					+ operationName);
+			throw new OperationTypeNotAvailableException(operationName);
 		}
 
 		return operation;

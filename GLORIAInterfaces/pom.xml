@@ -27,11 +27,13 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<!-- <dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>RTSClient</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>-->
+		<!-- <dependency> <groupId>eu.gloria.gs.services</groupId> <artifactId>RTSClient</artifactId> 
+			<version>0.0.1-SNAPSHOT</version> </dependency> -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.11</version>
+		</dependency>
 	</dependencies>
 	<parent>
 		<groupId>eu.gloriaproject</groupId>

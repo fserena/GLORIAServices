@@ -1,13 +1,16 @@
 package eu.gloria.gs.services.teleoperation.base;
 
-public class TeleoperationException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class TeleoperationException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public TeleoperationException(String message)
+	public TeleoperationException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

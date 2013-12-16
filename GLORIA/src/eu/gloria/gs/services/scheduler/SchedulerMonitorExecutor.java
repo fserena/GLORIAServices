@@ -1,30 +1,25 @@
 package eu.gloria.gs.services.scheduler;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import eu.gloria.gs.services.core.ErrorLogEntry;
+import eu.gloria.gs.services.core.InfoLogEntry;
+import eu.gloria.gs.services.core.LogEntry;
+import eu.gloria.gs.services.core.LogStore;
+import eu.gloria.gs.services.core.WarningLogEntry;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.core.tasks.ServerThread;
-import eu.gloria.gs.services.log.action.ActionLogException;
-import eu.gloria.gs.services.log.action.ActionLogInterface;
-import eu.gloria.gs.services.repository.image.data.ImageDatabaseException;
-import eu.gloria.gs.services.repository.image.data.ImageInformation;
-import eu.gloria.gs.services.repository.image.data.ImageRepositoryAdapter;
+import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.scheduler.brain.SchedulerBrain;
 import eu.gloria.gs.services.scheduler.data.SchedulerAdapter;
 import eu.gloria.gs.services.scheduler.data.SchedulerDatabaseException;
-import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
-import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
-import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
 
 public class SchedulerMonitorExecutor extends ServerThread {
 
 	private SchedulerAdapter adapter;
-	private ActionLogInterface alog;
+	private LogStore logStore;
 	private String username;
 	private String password;
 	private SchedulerBrain brain;
@@ -35,8 +30,8 @@ public class SchedulerMonitorExecutor extends ServerThread {
 		this.adapter = adapter;
 	}
 
-	public void setActionLog(ActionLogInterface alog) {
-		this.alog = alog;
+	public void setLogStore(LogStore logStore) {
+		this.logStore = logStore;
 	}
 
 	public void setUsername(String username) {
@@ -176,5 +171,31 @@ public class SchedulerMonitorExecutor extends ServerThread {
 		 * 
 		 * } catch (ImageDatabaseException e1) { e1.printStackTrace(); } } }
 		 */
+	}
+
+	private void processLogEntry(LogEntry entry, LogAction action) {
+		entry.setUsername(this.username);
+		entry.setDate(new Date());
+
+		entry.setAction(action);
+		this.logStore.addEntry(entry);
+	}
+
+	private void logError(LogAction action) {
+
+		LogEntry entry = new ErrorLogEntry();
+		this.processLogEntry(entry, action);
+	}
+
+	private void logInfo(LogAction action) {
+
+		LogEntry entry = new InfoLogEntry();
+		this.processLogEntry(entry, action);
+	}
+
+	private void logWarning(LogAction action) {
+
+		LogEntry entry = new WarningLogEntry();
+		this.processLogEntry(entry, action);
 	}
 }

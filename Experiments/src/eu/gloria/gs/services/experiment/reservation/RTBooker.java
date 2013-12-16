@@ -48,17 +48,14 @@ public class RTBooker {
 		if (timeSlot != null) {
 
 			if (timeSlot.getBegin().getTime() >= timeSlot.getEnd().getTime()) {
-				throw new ExperimentReservationArgumentException(
-						"The time slot is incorrect");
+				throw new ExperimentReservationArgumentException("incorrect time slot");
 			}
 
 		} else
-			throw new ExperimentReservationArgumentException(
-					"The time slot to make a reservation can not be null");
+			throw new ExperimentReservationArgumentException("null time slot");
 
 		if (telescopes == null || telescopes.size() == 0) {
-			throw new ExperimentReservationArgumentException(
-					"At least one telescope is needed to make a reservation");
+			throw new ExperimentReservationArgumentException("no telescopes specified");
 		}
 
 		boolean available = true;

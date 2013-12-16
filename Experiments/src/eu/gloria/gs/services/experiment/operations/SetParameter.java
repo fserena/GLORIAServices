@@ -5,21 +5,22 @@
  */
 package eu.gloria.gs.services.experiment.operations;
 
-
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class SetParameter extends ServiceOperation {
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
 	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
@@ -30,17 +31,12 @@ public class SetParameter extends ServiceOperation {
 			Object value = (Object) this.getContext().getExperimentContext()
 					.getParameterValue(valueParameter);
 
-			try {
-				this.getContext().getExperimentContext().setParameterValue(
-						parameterName, value);
-			} catch (NoSuchExperimentException
-					| UndefinedExperimentParameterException e) {
-				throw new ExperimentOperationException(e.getMessage());
-			}
+			this.getContext().getExperimentContext()
+					.setParameterValue(parameterName, value);
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

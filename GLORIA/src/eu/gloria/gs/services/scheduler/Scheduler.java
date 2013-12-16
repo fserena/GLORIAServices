@@ -51,7 +51,7 @@ public class Scheduler extends GSLogProducerService implements
 		try {
 			return this.brain.prepare(op);
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -99,7 +99,7 @@ public class Scheduler extends GSLogProducerService implements
 		try {
 			return this.adapter.getScheduleInformation(id);
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -117,7 +117,7 @@ public class Scheduler extends GSLogProducerService implements
 					.getActiveSchedulesByUser(this.getClientUsername(), 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -136,7 +136,7 @@ public class Scheduler extends GSLogProducerService implements
 					.getInactiveSchedulesByUser(this.getClientUsername(), 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -153,7 +153,7 @@ public class Scheduler extends GSLogProducerService implements
 					this.getClientUsername(), 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -170,7 +170,7 @@ public class Scheduler extends GSLogProducerService implements
 			List<ScheduleInformation> schInfos = adapter.getSchedulesByRT(rt, 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -187,7 +187,7 @@ public class Scheduler extends GSLogProducerService implements
 			List<ScheduleInformation> schInfos = adapter.getAllActiveSchedules();
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 
@@ -202,7 +202,7 @@ public class Scheduler extends GSLogProducerService implements
 			List<ScheduleInformation> schInfos = adapter.getActiveSchedulesByRT(rt, 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException(e.getMessage());
+			throw new SchedulerException(e.getAction());
 		}
 	}
 }

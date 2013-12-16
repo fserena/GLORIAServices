@@ -28,7 +28,7 @@ public class Sequence extends ServiceOperation {
 				subContext = this.getContext().getExperimentContext()
 						.getOperation(operationName);
 			} catch (NoSuchOperationException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(e.getAction());
 			}
 			subContext.execute();
 		}

@@ -6,9 +6,9 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
@@ -38,9 +38,11 @@ public class SetSlewRate extends ServiceOperation {
 					.getExperimentContext().getParameterValue(mountParameter);
 			String rate = (String) this.getContext().getExperimentContext()
 					.getParameterValue(rateParameter);
-			
+
 			if (rate == null) {
-				throw new ExperimentOperationException("Slew rate cannot be null");
+				ExperimentOperationException ex = new ExperimentOperationException(
+						this.getContext().getName(), "slew rate cannot be null");
+				throw ex;
 			}
 
 			GSClientProvider.setCredentials(this.getUsername(),
@@ -48,9 +50,9 @@ public class SetSlewRate extends ServiceOperation {
 
 			this.getMountTeleoperation().setSlewRate(rtName, mountName, rate);
 		} catch (DeviceOperationFailedException | MountTeleoperationException
-				| ExperimentParameterException | NoSuchExperimentException
+				| ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

@@ -8,7 +8,7 @@ package eu.gloria.gs.services.experiment.operations;
 import java.util.List;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -21,12 +21,15 @@ import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
- *
+ * 
  */
 public class PointToCoordinates extends ServiceOperation {
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
 	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
@@ -39,26 +42,26 @@ public class PointToCoordinates extends ServiceOperation {
 					.getParameterValue(rtNameParameter);
 			Object paramValue = this.getContext().getExperimentContext()
 					.getParameterValue(raParameter);
-			
+
 			double ra;
-			
+
 			if (paramValue instanceof Integer) {
-				ra = (int)(Integer)paramValue;
+				ra = (int) (Integer) paramValue;
 			} else {
-				ra = (Double)paramValue;
+				ra = (Double) paramValue;
 			}
-			
+
 			paramValue = (Double) this.getContext().getExperimentContext()
 					.getParameterValue(decParameter);
 
 			double dec;
-			
+
 			if (paramValue instanceof Integer) {
-				dec = (int)(Integer)paramValue;
+				dec = (int) (Integer) paramValue;
 			} else {
-				dec = (Double)paramValue;
+				dec = (Double) paramValue;
 			}
-			
+
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
 
@@ -71,7 +74,7 @@ public class PointToCoordinates extends ServiceOperation {
 				domes = this.getRTRepository().getRTDeviceNames(rtName,
 						DeviceType.DOME);
 			} catch (RTRepositoryException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(e.getAction());
 			}
 
 			if (domes != null && domes.size() > 0) {
@@ -87,7 +90,7 @@ public class PointToCoordinates extends ServiceOperation {
 					this.getDomeTeleoperation().open(rtName, domeName);
 					// }
 				} catch (DomeTeleoperationException e) {
-					throw new ExperimentOperationException(e.getMessage());
+					throw new ExperimentOperationException(e.getAction());
 				} catch (DeviceOperationFailedException e) {
 				}
 			}
@@ -113,19 +116,21 @@ public class PointToCoordinates extends ServiceOperation {
 							mountName, ra, dec);
 
 				} catch (MountTeleoperationException e) {
-					throw new ExperimentOperationException(e.getMessage());
+					throw new ExperimentOperationException(e.getAction());
 				} catch (DeviceOperationFailedException e) {
 				}
 			}
 
 			else {
-				throw new ExperimentOperationException(
-						"No mount available on the '" + rtName + "' RT");
+				ExperimentOperationException ex = new ExperimentOperationException(
+						this.getContext().getName(), "no mount available");
+				ex.getAction().put("rt", rtName);
+				throw ex;
 			}
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

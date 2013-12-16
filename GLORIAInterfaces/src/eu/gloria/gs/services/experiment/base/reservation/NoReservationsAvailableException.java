@@ -1,14 +1,19 @@
 package eu.gloria.gs.services.experiment.base.reservation;
 
-public class NoReservationsAvailableException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class NoReservationsAvailableException extends ActionException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public NoReservationsAvailableException(String message) {
-		super(message);
+	public NoReservationsAvailableException(String type) {
+		super(new LogAction());
+		LogAction action = this.getAction();
+		action.put("type", type);
 	}
 	
 }

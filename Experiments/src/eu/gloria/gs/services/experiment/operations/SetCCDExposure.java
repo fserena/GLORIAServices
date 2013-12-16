@@ -6,7 +6,7 @@
 package eu.gloria.gs.services.experiment.operations;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
@@ -57,14 +57,14 @@ public class SetCCDExposure extends ServiceOperation {
 				this.getCCDTeleoperation().setExposureTime(rtName, camName,
 						Math.min(120, exposure));
 			} catch (CCDTeleoperationException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(e.getAction());
 			} catch (DeviceOperationFailedException e) {
 
 			}
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
+		} catch (ExperimentParameterException | NoSuchParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

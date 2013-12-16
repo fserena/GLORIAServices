@@ -1,13 +1,16 @@
 package eu.gloria.gs.services.experiment.base.reservation;
 
-public class ReservationException extends Exception {
+import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.log.action.LogAction;
+
+public class ReservationException extends ActionException {
 
 	/**
 	 * 
 	 */
-	public ReservationException(String message)
+	public ReservationException(LogAction action)
 	{
-		super(message);
+		super(action);
 	}
 	
 	

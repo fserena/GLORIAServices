@@ -7,10 +7,9 @@ package eu.gloria.gs.services.experiment.operations;
 
 import java.util.List;
 
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
@@ -33,9 +32,9 @@ public class LoadDevicesNumber extends ServiceOperation {
 		try {
 			rtName = (String) this.getContext().getExperimentContext()
 					.getParameterValue(rtParameter);
-		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException
 				| ExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 
 		DeviceType deviceType;
@@ -45,9 +44,9 @@ public class LoadDevicesNumber extends ServiceOperation {
 							deviceTypeParameter);
 
 			deviceType = DeviceType.valueOf(deviceTypeStr);
-		} catch (NoSuchExperimentException | ExperimentNotInstantiatedException
+		} catch (NoSuchParameterException | ExperimentNotInstantiatedException
 				| ExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 
 		List<String> deviceNames = null;
@@ -56,17 +55,16 @@ public class LoadDevicesNumber extends ServiceOperation {
 			deviceNames = this.getRTRepository().getRTDeviceNames(rtName,
 					deviceType);
 		} catch (RTRepositoryException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 
 		try {
 			this.getContext().getExperimentContext().setParameterValue(
 					(String) this.getArguments()[2], deviceNames.size());
-		} catch (UndefinedExperimentParameterException
-				| NoSuchExperimentException
+		} catch (NoSuchParameterException
 				| ExperimentNotInstantiatedException
 				| ExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

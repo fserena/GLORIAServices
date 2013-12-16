@@ -9,10 +9,9 @@ import java.util.LinkedHashMap;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
@@ -110,17 +109,16 @@ public class StartExposure extends ServiceOperation {
 
 			} catch (NoSuchReservationException | ExperimentDatabaseException
 					| CCDTeleoperationException | ImageRepositoryException e) {
-				throw new ExperimentOperationException(e.getMessage());
+				throw new ExperimentOperationException(e.getAction());
 			} catch (DeviceOperationFailedException e) {
 			}
 
 			this.getContext().getExperimentContext()
 					.setParameterValue(imageIdParameter, imageId);
 
-		} catch (ExperimentParameterException | NoSuchExperimentException
-				| ExperimentNotInstantiatedException
-				| UndefinedExperimentParameterException e) {
-			throw new ExperimentOperationException(e.getMessage());
+		} catch (ExperimentParameterException | NoSuchParameterException
+				| ExperimentNotInstantiatedException e) {
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 

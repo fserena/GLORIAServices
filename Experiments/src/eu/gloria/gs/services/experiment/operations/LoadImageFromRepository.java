@@ -9,10 +9,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 
@@ -36,8 +35,8 @@ public class LoadImageFromRepository extends ServiceOperation {
 			try {
 				day = (Date) this.getContext().getExperimentContext()
 						.getParameterValue(dateParameter);
-			} catch (NoSuchExperimentException e) {
-				throw new ExperimentOperationException(e.getMessage());
+			} catch (NoSuchParameterException e) {
+				throw new ExperimentOperationException(e.getAction());
 			}
 
 			Calendar calendar = Calendar.getInstance();
@@ -70,14 +69,13 @@ public class LoadImageFromRepository extends ServiceOperation {
 			try {
 				this.getContext().getExperimentContext().setParameterValue(
 						idParameter, imageId);
-			} catch (NoSuchExperimentException
-					| UndefinedExperimentParameterException e) {
-				throw new ExperimentOperationException(e.getMessage());
+			} catch (NoSuchParameterException e) {
+				throw new ExperimentOperationException(e.getAction());
 			}
 
 		} catch (ExperimentParameterException
 				| ExperimentNotInstantiatedException e) {
-			throw new ExperimentOperationException(e.getMessage());
+			throw new ExperimentOperationException(e.getAction());
 		}
 	}
 
