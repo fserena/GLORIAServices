@@ -20,6 +20,15 @@ public class ImageInformation implements Serializable {
 	private String localid;
 	private Date creationDate;
 	private ImageTargetData target;
+	private double exposure;
+	
+	public double getExposure() {
+		return exposure;
+	}
+
+	public void setExposure(double exposure) {
+		this.exposure = exposure;
+	}
 
 	public String getRt() {
 		return rt;

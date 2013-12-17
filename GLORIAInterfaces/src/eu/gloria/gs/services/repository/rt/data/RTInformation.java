@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.repository.rt.data;
 
+import java.util.Date;
 import java.util.List;
 
 public class RTInformation {
@@ -15,6 +16,24 @@ public class RTInformation {
 	private String type;
 	private RTCoordinates coordinates;
 	private RTAvailability availability;
+	private String image;
+	private Date date;
+	
+	public Date getRegistrationDate() {
+		return date;
+	}
+
+	public void setRegistrationDate(Date date) {
+		this.date = date;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
 
 	public List<DeviceInformation> getDevices() {
 		return devices;

@@ -25,7 +25,8 @@ public interface ImageRepositoryInterface {
 			@WebParam(name = "rt") String rt,
 			@WebParam(name = "ccd") String ccd,
 			@WebParam(name = "lid") String lid,
-			@WebParam(name = "target") ImageTargetData target)
+			@WebParam(name = "target") ImageTargetData target,
+			@WebParam(name = "exposure") double exposure)
 			throws ImageRepositoryException;
 
 	public void setExperimentReservation(@WebParam(name = "id") int id,
@@ -93,11 +94,13 @@ public interface ImageRepositoryInterface {
 	public List<Integer> getAllImageIdentifiersByDate(
 			@WebParam(name = "dateFrom") Date from,
 			@WebParam(name = "dateTo") Date to) throws ImageRepositoryException;
-	
+
 	public List<Integer> getAllObjectImages(
-			@WebParam(name = "object") String object) throws ImageRepositoryException;
-	
+			@WebParam(name = "object") String object)
+			throws ImageRepositoryException;
+
 	public List<Integer> getAllObjectImagesByDate(
-			@WebParam(name = "object") String object, @WebParam(name = "dateFrom") Date from,
+			@WebParam(name = "object") String object,
+			@WebParam(name = "dateFrom") Date from,
 			@WebParam(name = "dateTo") Date to) throws ImageRepositoryException;
 }

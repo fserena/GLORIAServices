@@ -15,10 +15,12 @@ import javax.jws.WebService;
 @WebService(name = "RTRepositoryInterface", targetNamespace = "http://rt.repository.services.gs.gloria.eu/")
 public interface RTRepositoryInterface {
 
-	public void registerInteractiveRT(String rt, String owner, String url, String port, String user, String password)
+	public void registerInteractiveRT(String rt, String owner, String url,
+			String port, String user, String password)
 			throws RTRepositoryException;
 
-	public void registerBatchRT(String rt, String owner, String url, String port, String user, String password)
+	public void registerBatchRT(String rt, String owner, String url,
+			String port, String user, String password)
 			throws RTRepositoryException;
 
 	public void unregisterRT(String rt) throws RTRepositoryException;
@@ -88,6 +90,11 @@ public interface RTRepositoryInterface {
 			throws RTRepositoryException;
 
 	public String getRTDescription(String rt) throws RTRepositoryException;
+
+	public void setRTImage(String rt, String image)
+			throws RTRepositoryException;
+
+	public String getRTImage(String rt) throws RTRepositoryException;
 
 	public void setRTPublicKey(String rt, String pk)
 			throws RTRepositoryException;

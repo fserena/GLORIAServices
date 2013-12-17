@@ -228,7 +228,7 @@ public interface ExperimentInterface {
 	 */
 	boolean isExperimentContextReady(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException, ExperimentNotInstantiatedException,
+			throws ExperimentException,
 			NoSuchReservationException;
 
 }
