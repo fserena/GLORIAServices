@@ -7,13 +7,21 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `user` (
-		`name` varchar(40) NOT NULL,
+		`name` varchar(40)
+		NOT NULL,
 		`password` varchar(45) DEFAULT NULL,
-		`roles` varchar(20) NOT NULL,
+		`roles` varchar(20) NOT
+		NULL,
+		`date` datetime NOT NULL,
+		`language` varchar(45) DEFAULT NULL,
+		`ocupation` varchar(100) DEFAULT NULL,
+		`alias` varchar(50) NOT NULL,
 		PRIMARY KEY (`name`),
 		UNIQUE KEY
-		`name_UNIQUE` (`name`)
-		) ENGINE=InnoDB
+		`name_UNIQUE`
+		(`name`)
+		)
+		ENGINE=InnoDB
 		DEFAULT CHARSET=utf8
 	</update>
 
@@ -29,11 +37,12 @@
 		parameterType="eu.gloria.gs.services.repository.user.data.dbservices.UserEntry">
 		INSERT INTO
 		`user`
-		(name,
+		(name, alias,
 		password,
-		roles)
-		VALUE ( #{name},
-		#{password}, #{roles} )
+		roles, date)
+		VALUE (
+		#{name}, #{alias}
+		#{password}, #{roles}, #{date} )
 	</insert>
 
 	<delete id="remove">
@@ -60,6 +69,43 @@
 		UPDATE `user`
 		SET password=
 		#{password_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getDate" resultType="date">
+		SELECT date FROM
+		`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getLanguage" resultType="string">
+		SELECT language FROM
+		`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setLanguage">
+		UPDATE `user`
+		SET language=
+		#{language_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getOcupation" resultType="string">
+		SELECT ocupation FROM
+		`user`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setOcupation">
+		UPDATE `user`
+		SET ocupation=
+		#{ocupation_}
 		WHERE name
 		=#{name_}
 	</update>

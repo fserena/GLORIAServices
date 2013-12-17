@@ -73,27 +73,30 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 		List<ImageInformation> notUrlCompleted = null;
 
-		LogAction action = new LogAction();
-		action.put("sender", "image daemon");
+		LogAction preAction = new LogAction();
+		preAction.put("sender", "image daemon");
 
 		try {
 			notUrlCompleted = this.adapter.getAllWithoutUrl(100);
 
 			if (notUrlCompleted.size() > 0) {
 
-				action.put("pending", notUrlCompleted.size());
+				preAction.put("pending", notUrlCompleted.size());
 			}
 
 		} catch (ImageDatabaseException e) {
-			action.put("cause", "internal error");
-			this.logError(action);
-			action.remove("cause");
+			preAction.put("cause", "internal error");
+			this.logError(preAction);
+			preAction.remove("cause");
 		}
 
 		thereArePending = false;
 
 		for (ImageInformation imageInfo : notUrlCompleted) {
 
+			LogAction action = new LogAction();
+			action.put("sender", "image daemon");
+			
 			String url = null;
 
 			action.put("id", imageInfo.getId());
@@ -125,7 +128,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 					action.put("retries", recoverRetries.get(gid));
 
-					if (recoverRetries.get(gid) == 40) {
+					if (recoverRetries.get(gid) == 50) {
 						try {
 							action.put("operation", "remove");
 							adapter.removeImage(imageInfo.getId());

@@ -1,5 +1,7 @@
 package eu.gloria.gs.services.repository.user.data;
 
+import java.util.Date;
+
 import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserDBService;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserEntry;
@@ -107,6 +109,8 @@ public class UserRepositoryAdapter {
 			UserEntry admin = new UserEntry();
 			admin.setName(name);
 			admin.setPassword(password);
+			admin.setDate(new Date());
+			admin.setAlias(name);
 
 			if (role.equals(UserRole.ADMIN))
 				admin.setRoles(ADMIN_ROLE);
@@ -138,11 +142,11 @@ public class UserRepositoryAdapter {
 		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD, UserRole.WEB_SERVICE);
 	}
 
-	public void create(String name) throws UserRepositoryAdapterException {
+	public void create(String name, String alias) throws UserRepositoryAdapterException {
 
 		LogAction action = new LogAction();
 		action.put("name", name);
-		
+
 		if (name == null) {
 			action.put("cause", "user is null");
 			throw new UserRepositoryAdapterException(action);
@@ -157,6 +161,8 @@ public class UserRepositoryAdapter {
 			entry.setPassword(null);
 			entry.setName(name);
 			entry.setRoles(this.REGULAR_ROLE);
+			entry.setDate(new Date());
+			entry.setAlias(alias);
 
 			userService.save(entry);
 		}
@@ -292,10 +298,28 @@ public class UserRepositoryAdapter {
 
 		boolean contained = false;
 
-		UserEntry entry = userService.get(name);
-		contained = entry != null;
+		//UserEntry entry = userService.get(name);
+		//contained = entry != null;
+		
+		contained = userService.contains(name);
 
 		return contained;
+	}
+
+	public Date getCreationDate(String name)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		UserEntry entry = userService.get(name);
+
+		if (entry != null) {
+			return entry.getDate();
+		} else {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
+
 	}
 
 	public String getPassword(String name)
@@ -350,19 +374,124 @@ public class UserRepositoryAdapter {
 		}
 	}
 
+	public String getOcupation(String name)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		UserEntry entry = userService.get(name);
+
+		if (entry != null) {
+			return entry.getOcupation();
+		} else {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
+
+	}
+
+	public void setOcupation(String name, String ocupation)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		boolean previouslyContained = false;
+
+		previouslyContained = userService.contains(name);
+
+		if (previouslyContained) {
+			userService.setOcupation(name, ocupation);
+		}
+
+		if (!previouslyContained) {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
+	}
+
+	public String getLanguage(String name)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		UserEntry entry = userService.get(name);
+
+		if (entry != null) {
+			return entry.getLanguage();
+		} else {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
+
+	}
+
+	public void setLanguage(String name, String language)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		boolean previouslyContained = false;
+
+		previouslyContained = userService.contains(name);
+
+		if (previouslyContained) {
+			userService.setOcupation(name, language);
+		}
+
+		if (!previouslyContained) {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
+	}
+
 	public UserInformation getUserInformation(String name)
 			throws UserRepositoryAdapterException {
 
 		UserInformation userInfo = new UserInformation();
 
 		if (this.contains(name)) {
-			userInfo.setPassword(this.getPassword(name));
-			userInfo.setRoles(this.getRoles(name));
+
+			UserEntry entry = userService.get(name);
+
+			userInfo.setPassword(entry.getPassword());
+			userInfo.setRoles(this.parseRolesString(entry.getRoles()));
 			userInfo.setName(name);
+			userInfo.setCreationDate(entry.getDate());
+			userInfo.setLanguage(entry.getLanguage());
+			userInfo.setOcupation(entry.getOcupation());
+			userInfo.setAlias(entry.getAlias());
 
 			return userInfo;
 		}
 
 		return null;
+	}
+
+	public UserInformation getUserCredentials(String name)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+
+		UserInformation userInfo = new UserInformation();
+
+		if (this.contains(name)) {
+
+			String password = userService.getPassword(name);
+
+			if (password == null) {
+				action.put("cause", "user not activated");
+				throw new UserRepositoryAdapterException(action);
+			} else {
+				userInfo.setPassword(password);
+				String rolesStr = userService.getRoles(name);
+				userInfo.setRoles(this.parseRolesString(rolesStr));
+				userInfo.setName(name);
+
+				return userInfo;
+			}
+		} else {
+			action.put("cause", "user does not exist");
+			throw new UserRepositoryAdapterException(action);
+		}
 	}
 }

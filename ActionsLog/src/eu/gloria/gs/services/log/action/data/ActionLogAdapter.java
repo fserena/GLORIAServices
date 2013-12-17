@@ -34,9 +34,9 @@ public class ActionLogAdapter {
 		service.create();
 	}
 
-	private void register(String user, Date when, String type, Integer rid, String rt,
-			Object message) throws ActionLogAdapterException {
-				
+	private void register(String user, Date when, String type, Integer rid,
+			String rt, Object message) throws ActionLogAdapterException {
+
 		ActionLogEntry entry = new ActionLogEntry();
 		entry.setUser(user);
 		entry.setDate(when);
@@ -93,17 +93,26 @@ public class ActionLogAdapter {
 
 		this.register(user, when, "W", null, rt, message);
 	}
-	
+
 	public void registerRtError(String user, Date when, String rt,
 			Object message) throws ActionLogAdapterException {
 
 		this.register(user, when, "E", null, rt, message);
 	}
 
-	public void registerRtInfo(String user, Date when, String rt,
-			Object message) throws ActionLogAdapterException {
+	public void registerRtInfo(String user, Date when, String rt, Object message)
+			throws ActionLogAdapterException {
 
 		this.register(user, when, "I", null, rt, message);
+	}
+
+	private LogType parseType(String type) {
+		if (type.equals("E"))
+			return LogType.ERROR;
+		else if (type.equals("I"))
+			return LogType.INFO;
+		else
+			return LogType.WARNING;
 	}
 
 	private List<ActionLogInformation> getActionInformations(
@@ -118,6 +127,7 @@ public class ActionLogAdapter {
 			actionInfo.setRid(entry.getRid());
 			actionInfo.setRt(entry.getRt());
 			actionInfo.setId(entry.getIdactions_log());
+			actionInfo.setType(this.parseType(entry.getType()));
 			try {
 				actionInfo.setAction(JSONConverter.fromJSON(
 						(String) entry.getAction(), Object.class, null));
@@ -145,11 +155,12 @@ public class ActionLogAdapter {
 		}
 	}
 
-	public List<ActionLogInformation> getAllUserLogsByDate(String user, Date from, Date to)
-			throws ActionLogAdapterException {
+	public List<ActionLogInformation> getAllUserLogsByDate(String user,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getAllByUserAndDate(user, from, to);
+			List<ActionLogEntry> entries = service.getAllByUserAndDate(user,
+					from, to);
 
 			return this.getActionInformations(entries);
 
@@ -170,12 +181,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getAllRtLogsByDate(String rt, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getAllRtLogsByDate(String rt, Date from,
+			Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getAllByRtAndDate(rt, from, to);
+			List<ActionLogEntry> entries = service.getAllByRtAndDate(rt, from,
+					to);
 
 			return this.getActionInformations(entries);
 
@@ -183,7 +195,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public List<ActionLogInformation> getAllRidLogs(int rid)
 			throws ActionLogAdapterException {
 
@@ -196,12 +208,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getAllRidLogsByDate(int rid, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getAllRidLogsByDate(int rid, Date from,
+			Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getAllByRidAndDate(rid, from, to);
+			List<ActionLogEntry> entries = service.getAllByRidAndDate(rid,
+					from, to);
 
 			return this.getActionInformations(entries);
 
@@ -227,7 +240,8 @@ public class ActionLogAdapter {
 			throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByDateAndType(from, to, "E");
+			List<ActionLogEntry> entries = service.getByDateAndType(from, to,
+					"E");
 
 			return this.getActionInformations(entries);
 
@@ -248,12 +262,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getErrorUserLogsByDate(String user, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getErrorUserLogsByDate(String user,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user, "E", from, to);
+			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user,
+					"E", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -261,7 +276,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public List<ActionLogInformation> getErrorRtLogs(String rt)
 			throws ActionLogAdapterException {
 
@@ -274,12 +289,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getErrorRtLogsByDate(String rt, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getErrorRtLogsByDate(String rt,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "E", from, to);
+			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "E",
+					from, to);
 
 			return this.getActionInformations(entries);
 
@@ -300,12 +316,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getErrorRidLogsByDate(int rid, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getErrorRidLogsByDate(int rid, Date from,
+			Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid, "E", from, to);
+			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid,
+					"E", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -318,7 +335,8 @@ public class ActionLogAdapter {
 			throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByDateAndType(from, to, "W");
+			List<ActionLogEntry> entries = service.getByDateAndType(from, to,
+					"W");
 
 			return this.getActionInformations(entries);
 
@@ -339,12 +357,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getWarningUserLogsByDate(String user, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getWarningUserLogsByDate(String user,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user, "W", from, to);
+			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user,
+					"W", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -366,11 +385,12 @@ public class ActionLogAdapter {
 		}
 	}
 
-	public List<ActionLogInformation> getWarningRidLogsByDate(int rid, Date from, Date to)
-			throws ActionLogAdapterException {
+	public List<ActionLogInformation> getWarningRidLogsByDate(int rid,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid, "W", from, to);
+			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid,
+					"W", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -378,7 +398,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public List<ActionLogInformation> getWarningRtLogs(String rt)
 			throws ActionLogAdapterException {
 
@@ -392,11 +412,12 @@ public class ActionLogAdapter {
 		}
 	}
 
-	public List<ActionLogInformation> getWarningRtLogsByDate(String rt, Date from, Date to)
-			throws ActionLogAdapterException {
+	public List<ActionLogInformation> getWarningRtLogsByDate(String rt,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "W", from, to);
+			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "W",
+					from, to);
 
 			return this.getActionInformations(entries);
 
@@ -404,12 +425,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public List<ActionLogInformation> getInfoDateLogs(Date from, Date to)
 			throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByDateAndType(from, to, "I");
+			List<ActionLogEntry> entries = service.getByDateAndType(from, to,
+					"I");
 
 			return this.getActionInformations(entries);
 
@@ -430,12 +452,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getInfoUserLogsByDate(String user, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getInfoUserLogsByDate(String user,
+			Date from, Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user, "I", from, to);
+			List<ActionLogEntry> entries = service.getByUserTypeAndDate(user,
+					"I", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -456,12 +479,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getInfoRidLogsByDate(int rid, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getInfoRidLogsByDate(int rid, Date from,
+			Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid, "I", from, to);
+			List<ActionLogEntry> entries = service.getByRidTypeAndDate(rid,
+					"I", from, to);
 
 			return this.getActionInformations(entries);
 
@@ -469,7 +493,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public List<ActionLogInformation> getInfoRtLogs(String rt)
 			throws ActionLogAdapterException {
 
@@ -482,12 +506,13 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<ActionLogInformation> getInfoRtLogsByDate(String rt, Date from, Date to)
-			throws ActionLogAdapterException {
+
+	public List<ActionLogInformation> getInfoRtLogsByDate(String rt, Date from,
+			Date to) throws ActionLogAdapterException {
 
 		try {
-			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "I", from, to);
+			List<ActionLogEntry> entries = service.getByRtTypeAndDate(rt, "I",
+					from, to);
 
 			return this.getActionInformations(entries);
 
@@ -495,9 +520,8 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public boolean containsRidLogs(int rid)
-			throws ActionLogAdapterException {
+
+	public boolean containsRidLogs(int rid) throws ActionLogAdapterException {
 
 		try {
 			return service.containsRid(rid);
@@ -505,7 +529,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public boolean containsRidLogsByDate(int rid, Date from, Date to)
 			throws ActionLogAdapterException {
 
@@ -515,7 +539,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public boolean containsDateLogs(Date from, Date to)
 			throws ActionLogAdapterException {
 
@@ -525,7 +549,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public boolean containsUserLogs(String user)
 			throws ActionLogAdapterException {
 
@@ -535,7 +559,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public boolean containsUserLogsByDate(String user, Date from, Date to)
 			throws ActionLogAdapterException {
 
@@ -545,9 +569,8 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
-	public boolean containsRtLogs(String rt)
-			throws ActionLogAdapterException {
+
+	public boolean containsRtLogs(String rt) throws ActionLogAdapterException {
 
 		try {
 			return service.containsRt(rt);
@@ -555,7 +578,7 @@ public class ActionLogAdapter {
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
-	
+
 	public boolean containsRtLogsByDate(String rt, Date from, Date to)
 			throws ActionLogAdapterException {
 

@@ -19,5 +19,9 @@ public class ImageNotAvailableException extends TeleoperationException {
 		action.put("type", type);
 	}
 	
+	public ImageNotAvailableException() {
+		super();
+	}
+	
 	
 }

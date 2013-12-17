@@ -41,7 +41,7 @@ public class UserServerPasswordHandler extends ServerPasswordHandler {
 
 			UserInformation userInfo = null;
 
-			userInfo = repository.getUserInformation(pc.getIdentifier());
+			userInfo = repository.getUserCredentials(pc.getIdentifier());
 
 			boolean granted = false;
 

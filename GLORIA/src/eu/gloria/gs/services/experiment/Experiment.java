@@ -130,7 +130,7 @@ public class Experiment extends GSLogProducerService implements
 
 		UserInformation userInfo = null;
 		try {
-			userInfo = this.userRepository.getUserInformation(this
+			userInfo = this.userRepository.getUserCredentials(this
 					.getClientUsername());
 			if (userInfo.getRoles()[0].equals(UserRole.ADMIN)) {
 				adminMode = true;

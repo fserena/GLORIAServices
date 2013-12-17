@@ -18,6 +18,15 @@ public class ActionLogInformation {
 	private Integer rid;
 	private Object action;
 	private String rt;
+	private LogType type;
+
+	public LogType getType() {
+		return type;
+	}
+
+	public void setType(LogType type) {
+		this.type = type;
+	}
 
 	public int getId() {
 		return id;
