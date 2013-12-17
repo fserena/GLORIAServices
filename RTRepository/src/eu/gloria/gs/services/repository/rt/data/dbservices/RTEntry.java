@@ -1,6 +1,7 @@
 package eu.gloria.gs.services.repository.rt.data.dbservices;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class RTEntry implements Serializable {
 
@@ -21,6 +22,24 @@ public class RTEntry implements Serializable {
 	private double longitude;
 	private double latitude;
 	private int observatory;
+	private Date date;
+	private String image;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
 
 	public String getName() {
 		return name;
@@ -117,6 +136,5 @@ public class RTEntry implements Serializable {
 	public void setPort(String port) {
 		this.port = port;
 	}
-	
-	
+
 }

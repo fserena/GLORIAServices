@@ -7,25 +7,37 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `rt` (
-		`name` varchar(50) NOT NULL,
+		`name` varchar(50)
+		NOT NULL,
 		`description` varchar(100) DEFAULT NULL,
-		`url` varchar(100) NOT NULL,
+		`url` varchar(100)
+		NOT NULL,
 		`public_key` blob,
 		`owner` varchar(50) NOT NULL,
-		`oid` int(11) DEFAULT NULL,
+		`oid` int(11)
+		DEFAULT NULL,
 		`longitude` double DEFAULT NULL,
-		`latitude` double DEFAULT NULL,
+		`latitude` double DEFAULT
+		NULL,
 		`starting_avl` datetime DEFAULT NULL,
-		`ending_avl` datetime DEFAULT NULL,
+		`ending_avl` datetime
+		DEFAULT NULL,
 		`user` varchar(45) NOT NULL,
-		`password` varchar(45) NOT NULL,
+		`password` varchar(45) NOT
+		NULL,
 		`type` varchar(20) NOT NULL,
 		`port` varchar(5) NOT NULL,
-		PRIMARY KEY (`name`),
+		`date`
+		datetime NOT NULL,
+		`image` varchar(200) DEFAULT NULL,
+		PRIMARY KEY
+		(`name`),
 		KEY `oid` (`oid`),
-		CONSTRAINT `oid` FOREIGN KEY (`oid`) REFERENCES `observatory` (`oid`) ON DELETE
+		CONSTRAINT `oid` FOREIGN KEY (`oid`)
+		REFERENCES `observatory` (`oid`) ON DELETE
 		CASCADE ON UPDATE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		)
+		ENGINE=InnoDB DEFAULT CHARSET=utf8
 	</update>
 
 	<select id="get"
@@ -57,11 +69,13 @@
 		(name,
 		owner, url, port, user,
 		password,
-		type, longitude, latitude)
+		type, longitude, latitude, date)
 		VALUE
 		( #{name}, #{owner},
-		#{url}, #{port},
-		#{user}, #{password}, #{type}, #{longitude}, #{latitude} )
+		#{url},
+		#{port},
+		#{user}, #{password}, #{type}, #{longitude}, #{latitude},
+		#{date} )
 	</insert>
 
 	<delete id="remove">
@@ -94,6 +108,28 @@
 
 	<select id="getDescription" resultType="string">
 		SELECT description FROM
+		`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<select id="getDate" resultType="date">
+		SELECT date FROM
+		`rt`
+		WHERE
+		name=#{name_}
+	</select>
+
+	<update id="setImage">
+		UPDATE `rt`
+		SET image=
+		#{image_}
+		WHERE name
+		=#{name_}
+	</update>
+
+	<select id="getImage" resultType="string">
+		SELECT image FROM
 		`rt`
 		WHERE
 		name=#{name_}

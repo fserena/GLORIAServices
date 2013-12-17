@@ -219,7 +219,8 @@ public class SchedulerBrain {
 
 				if (planState.equals(PlanState.REJECTED)
 						|| planState.equals(PlanState.QUEUED)
-						|| planState.equals(PlanState.RUNNING) || planState.equals(PlanState.ERROR)) {
+						|| planState.equals(PlanState.RUNNING)
+						|| planState.equals(PlanState.ERROR)) {
 					this.adapter.setState(schInfo.getId(), planState.name());
 					this.adapter.setLastDate(schInfo.getId(), new Date());
 				}
@@ -292,15 +293,17 @@ public class SchedulerBrain {
 							result.setImages(images);
 
 							try {
-								
+
 								ImageTargetData target = new ImageTargetData();
 								target.setDec(schInfo.getOpInfo().getDec());
 								target.setRa(schInfo.getOpInfo().getRa());
-								target.setObject(schInfo.getOpInfo().getObject());
-								
+								target.setObject(schInfo.getOpInfo()
+										.getObject());
+
 								imageRepository.saveImage(schInfo.getUser(),
-										schInfo.getRt(), "unknown",
-										file.getUuid(), target);
+										schInfo.getRt(), "unknown", file
+												.getUuid(), target, schInfo
+												.getOpInfo().getExposure());
 							} catch (ImageRepositoryException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

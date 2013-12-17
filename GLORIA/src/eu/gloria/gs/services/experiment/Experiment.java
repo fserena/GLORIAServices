@@ -990,7 +990,7 @@ public class Experiment extends GSLogProducerService implements
 
 	@Override
 	public boolean isExperimentContextReady(int reservationId)
-			throws ExperimentException, ExperimentNotInstantiatedException,
+			throws ExperimentException,
 			NoSuchReservationException {
 
 		LogAction action = new LogAction();
@@ -1012,7 +1012,7 @@ public class Experiment extends GSLogProducerService implements
 			if (!grantAccess) {
 				buildErrorLog(action, null, "logic", "no context");
 				this.logContextError(getClientUsername(), reservationId, action);
-				throw new NoSuchReservationException(action);
+				return false;
 			}
 
 			return adapter.isReservationContextReady(reservationId);

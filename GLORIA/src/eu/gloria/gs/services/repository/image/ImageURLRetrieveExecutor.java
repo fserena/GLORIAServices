@@ -96,86 +96,97 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 			LogAction action = new LogAction();
 			action.put("sender", "image daemon");
-			
+
 			String url = null;
 
 			action.put("id", imageInfo.getId());
 
-			try {
-				url = ccd.getImageURL(imageInfo.getRt(), imageInfo.getCcd(),
-						imageInfo.getLocalid(), ImageExtensionFormat.JPG);
+			Date creationDate = imageInfo.getCreationDate();
+			double exposure = imageInfo.getExposure();
+			Date currentDate = new Date();
 
-				adapter.setJpgByRT(imageInfo.getRt(), imageInfo.getLocalid(),
-						url);
+			if (currentDate.getTime() - creationDate.getTime()
+					+ (exposure * 1000.0) > 0) {
 
-				url = ccd.getImageURL(imageInfo.getRt(), imageInfo.getCcd(),
-						imageInfo.getLocalid(), ImageExtensionFormat.FITS);
+				action.put("exposure", "should end");
+				try {
+					url = ccd.getImageURL(imageInfo.getRt(),
+							imageInfo.getCcd(), imageInfo.getLocalid(),
+							ImageExtensionFormat.JPG);
 
-				adapter.setFitsByRT(imageInfo.getRt(), imageInfo.getLocalid(),
-						url);
+					adapter.setJpgByRT(imageInfo.getRt(),
+							imageInfo.getLocalid(), url);
 
-				this.logInfo(action);
+					url = ccd.getImageURL(imageInfo.getRt(),
+							imageInfo.getCcd(), imageInfo.getLocalid(),
+							ImageExtensionFormat.FITS);
 
-			} catch (ImageNotAvailableException e) {
-				// Ignore the image this time, it will be treated by the
-				// next
-				// iteration of the executor
+					adapter.setFitsByRT(imageInfo.getRt(),
+							imageInfo.getLocalid(), url);
 
-				int gid = imageInfo.getId();
+					this.logInfo(action);
 
-				if (recoverRetries.containsKey(gid)) {
-					recoverRetries.put(gid, recoverRetries.get(gid) + 1);
+				} catch (ImageNotAvailableException e) {
+					// Ignore the image this time, it will be treated by the
+					// next
+					// iteration of the executor
 
-					action.put("retries", recoverRetries.get(gid));
+					int gid = imageInfo.getId();
 
-					if (recoverRetries.get(gid) == 50) {
-						try {
-							action.put("operation", "remove");
-							adapter.removeImage(imageInfo.getId());
+					if (recoverRetries.containsKey(gid)) {
+						recoverRetries.put(gid, recoverRetries.get(gid) + 1);
 
-							this.logWarning(action);
+						action.put("retries", recoverRetries.get(gid));
 
-						} catch (ImageDatabaseException e1) {
-							action.put("cause", "service error");
-							this.logError(action);
+						if (recoverRetries.get(gid) == 10) {
+							try {
+								action.put("operation", "remove");
+								adapter.removeImage(imageInfo.getId());
+
+								this.logWarning(action);
+
+							} catch (ImageDatabaseException e1) {
+								action.put("cause", "service error");
+								this.logError(action);
+							}
+
+							recoverRetries.remove(gid);
 						}
-
-						recoverRetries.remove(gid);
+					} else {
+						recoverRetries.put(gid, 0);
+						thereArePending = true;
 					}
-				} else {
-					recoverRetries.put(gid, 0);
-					thereArePending = true;
-				}
-			} catch (CCDTeleoperationException e) {
+				} catch (CCDTeleoperationException e) {
 
-				if (url == null) {
-					url = "";
-				}
+					if (url == null) {
+						url = "";
+					}
 
-				action.put("ccd", "fail");
-				action.put("operation", "remove");
+					action.put("ccd", "fail");
+					action.put("operation", "remove");
 
-				try {
-					adapter.removeImage(imageInfo.getId());
+					try {
+						adapter.removeImage(imageInfo.getId());
 
-					this.logError(action);
+						this.logError(action);
 
-				} catch (ImageDatabaseException e1) {
+					} catch (ImageDatabaseException e1) {
+						action.put("cause", "internal error");
+						this.logError(action);
+					}
+
+				} catch (Exception e) {
 					action.put("cause", "internal error");
-					this.logError(action);
-				}
+					action.put("operation", "remove");
 
-			} catch (Exception e) {
-				action.put("cause", "internal error");
-				action.put("operation", "remove");
+					try {
+						adapter.removeImage(imageInfo.getId());
 
-				try {
-					adapter.removeImage(imageInfo.getId());
-
-					this.logError(action);
-				} catch (ImageDatabaseException e1) {
-					action.put("cause", "internal error");
-					this.logError(action);
+						this.logError(action);
+					} catch (ImageDatabaseException e1) {
+						action.put("cause", "internal error");
+						this.logError(action);
+					}
 				}
 			}
 		}

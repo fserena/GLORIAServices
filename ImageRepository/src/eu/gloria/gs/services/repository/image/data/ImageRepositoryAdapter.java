@@ -33,7 +33,7 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void saveImage(String rt, String ccd, String user, Date when,
-			String lid, ImageTargetData target) throws ImageDatabaseException {
+			String lid, ImageTargetData target, double exposure) throws ImageDatabaseException {
 
 		ImageEntry entry = new ImageEntry();
 		entry.setUser(user);
@@ -41,6 +41,7 @@ public class ImageRepositoryAdapter {
 		entry.setLocal_id(lid);
 		entry.setRt(rt);
 		entry.setCcd(ccd);
+		entry.setExposure(exposure);
 
 		try {
 			entry.setTarget(JSONConverter.toJSON(target));
@@ -225,6 +226,7 @@ public class ImageRepositoryAdapter {
 		imageInfo.setId(id);
 		imageInfo.setLocalid(entry.getLocal_id());
 		imageInfo.setRt(entry.getRt());
+		imageInfo.setExposure(entry.getExposure());
 		imageInfo.setCcd(entry.getCcd());
 		imageInfo.setRid(entry.getRid());
 		imageInfo.setJpg(entry.getJpg());
@@ -261,6 +263,7 @@ public class ImageRepositoryAdapter {
 		imageInfo.setId(entry.getIdimage());
 		imageInfo.setLocalid(lid);
 		imageInfo.setRt(rt);
+		imageInfo.setExposure(entry.getExposure());
 		imageInfo.setCcd(entry.getCcd());
 		imageInfo.setRid(entry.getRid());
 		imageInfo.setJpg(entry.getJpg());
@@ -294,6 +297,7 @@ public class ImageRepositoryAdapter {
 				imageInfo.setLocalid(entry.getLocal_id());
 				imageInfo.setRid(entry.getRid());
 				imageInfo.setRt(entry.getRt());
+				imageInfo.setExposure(entry.getExposure());
 				imageInfo.setCcd(entry.getCcd());
 				imageInfo.setJpg(entry.getJpg());
 				imageInfo.setFits(entry.getFits());
@@ -329,6 +333,7 @@ public class ImageRepositoryAdapter {
 			imageInfo.setLocalid(entry.getLocal_id());
 			imageInfo.setRid(entry.getRid());
 			imageInfo.setRt(entry.getRt());
+			imageInfo.setExposure(entry.getExposure());
 			imageInfo.setCcd(entry.getCcd());
 			try {
 				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(

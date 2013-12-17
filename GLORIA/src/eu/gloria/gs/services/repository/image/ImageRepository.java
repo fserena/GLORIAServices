@@ -30,7 +30,8 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "rt") String rt,
 			@WebParam(name = "ccd") String ccd,
 			@WebParam(name = "lid") String lid,
-			@WebParam(name = "target") ImageTargetData target)
+			@WebParam(name = "target") ImageTargetData target,
+			@WebParam(name = "exposure") double exposure)
 			throws ImageRepositoryException {
 
 		LogAction action = new LogAction();
@@ -41,7 +42,8 @@ public class ImageRepository extends GSLogProducerService implements
 			action.put("operation", "save image");
 			action.put("rt", rt);
 
-			this.adapter.saveImage(rt, ccd, user, new Date(), lid, target);
+			this.adapter.saveImage(rt, ccd, user, new Date(), lid, target,
+					exposure);
 
 			this.logInfo(this.getClientUsername(), action);
 
@@ -361,7 +363,7 @@ public class ImageRepository extends GSLogProducerService implements
 			action.put("cause", "internal error");
 			this.logError(this.getClientUsername(), action);
 			action.put("more", e.getAction());
-			throw new ImageRepositoryException(action);			
+			throw new ImageRepositoryException(action);
 		}
 	}
 

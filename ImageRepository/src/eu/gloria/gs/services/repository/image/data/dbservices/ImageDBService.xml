@@ -15,18 +15,23 @@
 		`jpg` varchar(200) DEFAULT NULL,
 		`date` datetime NOT NULL,
 		`rid` int(11) DEFAULT NULL,
+		`exposure` double NOT NULL,
 		`local_id` varchar(50) NOT NULL,
 		`ccd`
-		varchar(40) NOT NULL,
+		varchar(40) NOT
+		NULL,
 		`fits` varchar(200) DEFAULT NULL,
 		`target` text,
-		PRIMARY KEY (`idimage`),
+		PRIMARY KEY
+		(`idimage`),
 		KEY `fk_image_rt` (`rt`),
 		KEY `fk_image_user`
 		(`user`),
-		KEY `fk_image_rid` (`rid`),
+		KEY
+		`fk_image_rid` (`rid`),
 		KEY `fk_image_ccd` (`ccd`),
-		CONSTRAINT `fk_image_rid` FOREIGN KEY (`rid`) REFERENCES `reservation`
+		CONSTRAINT
+		`fk_image_rid` FOREIGN KEY (`rid`) REFERENCES `reservation`
 		(`idreservation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 		CONSTRAINT
 		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `rt` (`name`) ON DELETE
@@ -95,8 +100,7 @@
 		rid=#{rid_}
 	</select>
 
-	<select id="getAllBetweenDates"
-		resultType="int">
+	<select id="getAllBetweenDates" resultType="int">
 		SELECT idimage FROM
 		`image`
 		WHERE date &gt;=
@@ -126,9 +130,9 @@
 		INSERT INTO
 		`image`
 		(rt, user, date,
-		local_id, ccd, target)
+		local_id, ccd, target, exposure)
 		VALUE (
-		#{rt}, #{user}, #{date}, #{local_id}, #{ccd}, #{target})
+		#{rt}, #{user}, #{date}, #{local_id}, #{ccd}, #{target}, #{exposure})
 	</insert>
 
 	<delete id="remove">

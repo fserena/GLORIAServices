@@ -13,7 +13,7 @@
 		`roles` varchar(20) NOT
 		NULL,
 		`date` datetime NOT NULL,
-		`language` varchar(45) DEFAULT NULL,
+		`language` varchar(45) DEFAULT 'en',
 		`ocupation` varchar(100) DEFAULT NULL,
 		`alias` varchar(50) NOT NULL,
 		PRIMARY KEY (`name`),

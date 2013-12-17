@@ -24,6 +24,15 @@ public class ImageEntry implements Serializable {
 	private String rt;
 	private String ccd;
 	private String target;
+	private double exposure;
+
+	public double getExposure() {
+		return exposure;
+	}
+
+	public void setExposure(double exposure) {
+		this.exposure = exposure;
+	}
 
 	public int getIdimage() {
 		return idimage;

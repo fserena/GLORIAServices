@@ -440,6 +440,27 @@ public class RTRepository extends GSLogProducerService implements
 			throw new RTRepositoryException(e.getAction());
 		}
 	}
+	
+	@Override
+	public void setRTImage(String rt, String image)
+			throws RTRepositoryException {
+		try {
+			adapter.setRTImage(rt, image);
+		} catch (RTRepositoryAdapterException e) {
+			throw new RTRepositoryException(e.getAction());
+		}
+	}
+
+	@Override
+	public String getRTImage(String rt) throws RTRepositoryException {
+		try {
+			String image = adapter.getRTImage(rt);
+
+			return image;
+		} catch (RTRepositoryAdapterException e) {
+			throw new RTRepositoryException(e.getAction());
+		}
+	}
 
 	@Override
 	public void setRTPublicKey(String rt, String pk)
@@ -556,6 +577,8 @@ public class RTRepository extends GSLogProducerService implements
 			rtInfo.setPort(adapter.getRTPort(rt));
 			rtInfo.setUser(adapter.getRTCredentials(rt).getUser());
 			rtInfo.setPassword(adapter.getRTCredentials(rt).getPassword());
+			rtInfo.setImage(adapter.getRTImage(rt));
+			rtInfo.setRegistrationDate(adapter.getRTDate(rt));
 
 			return rtInfo;
 

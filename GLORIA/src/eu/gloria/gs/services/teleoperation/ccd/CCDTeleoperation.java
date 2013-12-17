@@ -475,8 +475,10 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			target.setRa(null);
 			target.setObject(null);
 
+			double exposure = this.getExposureTime(rt, ccd);
+			
 			imageRepository.saveImage(this.getClientUsername(), rt, ccd,
-					imageId, target);
+					imageId, target, exposure);
 
 			this.processSuccess(rt, ccd, operationName, args.getArguments(),
 					imageId);

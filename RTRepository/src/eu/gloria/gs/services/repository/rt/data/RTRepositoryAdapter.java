@@ -51,20 +51,19 @@ public class RTRepositoryAdapter {
 		rtdevService.create();
 	}
 
-	private void registerRT(String rt, String owner, String url, String port, String user,
-			String password, String type) throws RTRepositoryAdapterException {
+	private void registerRT(String rt, String owner, String url, String port,
+			String user, String password, String type)
+			throws RTRepositoryAdapterException {
 		if (rt == null)
 			throw new RTRepositoryAdapterException("rt name cannot be null");
 		if (owner == null)
-			throw new RTRepositoryAdapterException(
-					"owner name cannot be null");
+			throw new RTRepositoryAdapterException("owner name cannot be null");
 		if (url == null)
 			throw new RTRepositoryAdapterException("url cannot be null");
 		if (user == null)
 			throw new RTRepositoryAdapterException("user cannot be null");
 		if (password == null)
-			throw new RTRepositoryAdapterException(
-					"password cannot be null");
+			throw new RTRepositoryAdapterException("password cannot be null");
 
 		boolean previouslyContained = false;
 
@@ -81,7 +80,8 @@ public class RTRepositoryAdapter {
 			entry.setType(type);
 			entry.setLatitude(0);
 			entry.setLongitude(0);
-			
+			entry.setDate(new Date());
+
 			rtService.save(entry);
 			rtService.setStartingAvailability(rt, new Date());
 			rtService.setEndingAvailability(rt, new Date());
@@ -96,13 +96,15 @@ public class RTRepositoryAdapter {
 		}
 	}
 
-	public void registerBatchRT(String rt, String owner, String url, String port,
-			String user, String password) throws RTRepositoryAdapterException {
+	public void registerBatchRT(String rt, String owner, String url,
+			String port, String user, String password)
+			throws RTRepositoryAdapterException {
 		this.registerRT(rt, owner, url, port, user, password, "BATCH");
 	}
 
-	public void registerInteractiveRT(String rt, String owner, String url, String port,
-			String user, String password) throws RTRepositoryAdapterException {
+	public void registerInteractiveRT(String rt, String owner, String url,
+			String port, String user, String password)
+			throws RTRepositoryAdapterException {
 		this.registerRT(rt, owner, url, port, user, password, "INTERACTIVE");
 	}
 
@@ -120,7 +122,7 @@ public class RTRepositoryAdapter {
 		if (!previouslyContained) {
 			LogAction action = new LogAction();
 			action.put("cause", "rt does not already exist");
-			action.put("name", rt);			
+			action.put("name", rt);
 			throw new RTRepositoryAdapterException(action);
 		}
 	}
@@ -150,7 +152,7 @@ public class RTRepositoryAdapter {
 		} catch (NullPointerException e) {
 			LogAction action = new LogAction();
 			action.put("cause", "device model does not already exist");
-			action.put("rt", rt);			
+			action.put("rt", rt);
 			action.put("device", name);
 			throw new RTRepositoryAdapterException(action);
 		}
@@ -586,9 +588,8 @@ public class RTRepositoryAdapter {
 			throw new RTRepositoryAdapterException(e.getMessage());
 		}
 	}
-	
-	public List<String> getAllBatchRTs()
-			throws RTRepositoryAdapterException {
+
+	public List<String> getAllBatchRTs() throws RTRepositoryAdapterException {
 
 		try {
 			List<String> rts = rtService.getAllBatch();
@@ -637,7 +638,7 @@ public class RTRepositoryAdapter {
 			throw new RTRepositoryAdapterException("The telescope '" + rt
 					+ "' does not exist");
 	}
-	
+
 	public String getRTPort(String rt) throws RTRepositoryAdapterException {
 
 		RTEntry entry = null;
@@ -682,6 +683,53 @@ public class RTRepositoryAdapter {
 			description = rtService.getDescription(rt);
 
 			return description;
+		} catch (NullPointerException e) {
+			throw new RTRepositoryAdapterException("The telescope '" + rt
+					+ "' does not exist");
+		} catch (PersistenceException e) {
+			throw new RTRepositoryAdapterException(e.getMessage());
+		}
+	}
+
+	public Date getRTDate(String rt) throws RTRepositoryAdapterException {
+
+		Date date = null;
+
+		try {
+			date = rtService.getDate(rt);
+
+			return date;
+		} catch (NullPointerException e) {
+			throw new RTRepositoryAdapterException("The telescope '" + rt
+					+ "' does not exist");
+		} catch (PersistenceException e) {
+			throw new RTRepositoryAdapterException(e.getMessage());
+		}
+	}
+
+	public void setRTImage(String rt, String image)
+			throws RTRepositoryAdapterException {
+
+		try {
+			rtService.setImage(rt, image);
+
+		} catch (NullPointerException e) {
+			throw new RTRepositoryAdapterException("The telescope '" + rt
+					+ "' does not exist");
+		} catch (PersistenceException e) {
+			throw new RTRepositoryAdapterException(e.getMessage());
+		}
+
+	}
+
+	public String getRTImage(String rt) throws RTRepositoryAdapterException {
+
+		String image = null;
+
+		try {
+			image = rtService.getImage(rt);
+
+			return image;
 		} catch (NullPointerException e) {
 			throw new RTRepositoryAdapterException("The telescope '" + rt
 					+ "' does not exist");
