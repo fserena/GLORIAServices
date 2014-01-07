@@ -76,6 +76,10 @@ public interface ImageRepositoryInterface {
 	public ImageInformation getImageInformation(@WebParam(name = "id") int id)
 			throws ImageRepositoryException;
 
+	public List<ImageInformation> getRandomImagesInformation(
+			@WebParam(name = "count") int count)
+			throws ImageRepositoryException;
+
 	public ImageInformation getImageInformationByRTLocaId(
 			@WebParam(name = "rt") String rt, @WebParam(name = "lid") String lid)
 			throws ImageRepositoryException;

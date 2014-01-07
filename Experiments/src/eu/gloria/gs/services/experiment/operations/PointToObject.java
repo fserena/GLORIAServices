@@ -65,8 +65,7 @@ public class PointToObject extends ServiceOperation {
 
 					System.out.println(domeState.name());
 
-					if (domeState.equals(DomeOpeningState.UNDEFINED)
-							|| domeState.equals(DomeOpeningState.CLOSED)) {
+					if (domeState.equals(DomeOpeningState.CLOSED)) {
 						this.getDomeTeleoperation().open(rtName, domeName);
 					}
 				} catch (DomeTeleoperationException e) {

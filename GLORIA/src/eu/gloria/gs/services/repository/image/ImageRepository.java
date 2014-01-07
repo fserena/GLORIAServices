@@ -131,6 +131,22 @@ public class ImageRepository extends GSLogProducerService implements
 	 * (non-Javadoc)
 	 * 
 	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
+	 * getImageInformation(int)
+	 */
+	@Override
+	public List<ImageInformation> getRandomImagesInformation(int count)
+			throws ImageRepositoryException {
+		try {
+			return this.adapter.getRandomImagesInformation(count);
+		} catch (ImageDatabaseException e) {
+			throw new ImageRepositoryException(e.getAction());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
 	 * getAllUserImageIdentifiers(java.lang.String)
 	 */
 	@Override

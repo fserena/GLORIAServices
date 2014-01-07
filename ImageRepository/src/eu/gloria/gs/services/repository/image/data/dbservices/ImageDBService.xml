@@ -16,31 +16,40 @@
 		`date` datetime NOT NULL,
 		`rid` int(11) DEFAULT NULL,
 		`exposure` double NOT NULL,
-		`local_id` varchar(50) NOT NULL,
+		`local_id`
+		varchar(50) NOT NULL,
 		`ccd`
 		varchar(40) NOT
 		NULL,
-		`fits` varchar(200) DEFAULT NULL,
+		`fits` varchar(200)
+		DEFAULT NULL,
 		`target` text,
 		PRIMARY KEY
 		(`idimage`),
-		KEY `fk_image_rt` (`rt`),
+		KEY `fk_image_rt`
+		(`rt`),
 		KEY `fk_image_user`
 		(`user`),
 		KEY
 		`fk_image_rid` (`rid`),
-		KEY `fk_image_ccd` (`ccd`),
+		KEY
+		`fk_image_ccd` (`ccd`),
 		CONSTRAINT
-		`fk_image_rid` FOREIGN KEY (`rid`) REFERENCES `reservation`
-		(`idreservation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+		`fk_image_rid` FOREIGN KEY (`rid`)
+		REFERENCES `reservation`
+		(`idreservation`) ON DELETE NO ACTION ON
+		UPDATE NO ACTION,
 		CONSTRAINT
-		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES `rt` (`name`) ON DELETE
+		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES
+		`rt` (`name`) ON DELETE
 		CASCADE ON UPDATE CASCADE,
-		CONSTRAINT `fk_image_user` FOREIGN KEY
+		CONSTRAINT
+		`fk_image_user` FOREIGN KEY
 		(`user`) REFERENCES `user` (`name`) ON
 		DELETE NO ACTION ON UPDATE NO
 		ACTION
-		) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8
+		) ENGINE=InnoDB AUTO_INCREMENT=29
+		DEFAULT CHARSET=utf8
 	</update>
 
 	<select id="get"
@@ -49,6 +58,14 @@
 		`image`
 		WHERE
 		idimage=#{id_}
+	</select>
+
+	<select id="getRandom"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`image`
+		WHERE NOT(jpg is NULL) ORDER BY RAND()
+		LIMIT #{count_}
 	</select>
 
 	<select id="getByUser"
@@ -130,9 +147,11 @@
 		INSERT INTO
 		`image`
 		(rt, user, date,
-		local_id, ccd, target, exposure)
+		local_id, ccd, target,
+		exposure)
 		VALUE (
-		#{rt}, #{user}, #{date}, #{local_id}, #{ccd}, #{target}, #{exposure})
+		#{rt}, #{user}, #{date}, #{local_id}, #{ccd},
+		#{target}, #{exposure})
 	</insert>
 
 	<delete id="remove">

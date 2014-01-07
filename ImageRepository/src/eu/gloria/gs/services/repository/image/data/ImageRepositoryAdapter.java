@@ -33,7 +33,8 @@ public class ImageRepositoryAdapter {
 	}
 
 	public void saveImage(String rt, String ccd, String user, Date when,
-			String lid, ImageTargetData target, double exposure) throws ImageDatabaseException {
+			String lid, ImageTargetData target, double exposure)
+			throws ImageDatabaseException {
 
 		ImageEntry entry = new ImageEntry();
 		entry.setUser(user);
@@ -55,7 +56,7 @@ public class ImageRepositoryAdapter {
 	public void removeImage(int id) throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
 			LogAction action = new LogAction();
-			
+
 			action.put("id", id);
 			action.put("cause", "image does not exist");
 			throw new ImageDatabaseException(action);
@@ -209,6 +210,47 @@ public class ImageRepositoryAdapter {
 		imageService.setUser(entry.getIdimage(), user);
 	}
 
+	public List<ImageInformation> getRandomImagesInformation(int count)
+			throws ImageDatabaseException {
+
+		LogAction action = new LogAction();
+		action.put("cause", "no images available");
+
+		List<ImageEntry> entries = imageService.getRandom(count);
+
+		if (entries == null) {
+			throw new ImageDatabaseException(action);
+		}
+
+		List<ImageInformation> imageInfos = new ArrayList<ImageInformation>();
+
+		for (ImageEntry entry : entries) {
+			ImageInformation imageInfo = new ImageInformation();
+
+			imageInfo.setCreationDate(entry.getDate());
+			imageInfo.setId(entry.getIdimage());
+			imageInfo.setLocalid(entry.getLocal_id());
+			imageInfo.setRt(entry.getRt());
+			imageInfo.setExposure(entry.getExposure());
+			imageInfo.setCcd(entry.getCcd());
+			imageInfo.setRid(entry.getRid());
+			imageInfo.setJpg(entry.getJpg());
+			imageInfo.setFits(entry.getFits());
+			imageInfo.setUser(entry.getUser());
+			try {
+				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
+						entry.getTarget(), ImageTargetData.class, null));
+			} catch (IOException e) {
+				action.put("cause", "json error");
+				throw new ImageDatabaseException(action);
+			}
+			
+			imageInfos.add(imageInfo);
+
+		}
+		return imageInfos;
+	}
+
 	public ImageInformation getImageInformation(int id)
 			throws ImageDatabaseException {
 		if (!imageService.contains(id)) {
@@ -308,7 +350,7 @@ public class ImageRepositoryAdapter {
 									null));
 				} catch (IOException e) {
 					LogAction action = new LogAction();
-					action.put("rid", rid);					
+					action.put("rid", rid);
 					action.put("cause", "json error");
 					throw new ImageDatabaseException(action);
 				}
@@ -372,11 +414,12 @@ public class ImageRepositoryAdapter {
 
 		return imageIds;
 	}
-	
-	public List<Integer> getAllObjectImagesByDate(String object, Date from, Date to) {
 
-		List<Integer> imageIds = imageService.getAllObjectImagesBetweenDates("%" + object
-				+ "%", from, to);
+	public List<Integer> getAllObjectImagesByDate(String object, Date from,
+			Date to) {
+
+		List<Integer> imageIds = imageService.getAllObjectImagesBetweenDates(
+				"%" + object + "%", from, to);
 
 		if (imageIds == null) {
 			imageIds = new ArrayList<>();
