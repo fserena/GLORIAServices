@@ -75,14 +75,14 @@ public class RTSHandler implements ServerHandler {
 
 		URL urlWsdl = null;
 		try {
-			urlWsdl = new URL("https://" + host + ":" + port + "/"
+			urlWsdl = new URL(host + ":" + port + "/"
 					+ serviceName + "/gloria_rti.wsdl");
 		} catch (MalformedURLException e) {
 		}
 
 		URL urlWs = null;
 		try {
-			urlWs = new URL("https://" + host + ":" + port + "/" + serviceName
+			urlWs = new URL(host + ":" + port + "/" + serviceName
 					+ "/services/gloria_rtiSOAP?wsdl");
 		} catch (MalformedURLException e) {
 			throw new ServerNotAvailableException(host, port, e.getClass()
