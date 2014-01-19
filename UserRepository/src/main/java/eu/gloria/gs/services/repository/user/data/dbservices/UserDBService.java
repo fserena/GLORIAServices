@@ -12,7 +12,9 @@ public interface UserDBService {
 
 	public void save(UserEntry entry);
 
-	public boolean contains(@Param(value = "name_") String name);
+	public boolean containsName(@Param(value = "name_") String name);
+
+	public boolean containsAlias(@Param(value = "alias_") String alias);
 
 	public Date getDate(@Param(value = "name_") String name);
 

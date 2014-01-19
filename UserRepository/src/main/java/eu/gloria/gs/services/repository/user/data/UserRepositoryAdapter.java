@@ -105,7 +105,7 @@ public class UserRepositoryAdapter {
 
 	private void createUser(String name, String password, UserRole role) {
 
-		if (!userService.contains(name)) {
+		if (!userService.containsName(name)) {
 			UserEntry admin = new UserEntry();
 			admin.setName(name);
 			admin.setPassword(password);
@@ -142,7 +142,44 @@ public class UserRepositoryAdapter {
 		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD, UserRole.WEB_SERVICE);
 	}
 
-	public void create(String name, String alias) throws UserRepositoryAdapterException {
+	public void create(String name, String alias)
+			throws UserRepositoryAdapterException {
+
+		LogAction action = new LogAction();
+		action.put("name", name);
+		action.put("alias", alias);
+
+		if (name == null) {
+			action.put("cause", "user is null");
+			throw new UserRepositoryAdapterException(action);
+		}
+
+		if (alias == null) {
+			action.put("cause", "alias is null");
+			throw new UserRepositoryAdapterException(action);
+		}
+
+		boolean previouslyContained = false;
+
+		previouslyContained = userService.containsName(name);
+
+		if (!previouslyContained) {
+			UserEntry entry = new UserEntry();
+			entry.setPassword(null);
+			entry.setName(name);
+			entry.setRoles(this.REGULAR_ROLE);
+			entry.setAlias(alias);
+
+			userService.save(entry);
+		}
+
+		if (previouslyContained) {
+			action.put("cause", "user already exists");
+			throw new UserRepositoryAdapterException(action);
+		}
+	}
+
+	public void delete(String name) throws UserRepositoryAdapterException {
 
 		LogAction action = new LogAction();
 		action.put("name", name);
@@ -154,21 +191,14 @@ public class UserRepositoryAdapter {
 
 		boolean previouslyContained = false;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
-		if (!previouslyContained) {
-			UserEntry entry = new UserEntry();
-			entry.setPassword(null);
-			entry.setName(name);
-			entry.setRoles(this.REGULAR_ROLE);
-			entry.setDate(new Date());
-			entry.setAlias(alias);
-
-			userService.save(entry);
+		if (previouslyContained) {
+			userService.remove(name);
 		}
 
 		if (previouslyContained) {
-			action.put("cause", "user already exists");
+			action.put("cause", "user does not exist");
 			throw new UserRepositoryAdapterException(action);
 		}
 	}
@@ -181,7 +211,7 @@ public class UserRepositoryAdapter {
 		boolean previouslyContained = false;
 		boolean previouslyActivated = false;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
 		if (previouslyContained) {
 
@@ -211,7 +241,7 @@ public class UserRepositoryAdapter {
 		boolean previouslyContained = false;
 		boolean previouslyDeactivated = false;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
 		if (previouslyContained) {
 
@@ -294,16 +324,23 @@ public class UserRepositoryAdapter {
 		return false;
 	}
 
-	public boolean contains(String name) throws UserRepositoryAdapterException {
+	public boolean containsName(String name)
+			throws UserRepositoryAdapterException {
 
-		boolean contained = false;
+		return userService.containsName(name);
+	}
+	
+	public boolean containsAlias(String alias)
+			throws UserRepositoryAdapterException {
 
-		//UserEntry entry = userService.get(name);
-		//contained = entry != null;
-		
-		contained = userService.contains(name);
+		return userService.containsAlias(alias);
+	}
 
-		return contained;
+	public boolean contains(String name, String alias)
+			throws UserRepositoryAdapterException {
+
+		return userService.containsAlias(alias)
+				|| userService.containsName(name);
 	}
 
 	public Date getCreationDate(String name)
@@ -352,7 +389,7 @@ public class UserRepositoryAdapter {
 		boolean previouslyContained = false;
 		boolean previouslyActivated = true;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
 		if (previouslyContained) {
 
@@ -397,7 +434,7 @@ public class UserRepositoryAdapter {
 		action.put("name", name);
 		boolean previouslyContained = false;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
 		if (previouslyContained) {
 			userService.setOcupation(name, ocupation);
@@ -432,7 +469,7 @@ public class UserRepositoryAdapter {
 		action.put("name", name);
 		boolean previouslyContained = false;
 
-		previouslyContained = userService.contains(name);
+		previouslyContained = userService.containsName(name);
 
 		if (previouslyContained) {
 			userService.setOcupation(name, language);
@@ -449,7 +486,7 @@ public class UserRepositoryAdapter {
 
 		UserInformation userInfo = new UserInformation();
 
-		if (this.contains(name)) {
+		if (this.containsName(name)) {
 
 			UserEntry entry = userService.get(name);
 
@@ -474,7 +511,7 @@ public class UserRepositoryAdapter {
 
 		UserInformation userInfo = new UserInformation();
 
-		if (this.contains(name)) {
+		if (this.containsName(name)) {
 
 			String password = userService.getPassword(name);
 

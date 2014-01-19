@@ -16,6 +16,13 @@ public interface UserRepositoryInterface {
 			@WebParam(name = "password") String password)
 			throws UserRepositoryException;
 
+	public boolean containsAlias(@WebParam(name = "alias") String alias)
+			throws UserRepositoryException;
+
+	public boolean contains(@WebParam(name = "name") String name,
+			@WebParam(name = "alias") String alias)
+			throws UserRepositoryException;
+
 	public boolean containsUser(@WebParam(name = "name") String name)
 			throws UserRepositoryException;
 

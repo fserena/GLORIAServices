@@ -38,7 +38,6 @@ public class UserRepository extends GSLogProducerService implements
 		} catch (UserRepositoryAdapterException e) {
 			action.put("cause", e.getAction());
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new UserRepositoryException(action);
 		}
 	}
@@ -59,7 +58,6 @@ public class UserRepository extends GSLogProducerService implements
 		} catch (UserRepositoryAdapterException e) {
 			action.put("cause", e.getAction());
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new UserRepositoryException(action);
 		}
 	}
@@ -68,7 +66,29 @@ public class UserRepository extends GSLogProducerService implements
 	public boolean containsUser(String name) throws UserRepositoryException {
 
 		try {
-			boolean contains = adapter.contains(name);
+			boolean contains = adapter.containsName(name);
+			return contains;
+		} catch (UserRepositoryAdapterException e) {
+			throw new UserRepositoryException(e.getAction());
+		}
+	}
+	
+	@Override
+	public boolean containsAlias(String alias) throws UserRepositoryException {
+
+		try {
+			boolean contains = adapter.containsAlias(alias);
+			return contains;
+		} catch (UserRepositoryAdapterException e) {
+			throw new UserRepositoryException(e.getAction());
+		}
+	}
+	
+	@Override
+	public boolean contains(String name, String alias) throws UserRepositoryException {
+
+		try {
+			boolean contains = adapter.contains(name, alias);
 			return contains;
 		} catch (UserRepositoryAdapterException e) {
 			throw new UserRepositoryException(e.getAction());
@@ -103,7 +123,6 @@ public class UserRepository extends GSLogProducerService implements
 		} catch (UserRepositoryAdapterException e) {
 			action.put("cause", e.getAction());
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new UserRepositoryException(action);
 		}
 
@@ -148,7 +167,7 @@ public class UserRepository extends GSLogProducerService implements
 
 		try {
 
-			if (adapter.contains(name) && adapter.isActivated(name)) {
+			if (adapter.containsName(name) && adapter.isActivated(name)) {
 				String actualPassword = adapter.getPassword(name);
 
 				boolean result = false;
@@ -185,8 +204,7 @@ public class UserRepository extends GSLogProducerService implements
 			this.logInfo(getClientUsername(), action);
 		} catch (UserRepositoryAdapterException e) {
 			action.put("cause", e.getAction());
-			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
+			this.logError(getClientUsername(), action);			
 			throw new UserRepositoryException(action);
 		}
 
@@ -214,7 +232,6 @@ public class UserRepository extends GSLogProducerService implements
 		} catch (UserRepositoryAdapterException e) {
 			action.put("cause", e.getAction());
 			this.logError(getClientUsername(), action);
-			action.put("more", e.getAction());
 			throw new UserRepositoryException(action);
 		}
 

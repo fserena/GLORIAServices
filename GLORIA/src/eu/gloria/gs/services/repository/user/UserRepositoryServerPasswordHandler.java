@@ -23,7 +23,7 @@ public class UserRepositoryServerPasswordHandler extends ServerPasswordHandler {
 
 		try {
 
-			if (!adapter.contains(user)) {
+			if (!adapter.containsName(user)) {
 				System.out.println("User " + pc.getIdentifier()
 						+ " does not exist");
 			} else {
