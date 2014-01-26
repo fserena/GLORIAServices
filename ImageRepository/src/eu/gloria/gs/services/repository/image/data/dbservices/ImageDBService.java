@@ -16,6 +16,8 @@ public interface ImageDBService {
 	public ImageEntry get(@Param(value = "id_") int id);
 	
 	public List<ImageEntry> getRandom(@Param(value = "count_") int count);
+	
+	public List<ImageEntry> getUserRandom(@Param(value = "user_") String user, @Param(value = "count_") int count);
 
 	public ImageEntry getByFits(@Param(value = "fits_") String fits);
 

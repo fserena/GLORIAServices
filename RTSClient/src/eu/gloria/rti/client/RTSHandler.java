@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
@@ -22,6 +23,7 @@ import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
 import eu.gloria.rt.entity.device.ActivityStateDomeOpening;
 import eu.gloria.rt.entity.device.ActivityStateMount;
+import eu.gloria.rt.entity.device.AlarmState;
 import eu.gloria.rt.entity.device.Device;
 import eu.gloria.rt.entity.device.DeviceCamera;
 import eu.gloria.rt.entity.device.DeviceDome;
@@ -1136,10 +1138,10 @@ public class RTSHandler implements ServerHandler {
 
 		if (rtsPort == null) {
 			throw new ServerNotAvailableException(host, port, null);
-		}
+		}		
 
 		try {
-			return rtsPort.tempGetMeasure(null, tempSensor);
+			return rtsPort.tempGetMeasure(null, tempSensor);	
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(tempSensor,
 					DeviceType.TEMPERATURE_SENSOR.name(), "get temperature",

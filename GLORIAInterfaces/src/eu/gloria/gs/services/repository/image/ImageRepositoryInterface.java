@@ -80,6 +80,11 @@ public interface ImageRepositoryInterface {
 			@WebParam(name = "count") int count)
 			throws ImageRepositoryException;
 
+	public List<ImageInformation> getRandomUserImagesInformation(
+			@WebParam(name = "user") String user,
+			@WebParam(name = "count") int count)
+			throws ImageRepositoryException;
+
 	public ImageInformation getImageInformationByRTLocaId(
 			@WebParam(name = "rt") String rt, @WebParam(name = "lid") String lid)
 			throws ImageRepositoryException;

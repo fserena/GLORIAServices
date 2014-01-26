@@ -236,7 +236,48 @@ public class ImageRepositoryAdapter {
 			imageInfo.setRid(entry.getRid());
 			imageInfo.setJpg(entry.getJpg());
 			imageInfo.setFits(entry.getFits());
-			imageInfo.setUser(entry.getUser());
+			//imageInfo.setUser(entry.getUser());
+			try {
+				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
+						entry.getTarget(), ImageTargetData.class, null));
+			} catch (IOException e) {
+				action.put("cause", "json error");
+				throw new ImageDatabaseException(action);
+			}
+			
+			imageInfos.add(imageInfo);
+
+		}
+		return imageInfos;
+	}
+	
+	public List<ImageInformation> getRandomUserImagesInformation(String user, int count)
+			throws ImageDatabaseException {
+
+		LogAction action = new LogAction();
+		action.put("cause", "no images available");
+
+		List<ImageEntry> entries = imageService.getUserRandom(user, count);
+
+		if (entries == null) {
+			throw new ImageDatabaseException(action);
+		}
+
+		List<ImageInformation> imageInfos = new ArrayList<ImageInformation>();
+
+		for (ImageEntry entry : entries) {
+			ImageInformation imageInfo = new ImageInformation();
+
+			imageInfo.setCreationDate(entry.getDate());
+			imageInfo.setId(entry.getIdimage());
+			imageInfo.setLocalid(entry.getLocal_id());
+			imageInfo.setRt(entry.getRt());
+			imageInfo.setExposure(entry.getExposure());
+			imageInfo.setCcd(entry.getCcd());
+			imageInfo.setRid(entry.getRid());
+			imageInfo.setJpg(entry.getJpg());
+			imageInfo.setFits(entry.getFits());
+			//imageInfo.setUser(entry.getUser());
 			try {
 				imageInfo.setTarget((ImageTargetData) JSONConverter.fromJSON(
 						entry.getTarget(), ImageTargetData.class, null));

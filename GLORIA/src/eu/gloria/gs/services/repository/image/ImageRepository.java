@@ -142,6 +142,16 @@ public class ImageRepository extends GSLogProducerService implements
 			throw new ImageRepositoryException(e.getAction());
 		}
 	}
+	
+	@Override
+	public List<ImageInformation> getRandomUserImagesInformation(String user, int count)
+			throws ImageRepositoryException {
+		try {
+			return this.adapter.getRandomUserImagesInformation(user, count);
+		} catch (ImageDatabaseException e) {
+			throw new ImageRepositoryException(e.getAction());
+		}
+	}
 
 	/*
 	 * (non-Javadoc)

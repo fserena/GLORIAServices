@@ -67,6 +67,14 @@
 		WHERE NOT(jpg is NULL) ORDER BY RAND()
 		LIMIT #{count_}
 	</select>
+	
+	<select id="getUserRandom"
+		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
+		SELECT * FROM
+		`image`
+		WHERE NOT(jpg is NULL) AND user=#{user_} ORDER BY RAND()
+		LIMIT #{count_}
+	</select>
 
 	<select id="getByUser"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
