@@ -21,5 +21,10 @@ public class RHSensor extends DeviceHandler implements RHSensorInterface {
 	public double getRelativeHumidity() throws TeleoperationException {
 		return rts.getRelativeHumidity(rhSensor);
 	}
+
+	@Override
+	public boolean isOnAlarm() throws TeleoperationException {
+		return rts.isRHSensorInAlarm(rhSensor);
+	}
 	
 }

@@ -969,7 +969,8 @@
 									"order" : 0,
 									"type" :
 									"WIND_SPEED_SENSOR",
-									"value" : -1
+									"value" : -1,
+									"alarm" : false
 									},
 									"rh" :
 									{
@@ -977,7 +978,8 @@
 									"order"
 									: 0,
 									"type" : "RH_SENSOR",
-									"value" : -1
+									"value" : -1,
+									"alarm" : false
 									},
 									"temperature" :
 									{
@@ -985,7 +987,8 @@
 									null,
 									"order" : 0,
 									"type" : "TEMPERATURE_SENSOR",
-									"value" : -1
+									"value" : -1,
+									"alarm" : false
 									}
 									}
 								</value>
@@ -1056,6 +1059,20 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="get_wind_speed_alarm">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="GetWindSpeedAlarm"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>weather.wind.name</value>
+								<value>weather.wind.alarm</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
 				<entry key="get_temperature">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
@@ -1070,6 +1087,20 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="get_temperature_alarm">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="GetTemperatureAlarm"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>weather.temperature.name</value>
+								<value>weather.temperature.alarm</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
 				<entry key="get_rh">
 					<bean
 						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
@@ -1080,6 +1111,20 @@
 								<value>rt.name</value>
 								<value>weather.rh.name</value>
 								<value>weather.rh.value</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="get_rh_alarm">
+					<bean
+						class="eu.gloria.gs.services.experiment.base.models.OperationFeature"
+						scope="singleton">
+						<property name="operation" ref="GetRelativeHumidityAlarm"></property>
+						<property name="relations">
+							<list>
+								<value>rt.name</value>
+								<value>weather.rh.name</value>
+								<value>weather.rh.alarm</value>
 							</list>
 						</property>
 					</bean>

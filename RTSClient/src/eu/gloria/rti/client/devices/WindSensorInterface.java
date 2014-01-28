@@ -5,4 +5,5 @@ import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 public interface WindSensorInterface {
 
 	public double getWindSpeed() throws TeleoperationException;
+	public boolean isOnAlarm() throws TeleoperationException;
 }

@@ -484,6 +484,27 @@
 		</property>
 	</bean>
 	
+	<bean id="GetWindSpeedAlarm" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetWindSpeedAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
 	<bean id="GetTemperature" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
@@ -495,6 +516,27 @@
 		<property name="behaviour">
 			<map>
 				<entry key="GetTemperature">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetTemperatureAlarm" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetTemperatureAlarm">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>
@@ -526,6 +568,27 @@
 		</property>
 	</bean>
 	
+	<bean id="GetPressureAlarm" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetPressureAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
 	<bean id="GetRelativeHumidity" parent="ExperimentOperation">
 		<property name="parameterTypes">
 			<list>
@@ -537,6 +600,27 @@
 		<property name="behaviour">
 			<map>
 				<entry key="GetRelativeHumidity">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetRelativeHumidityAlarm" parent="ExperimentOperation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+				<ref bean="OBJECT"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="GetRelativeHumidityAlarm">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>

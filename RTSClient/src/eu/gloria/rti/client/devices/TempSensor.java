@@ -21,4 +21,9 @@ public class TempSensor extends DeviceHandler implements TempSensorInterface {
 	public double getTemperature() throws TeleoperationException {
 		return rts.getTemperature(tempSensor);
 	}
+
+	@Override
+	public boolean isOnAlarm() throws TeleoperationException {
+		return rts.isTemperatureSensorInAlarm(tempSensor);
+	}
 }

@@ -1117,6 +1117,23 @@ public class RTSHandler implements ServerHandler {
 					e.getMessage());
 		}
 	}
+	
+	public boolean isRHSensorInAlarm(String rhSensor)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			Device sensor = rtsPort.devGetDevice(null, rhSensor, false);
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(rhSensor,
+					DeviceType.RH_SENSOR.name(), "get rh alarm",
+					e.getMessage());
+		}
+	}
 
 	public double getPressure(String barometer) throws TeleoperationException {
 
@@ -1129,6 +1146,23 @@ public class RTSHandler implements ServerHandler {
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(barometer,
 					DeviceType.BAROMETER.name(), "get pressure",
+					e.getMessage());
+		}
+	}
+	
+	public boolean isPressureSensorInAlarm(String barometer)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			Device sensor = rtsPort.devGetDevice(null, barometer, false);
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(barometer,
+					DeviceType.RH_SENSOR.name(), "get pressure alarm",
 					e.getMessage());
 		}
 	}
@@ -1148,6 +1182,23 @@ public class RTSHandler implements ServerHandler {
 					e.getMessage());
 		}
 	}
+	
+	public boolean isTemperatureSensorInAlarm(String tempSensor)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			Device sensor = rtsPort.devGetDevice(null, tempSensor, false);
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(tempSensor,
+					DeviceType.RH_SENSOR.name(), "get temperature alarm",
+					e.getMessage());
+		}
+	}
 
 	public double getWindSpeed(String wind) throws TeleoperationException {
 
@@ -1160,6 +1211,23 @@ public class RTSHandler implements ServerHandler {
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(wind,
 					DeviceType.WIND_SPEED_SENSOR.name(), "get wind speed",
+					e.getMessage());
+		}
+	}
+	
+	public boolean isWindSensorInAlarm(String wind)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			Device sensor = rtsPort.devGetDevice(null, wind, false);
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+		} catch (RtiError e) {
+			throw new DeviceOperationFailedException(wind,
+					DeviceType.RH_SENSOR.name(), "get temperature alarm",
 					e.getMessage());
 		}
 	}

@@ -21,4 +21,9 @@ public class Barometer extends DeviceHandler implements BarometerInterface {
 	public double getPressure() throws TeleoperationException {
 		return rts.getPressure(barometer);
 	}
+
+	@Override
+	public boolean isOnAlarm() throws TeleoperationException {
+		return rts.isPressureSensorInAlarm(barometer);
+	}
 }

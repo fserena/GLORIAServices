@@ -5,5 +5,6 @@ import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 public interface RHSensorInterface {
 
 	public double getRelativeHumidity() throws TeleoperationException;
+	public boolean isOnAlarm() throws TeleoperationException;
 
 }

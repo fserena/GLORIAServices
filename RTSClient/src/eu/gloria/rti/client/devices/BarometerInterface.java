@@ -6,4 +6,5 @@ import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 public interface BarometerInterface {
 
 	public double getPressure() throws TeleoperationException;
+	public boolean isOnAlarm() throws TeleoperationException;
 }
