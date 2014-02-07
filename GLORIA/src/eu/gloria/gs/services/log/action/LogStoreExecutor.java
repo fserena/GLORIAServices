@@ -11,7 +11,7 @@ import eu.gloria.gs.services.core.WarningLogEntry;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.core.tasks.ServerThread;
 import eu.gloria.gs.services.log.action.ActionLogInterface;
-import eu.gloria.gs.services.log.action.data.JSONConverter;
+import eu.gloria.gs.services.utils.JSONConverter;
 import eu.gloria.gs.services.utils.ObjectResponse;
 
 public class LogStoreExecutor extends ServerThread {

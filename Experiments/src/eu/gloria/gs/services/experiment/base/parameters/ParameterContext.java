@@ -11,7 +11,6 @@ import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
@@ -19,6 +18,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.parameters.ParameterContextService;
 import eu.gloria.gs.services.log.action.LogAction;
+import eu.gloria.gs.services.utils.JSONConverter;
 
 public class ParameterContext extends Context {
 

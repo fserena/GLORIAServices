@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jws.WebParam;
+
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.ExperimentException;
@@ -20,7 +21,6 @@ import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
-import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
@@ -54,6 +54,7 @@ import eu.gloria.gs.services.repository.user.UserRepositoryException;
 import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
 import eu.gloria.gs.services.repository.user.data.UserInformation;
 import eu.gloria.gs.services.repository.user.data.UserRole;
+import eu.gloria.gs.services.utils.JSONConverter;
 import eu.gloria.gs.services.utils.ObjectResponse;
 
 public class Experiment extends GSLogProducerService implements

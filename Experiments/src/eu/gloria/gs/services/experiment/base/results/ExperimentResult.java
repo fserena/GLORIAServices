@@ -10,7 +10,7 @@ import java.util.Date;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.JSONConverter;
+import eu.gloria.gs.services.utils.JSONConverter;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)

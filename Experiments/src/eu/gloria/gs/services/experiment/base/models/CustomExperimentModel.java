@@ -12,7 +12,6 @@ import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
 import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
-import eu.gloria.gs.services.experiment.base.data.JSONConverter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
@@ -29,6 +28,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
+import eu.gloria.gs.services.utils.JSONConverter;
 
 public class CustomExperimentModel extends ExperimentModel {
 

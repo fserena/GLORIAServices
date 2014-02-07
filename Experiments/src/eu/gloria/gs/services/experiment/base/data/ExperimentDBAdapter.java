@@ -34,6 +34,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailabl
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.utils.JSONConverter;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
