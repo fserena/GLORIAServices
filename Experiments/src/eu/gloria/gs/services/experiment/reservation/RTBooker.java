@@ -84,16 +84,24 @@ public class RTBooker {
 
 		Date startingTime = availability.getStartingTime();
 		Date endingTime = availability.getEndingTime();
-
+		
 		Calendar calendar = Calendar.getInstance();
-
+		calendar.setTime(timeSlot.getBegin());
+		int beginYear = calendar.get(Calendar.YEAR);
+		
+		calendar.setTime(timeSlot.getEnd());
+		int endYear = calendar.get(Calendar.YEAR);
+		
 		calendar.setTime(startingTime);
 		calendar.set(Calendar.DAY_OF_YEAR, 1);
+		calendar.set(Calendar.YEAR, beginYear);
 		int startingHour = calendar.get(Calendar.HOUR_OF_DAY);
 
 		startingTime = calendar.getTime();
 
 		calendar.setTime(endingTime);
+		calendar.set(Calendar.DAY_OF_YEAR, 1);
+		calendar.set(Calendar.YEAR, endYear);
 		int endingHour = calendar.get(Calendar.HOUR_OF_DAY);
 
 		if (startingHour <= endingHour) {
@@ -119,11 +127,10 @@ public class RTBooker {
 		calendar.setTime(timeSlot.getBegin());
 		int beginHour = calendar.get(Calendar.HOUR_OF_DAY);
 		int beginDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-		int beginYear = calendar.get(Calendar.YEAR);
+		beginYear = calendar.get(Calendar.YEAR);
 		calendar.setTime(timeSlot.getEnd());
-		// int endHour = calendar.get(Calendar.HOUR_OF_DAY);
 		int endDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);		
-		int endYear = calendar.get(Calendar.YEAR);
+		endYear = calendar.get(Calendar.YEAR);
 		
 		calendar.setTime(startingTime);
 		calendar.set(Calendar.YEAR, beginYear);

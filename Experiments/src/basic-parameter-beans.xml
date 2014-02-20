@@ -4,7 +4,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="OBJECT_VALUE"
+	<bean id="basic-parameter-service"
+		class="eu.gloria.gs.services.experiment.parameters.ParameterContextService"
+		parent="experiment-context-service" scope="singleton" lazy-init="true">
+	</bean>
+
+	<bean id="basic-parameter-context" parent="parameter-context"
+		scope="prototype">
+		<property name="contextService" ref="basic-parameter-service"></property>
+	</bean>
+
+	<bean id="basic-parameter" parent="experiment-parameter">
+		<property name="contextBeanName" value="basic-parameter-context"></property>
+	</bean>
+
+	<bean id="object-type"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
 		<property name="valueType" value="java.lang.Object"></property>
@@ -13,9 +27,14 @@
 				<value>java.lang.Object</value>
 			</list>
 		</property>
+		<property name="argumentNames">
+			<list>
+				<value>default</value>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="INTEGER_VALUE"
+	<bean id="integer-type"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
 		<property name="valueType" value="java.lang.Integer"></property>
@@ -24,9 +43,14 @@
 				<value>java.lang.Integer</value>
 			</list>
 		</property>
+		<property name="argumentNames">
+			<list>
+				<value>default</value>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="DATE_VALUE"
+	<bean id="date-type"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
 		<property name="valueType" value="java.util.Date"></property>
@@ -35,9 +59,14 @@
 				<value>java.util.Date</value>
 			</list>
 		</property>
+		<property name="argumentNames">
+			<list>
+				<value>default</value>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="DOUBLE_VALUE"
+	<bean id="double-type"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
 		<property name="operationDependent" value="false"></property>
@@ -47,9 +76,14 @@
 				<value>java.lang.Double</value>
 			</list>
 		</property>
+		<property name="argumentNames">
+			<list>
+				<value>default</value>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="STRING_VALUE"
+	<bean id="string-type"
 		class="eu.gloria.gs.services.experiment.base.parameters.ParameterType"
 		scope="singleton">
 		<property name="valueType" value="java.lang.String"></property>
@@ -58,16 +92,36 @@
 				<value>java.lang.String</value>
 			</list>
 		</property>
-	</bean>	
+		<property name="argumentNames">
+			<list>
+				<value>default</value>
+			</list>
+		</property>
+	</bean>
 
-	<bean id="POINTER_VALUE" parent="STRING_VALUE" scope="singleton">
+	<bean id="pointer-type" parent="string-type">
 		<property name="operationDependent" value="true"></property>
-	</bean>	
+	</bean>
 
-	<bean id="OBJECT"
-		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
-		scope="singleton">
-		<property name="type" ref="OBJECT_VALUE"></property>
+	<bean id="object" parent="basic-parameter">
+		<property name="type" ref="object-type"></property>
+		<property name="description" value="Generic parameter"></property>
+		<property name="initOperations">
+			<map>
+				<entry key="setValue">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+		
+	</bean>
+
+	<bean id="integer" parent="basic-parameter">
+		<property name="type" ref="integer-type"></property>
+		<property name="description"
+			value="Represents an integer value (only at context root)"></property>
 		<property name="initOperations">
 			<map>
 				<entry key="setValue">
@@ -79,10 +133,10 @@
 		</property>
 	</bean>
 
-	<bean id="INTEGER"
-		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
-		scope="singleton">
-		<property name="type" ref="INTEGER_VALUE"></property>
+	<bean id="double" parent="basic-parameter">
+		<property name="type" ref="double-type"></property>
+		<property name="description"
+			value="Represents an double value (only at context root)"></property>
 		<property name="initOperations">
 			<map>
 				<entry key="setValue">
@@ -94,10 +148,10 @@
 		</property>
 	</bean>
 
-	<bean id="DOUBLE"
-		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
-		scope="singleton">
-		<property name="type" ref="DOUBLE_VALUE"></property>
+	<bean id="string" parent="basic-parameter">
+		<property name="type" ref="string-type"></property>
+		<property name="description"
+			value="Represents an string value (only at context root)"></property>
 		<property name="initOperations">
 			<map>
 				<entry key="setValue">
@@ -109,25 +163,10 @@
 		</property>
 	</bean>
 
-	<bean id="STRING"
-		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
-		scope="singleton">
-		<property name="type" ref="STRING_VALUE"></property>
-		<property name="initOperations">
-			<map>
-				<entry key="setValue">
-					<list>
-						<value>arg0</value>
-					</list>
-				</entry>
-			</map>
-		</property>
-	</bean>	
-
-	<bean id="DATE"
-		class="eu.gloria.gs.services.experiment.base.parameters.BeanExperimentParameter"
-		scope="singleton">
-		<property name="type" ref="DATE_VALUE"></property>
+	<bean id="date" parent="basic-parameter">
+		<property name="type" ref="date-type"></property>
+		<property name="description"
+			value="Represents a date value (only at context root)"></property>
 		<property name="initOperations">
 			<map>
 				<entry key="setValue">
@@ -139,16 +178,15 @@
 		</property>
 	</bean>
 
-	<bean id="POINTER" parent="STRING" scope="singleton">
-		<property name="type" ref="POINTER_VALUE"></property>
+	<bean id="pointer" parent="string">
+		<property name="type" ref="pointer-type"></property>
+		<property name="description" value="Represents an operation pointer"></property>
 		<property name="operationDependencies">
 			<map>
 				<entry key="0">
-					<ref bean="ExperimentOperation"></ref>
+					<ref bean="basic-operation"></ref>
 				</entry>
 			</map>
 		</property>
 	</bean>
-
-
 </beans>

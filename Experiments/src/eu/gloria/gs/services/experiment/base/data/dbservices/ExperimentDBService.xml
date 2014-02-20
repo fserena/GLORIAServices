@@ -23,7 +23,8 @@
 		PRIMARY
 		KEY (`idexperiment`),
 		UNIQUE
-		KEY `name_UNIQUE` (`name`),
+		KEY
+		`name_UNIQUE` (`name`),
 		KEY `author_fk`
 		(`author`),
 		CONSTRAINT
@@ -488,6 +489,51 @@
 		DELETE FROM `experiment`
 		WHERE
 		name=#{name_}
+	</delete>
+
+	<delete id="removeDependantOperations">
+		DELETE FROM experiment_operation where idoperation in
+		(SELECT DISTINCT operation FROM experiment_argument LEFT JOIN
+		experiment_parameter on
+		experiment_argument.parameter=experiment_parameter.idparameter WHERE
+		experiment_parameter.parameter=#{name_} AND
+		experiment_parameter.experiment=#{experiment_})
+	</delete>
+
+	<delete id="removeExperimentContexts">
+		DELETE FROM experiment_context where
+		experiment_context.rid in (SELECT
+		DISTINCT idreservation FROM
+		reservation LEFT JOIN
+		experiment on
+		reservation.idreservation=experiment.idexperiment WHERE
+		reservation.experiment=#{experiment_})
+	</delete>
+
+	<delete id="removeExperimentParameter">
+		DELETE from
+		experiment_parameter
+		WHERE
+		parameter=#{name_} AND
+		experiment=#{experiment_}
+	</delete>
+
+	<delete id="removeExperimentOperation">
+		DELETE from experiment_operation
+		WHERE
+		operation=#{name_} AND experiment=#{experiment_}
+	</delete>
+
+	<delete id="removeAllExperimentParameters">
+		DELETE from experiment_parameter
+		WHERE
+		experiment=#{experiment_}
+	</delete>
+
+	<delete id="removeAllExperimentOperations">
+		DELETE from experiment_operation
+		WHERE
+		experiment=#{experiment_}
 	</delete>
 
 	<select id="containsExperiment" resultType="boolean">

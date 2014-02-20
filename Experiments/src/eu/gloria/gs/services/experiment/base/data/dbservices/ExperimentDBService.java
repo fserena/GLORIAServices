@@ -210,6 +210,45 @@ public interface ExperimentDBService {
 	public void removeExperiment(@Param(value = "name_") String name);
 
 	/**
+	 * @param name
+	 */
+	public void removeDependantOperations(
+			@Param(value = "experiment_") int experiment,
+			@Param(value = "name_") String name);
+
+	/**
+	 * @param name
+	 */
+	public void removeExperimentParameter(
+			@Param(value = "experiment_") int experiment,
+			@Param(value = "name_") String name);
+
+	/**
+	 * @param name
+	 */
+	public void removeExperimentContexts(
+			@Param(value = "experiment_") int experiment);
+
+	/**
+	 * @param name
+	 */
+	public void removeExperimentOperation(
+			@Param(value = "experiment_") int experiment,
+			@Param(value = "name_") String name);
+
+	/**
+	 * @param name
+	 */
+	public void removeAllExperimentOperations(
+			@Param(value = "experiment_") int experiment);
+
+	/**
+	 * @param name
+	 */
+	public void removeAllExperimentParameters(
+			@Param(value = "experiment_") int experiment);
+
+	/**
 	 * @param type
 	 * @return
 	 */
@@ -344,7 +383,8 @@ public interface ExperimentDBService {
 	 * @param when
 	 * @return
 	 */
-	public boolean isReservationActiveNowForUser(@Param(value = "rid_") int rid,
+	public boolean isReservationActiveNowForUser(
+			@Param(value = "rid_") int rid,
 			@Param(value = "user_") String user,
 			@Param(value = "when_") Date when);
 

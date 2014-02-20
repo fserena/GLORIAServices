@@ -16,10 +16,12 @@ import eu.gloria.gs.services.experiment.base.models.InvalidExperimentModelExcept
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationFactory;
+import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 
 public class ExperimentModelFactory {
@@ -67,7 +69,6 @@ public class ExperimentModelFactory {
 		model.setName(experiment);
 		model.setParameterFactory(this.parameterFactory);
 		model.setOperationFactory(this.operationFactory);
-		model.setFeatureFactory(this.featureFactory);
 
 		List<ParameterInformation> parameters = expInfo.getParameters();
 		List<ParameterInformation> pointers = new ArrayList<>();
@@ -202,12 +203,14 @@ public class ExperimentModelFactory {
 		return this.featureFactory.getAllFeatures();
 	}
 
-	public ExperimentParameter getExperimentParameter(String name) {
+	public ExperimentParameter getExperimentParameter(String name)
+			throws NoSuchParameterException {
 		return this.parameterFactory.getParameter(name);
 
 	}
 
-	public ExperimentOperation getExperimentOperation(String name) {
+	public ExperimentOperation getExperimentOperation(String name)
+			throws NoSuchOperationException {
 		return this.operationFactory.getOperation(name);
 
 	}

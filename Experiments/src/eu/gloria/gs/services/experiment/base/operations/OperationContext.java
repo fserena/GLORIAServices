@@ -4,7 +4,6 @@ import java.util.Map;
 
 import eu.gloria.gs.services.experiment.base.contexts.Context;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
-import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.operations.OperationContextService;
@@ -12,7 +11,6 @@ import eu.gloria.gs.services.experiment.operations.OperationContextService;
 public class OperationContext extends Context {
 
 	private ExperimentOperation operation = null;
-	private ExperimentDBAdapter adapter;
 	private String name;
 	private ExperimentContext context;
 	private String[] contextArguments;
@@ -40,14 +38,6 @@ public class OperationContext extends Context {
 
 	public ExperimentContext getExperimentContext() {
 		return this.context;
-	}
-
-	public void setAdapter(ExperimentDBAdapter adapter) {
-		this.adapter = adapter;
-	}
-
-	public ExperimentDBAdapter getAdapter() {
-		return this.adapter;
 	}
 
 	public void execute() throws ExperimentOperationException {

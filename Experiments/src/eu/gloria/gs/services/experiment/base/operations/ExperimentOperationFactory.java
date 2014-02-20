@@ -3,6 +3,7 @@ package eu.gloria.gs.services.experiment.base.operations;
 import java.util.Map;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -41,7 +42,14 @@ public class ExperimentOperationFactory implements ApplicationContextAware {
 				.getBeansOfType(ExperimentOperation.class);
 	}
 
-	public ExperimentOperation getOperation(String name) {
-		return (ExperimentOperation) this.applicationContext.getBean(name);
+	public ExperimentOperation getOperation(String name)
+			throws NoSuchOperationException {
+		try {
+			return (ExperimentOperation) this.applicationContext.getBean(name);
+		} catch (NoSuchBeanDefinitionException e) {
+			throw new NoSuchOperationException(name);
+		} catch (ClassCastException e) {
+			throw new NoSuchOperationException(name);
+		}
 	}
 }

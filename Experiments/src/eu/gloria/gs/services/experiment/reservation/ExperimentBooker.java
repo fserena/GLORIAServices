@@ -5,6 +5,7 @@ import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
+import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
@@ -157,9 +158,11 @@ public class ExperimentBooker {
 		if (pendingReservations != null) {
 			for (ReservationInformation reservation : pendingReservations) {
 
-				TimeSlot reservedTimeSlot = reservation.getTimeSlot();
-				msReserved += reservedTimeSlot.getEnd().getTime()
-						- reservedTimeSlot.getBegin().getTime();
+				if (reservation.getExperiment().equals(experiment)) {
+					TimeSlot reservedTimeSlot = reservation.getTimeSlot();
+					msReserved += reservedTimeSlot.getEnd().getTime()
+							- reservedTimeSlot.getBegin().getTime();
+				}
 			}
 		}
 
@@ -236,7 +239,8 @@ public class ExperimentBooker {
 	}
 
 	public void cancelReservation(String username, int reservationId)
-			throws NoSuchReservationException, ExperimentDatabaseException {
+			throws NoSuchReservationException, ExperimentDatabaseException,
+			InvalidUserContextException {
 
 		boolean allowCancel = true;
 
@@ -264,7 +268,7 @@ public class ExperimentBooker {
 				LogAction action = new LogAction();
 				action.put("user", username);
 				action.put("cause", "invalid user");
-				throw new NoSuchReservationException(action);
+				throw new InvalidUserContextException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
 			throw e;

@@ -119,6 +119,64 @@ public class ExperimentDBAdapter {
 		}
 	}
 
+	public void removeExperimentParameter(String experiment, String paramName)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+
+				service.removeDependantOperations(experimentId, paramName);
+				service.removeExperimentParameter(experimentId, paramName);
+				service.removeExperimentContexts(experimentId);
+			} else
+				throw new NoSuchExperimentException(experiment);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	public void removeExperimentOperation(String experiment, String opName)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+				service.removeExperimentOperation(experimentId, opName);
+				service.removeExperimentContexts(experimentId);
+			} else
+				throw new NoSuchExperimentException(experiment);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	public void emptyExperiment(String experiment)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+
+				service.removeAllExperimentOperations(experimentId);
+				service.removeAllExperimentParameters(experimentId);
+				service.removeExperimentContexts(experimentId);
+			} else
+				throw new NoSuchExperimentException(experiment);
+
+		} catch (PersistenceException e) {
+			throw new ExperimentDatabaseException();
+		}
+	}
+
 	/**
 	 * @param experiment
 	 * @param parameter
@@ -212,7 +270,7 @@ public class ExperimentDBAdapter {
 	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public boolean isReservationIsActiveNowForUser(int rid, String user)
+	public boolean reservationIsActiveNowForUser(int rid, String user)
 			throws ExperimentDatabaseException {
 
 		boolean anyActive = false;
@@ -527,7 +585,7 @@ public class ExperimentDBAdapter {
 				expInfo.setName(entry.getName());
 				expInfo.setAuthor(entry.getAuthor());
 				expInfo.setDescription(entry.getDescription());
-				expInfo.setType(ExperimentType.ONLINE);
+				expInfo.setType(ExperimentType.valueOf(entry.getType()));
 
 				int experimentId = entry.getIdexperiment();
 

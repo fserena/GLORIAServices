@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="basic-operation-service"
+		class="eu.gloria.gs.services.experiment.operations.OperationContextService"
+		parent="experiment-context-service" scope="singleton" lazy-init="true">
+	</bean>
+
+	<bean id="basic-operation-context" parent="operation-context">
+		<property name="contextService" ref="basic-operation-service"></property>
+	</bean>
+
+	<bean id="basic-operation" parent="experiment-operation">
+		<property name="contextBeanName" value="basic-operation-context"></property>
+	</bean>
+
+	<bean id="SetParameter" parent="basic-operation">
+		<property name="description"
+			value="Copies the value of one parameter into another">
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>source</value>
+				<value>destination</value>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetParameter">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SaveResult" parent="basic-operation">
+		<property name="description" value="Persists the value of a context parameter">
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>container</value>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SaveResult">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence1" parent="basic-operation">
+		<property name="description" value="Executes a sequence of another operation">
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op-name</value>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence2" parent="basic-operation">
+		<property name="description" value="Executes a sequence of other two operations">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op1-name</value>
+				<value>op2-name</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence3" parent="basic-operation">
+		<property name="description"
+			value="Executes a sequence of other three operations">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op1-name</value>
+				<value>op2-name</value>
+				<value>op3-name</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence4" parent="basic-operation">
+		<property name="description" value="Executes a sequence of other four operations">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op1-name</value>
+				<value>op2-name</value>
+				<value>op3-name</value>
+				<value>op4-name</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence5" parent="basic-operation">
+		<property name="description" value="Executes a sequence of other five operations">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op1-name</value>
+				<value>op2-name</value>
+				<value>op3-name</value>
+				<value>op4-name</value>
+				<value>op5-name</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Sequence6" parent="basic-operation">
+		<property name="description" value="Executes a sequence of other six operations">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op1-name</value>
+				<value>op2-name</value>
+				<value>op3-name</value>
+				<value>op4-name</value>
+				<value>op5-name</value>
+				<value>op5-name</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Sequence">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+						<value>arg4</value>
+						<value>arg5</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Iteration" parent="basic-operation">
+		<property name="description" value="Executes an operation n times">
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>op-name</value>
+				<value>current</value>
+				<value>n</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="pointer"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Iteration">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

@@ -9,7 +9,9 @@ import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException
 import eu.gloria.gs.services.experiment.base.models.ExperimentFeature;
 import eu.gloria.gs.services.experiment.base.models.InvalidExperimentModelException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
+import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 
 public class ExperimentModelManager {
 
@@ -28,8 +30,7 @@ public class ExperimentModelManager {
 	}
 
 	public CustomExperimentModel getModel(String experiment)
-			throws NoSuchExperimentException,
-			ExperimentDatabaseException {
+			throws NoSuchExperimentException, ExperimentDatabaseException {
 		CustomExperimentModel model = null;
 
 		if (adapter.containsExperiment(experiment)) {
@@ -63,9 +64,19 @@ public class ExperimentModelManager {
 		}
 	}
 
-	public void removeModel(String experiment)
+	public void deleteModel(String experiment)
 			throws NoSuchExperimentException, ExperimentDatabaseException {
 		adapter.deleteExperiment(experiment);
+	}
+
+	public void deleteParameter(String experiment, String parameter)
+			throws NoSuchExperimentException, ExperimentDatabaseException {
+		adapter.removeExperimentParameter(experiment, parameter);
+	}
+
+	public void deleteOperation(String experiment, String operation)
+			throws NoSuchExperimentException, ExperimentDatabaseException {
+		adapter.removeExperimentOperation(experiment, operation);
 	}
 
 	public Map<String, ExperimentParameter> getAllExperimentParameters() {
@@ -75,20 +86,14 @@ public class ExperimentModelManager {
 	public Map<String, ExperimentOperation> getAllExperimentOperations() {
 		return factory.getAllExperimentOperations();
 	}
-	
-	public Map<String, ExperimentFeature> getAllExperimentFeatures() {
-		return factory.getAllExperimentFeatures();
-	}
 
-	public ExperimentParameter getExperimentParameter(String name) {
+	public ExperimentParameter getExperimentParameter(String name)
+			throws NoSuchParameterException {
 		return factory.getExperimentParameter(name);
 	}
-	
-	public ExperimentOperation getExperimentOperation(String name) {
+
+	public ExperimentOperation getExperimentOperation(String name)
+			throws NoSuchOperationException {
 		return factory.getExperimentOperation(name);
-	}
-	
-	public ExperimentFeature getExperimentFeature(String name) {
-		return factory.getExperimentFeature(name);
 	}
 }

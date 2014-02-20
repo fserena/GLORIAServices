@@ -9,7 +9,6 @@ import java.util.Map;
 import eu.gloria.gs.services.experiment.base.contexts.Context;
 import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
-import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
@@ -23,7 +22,6 @@ import eu.gloria.gs.services.utils.JSONConverter;
 public class ParameterContext extends Context {
 
 	private ExperimentParameter parameter = null;
-	private ExperimentDBAdapter adapter;
 	private String name;
 	private ExperimentContext context;
 	private ParameterContextService contextService;
@@ -56,20 +54,13 @@ public class ParameterContext extends Context {
 		return this.context;
 	}
 
-	public void setAdapter(ExperimentDBAdapter adapter) {
-		this.adapter = adapter;
-	}
-
-	public ExperimentDBAdapter getAdapter() {
-		return this.adapter;
-	}
-
 	public void instantiate() throws ExperimentParameterException,
 			NoSuchExperimentException {
 
 		try {
-			adapter.addParameterContext(this.context.getExperimentName(),
-					this.getName(), this.context.getReservation());
+			this.getAdapter().addParameterContext(
+					this.context.getExperimentName(), this.getName(),
+					this.context.getReservation());
 		} catch (ExperimentDatabaseException e) {
 			throw new ExperimentParameterException(e.getAction());
 		}
@@ -247,8 +238,8 @@ public class ParameterContext extends Context {
 			ExperimentNotInstantiatedException, NoSuchParameterException {
 
 		try {
-			Object value = (Object) adapter.getParameterContextValue(name,
-					this.context.getReservation());
+			Object value = (Object) this.getAdapter().getParameterContextValue(
+					name, this.context.getReservation());
 
 			value = this.parseValue((String) value, tree);
 
@@ -375,12 +366,13 @@ public class ParameterContext extends Context {
 
 			String valueStr = this.serializeValue(actualValue);
 
-			adapter.setParameterContextValue(name,
+			this.getAdapter().setParameterContextValue(name,
 					this.context.getReservation(), valueStr);
 		} catch (ExperimentDatabaseException e) {
 			throw new ExperimentParameterException(e.getAction());
 		} catch (IOException e) {
-			throw new ExperimentParameterException(this.getName(), "value json error");
+			throw new ExperimentParameterException(this.getName(),
+					"value json error");
 		}
 	}
 

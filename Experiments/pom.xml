@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.gloria.gs.services</groupId>
-	<artifactId>Experiments</artifactId>
+	<artifactId>experiments-engine</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA Experiments</name>
 	<build>
@@ -42,16 +42,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>GLORIAInterfaces</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>SClientTools</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.11</version>
@@ -62,6 +52,16 @@
 			<artifactId>mybatis-spring</artifactId>
 			<version>1.1.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>gloria-commons</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<repositories>

@@ -1136,7 +1136,7 @@
 						<property name="operation" ref="Sequence3"></property>
 						<property name="relations">
 							<list>
-								<value>load_wind_name</value>								
+								<value>load_wind_name</value>
 								<value>load_rh_name</value>
 								<value>load_temp_name</value>
 							</list>

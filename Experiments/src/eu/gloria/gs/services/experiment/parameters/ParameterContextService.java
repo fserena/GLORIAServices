@@ -1,19 +1,11 @@
 package eu.gloria.gs.services.experiment.parameters;
 
-import java.util.List;
-
-import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextService;
-import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.repository.rt.RTRepositoryException;
-import eu.gloria.gs.services.repository.rt.data.DeviceType;
 
 public class ParameterContextService extends ExperimentContextService {
 
@@ -34,15 +26,15 @@ public class ParameterContextService extends ExperimentContextService {
 
 		if (operation.equals("setValue")) {
 			this.setValue(parameterContext, operationArguments);
-		} else if (operation.equals("loadRTName")) {
+		} /*else if (operation.equals("loadRTName")) {
 			this.loadRTName(parameterContext, operationArguments);
 		} else if (operation.equals("loadDeviceName")) {
 			this.loadDeviceName(parameterContext, operationArguments);
-		}
+		}*/
 
 	}
 
-	private void loadDeviceName(ParameterContext parameterContext,
+	/*private void loadDeviceName(ParameterContext parameterContext,
 			Object[] operationArguments) throws ExperimentParameterException,
 			ContextNotReadyException {
 
@@ -106,5 +98,5 @@ public class ParameterContextService extends ExperimentContextService {
 			throw new ExperimentParameterException(e.getAction());
 		}
 
-	}
+	}*/
 }

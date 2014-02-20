@@ -3,9 +3,11 @@ package eu.gloria.gs.services.experiment.base.parameters;
 import java.util.Map;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterType;
@@ -52,8 +54,14 @@ public class ExperimentParameterFactory implements ApplicationContextAware {
 				.getBeansOfType(ExperimentParameter.class);
 	}
 
-	public ExperimentParameter getParameter(String name) {
-		return (ExperimentParameter) this.applicationContext
-				.getBean(name);
+	public ExperimentParameter getParameter(String name)
+			throws NoSuchParameterException {
+		try {
+			return (ExperimentParameter) this.applicationContext.getBean(name);
+		} catch (NoSuchBeanDefinitionException e) {
+			throw new NoSuchParameterException(name);
+		} catch (ClassCastException e) {
+			throw new NoSuchParameterException(name);
+		}
 	}
 }

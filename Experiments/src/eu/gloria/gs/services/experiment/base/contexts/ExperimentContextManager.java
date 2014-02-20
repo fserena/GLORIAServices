@@ -1,6 +1,8 @@
 package eu.gloria.gs.services.experiment.base.contexts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
@@ -34,5 +36,23 @@ public class ExperimentContextManager {
 		}
 
 		return context;
+	}
+
+	public void deleteExperimentContexts(String experiment) {
+
+		List<Integer> ids = new ArrayList<Integer>();
+
+		synchronized (contexts) {
+
+			for (Integer rid : contexts.keySet()) {
+				if (contexts.get(rid).getExperimentName().equals(experiment)) {
+					ids.add(rid);
+				}
+			}
+
+			for (Integer rid : ids) {
+				contexts.remove(rid);
+			}
+		}
 	}
 }

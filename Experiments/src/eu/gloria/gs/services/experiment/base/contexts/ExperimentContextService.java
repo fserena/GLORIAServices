@@ -6,16 +6,6 @@
 package eu.gloria.gs.services.experiment.base.contexts;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
-import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
-import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
-import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
-import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface;
-import eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -26,16 +16,6 @@ public abstract class ExperimentContextService {
 	private ExperimentDBAdapter adapter;
 	private String username;
 	private String password;
-	private RTRepositoryInterface rt;
-	private UserRepositoryInterface user;
-	private CCDTeleoperationInterface ccd;
-	private DomeTeleoperationInterface dome;
-	private SCamTeleoperationInterface scam;
-	private MountTeleoperationInterface mount;
-	private FocuserTeleoperationInterface focus;
-	private FilterWheelTeleoperationInterface fw;
-	private ImageRepositoryInterface image;
-	private WeatherTeleoperationInterface weather;
 	
 	public ExperimentDBAdapter getAdapter() {
 		return adapter;
@@ -61,7 +41,7 @@ public abstract class ExperimentContextService {
 		return this.password;
 	}
 
-	public void setRTRepository(RTRepositoryInterface rtRepository) {
+/*	public void setRTRepository(RTRepositoryInterface rtRepository) {
 		this.rt = rtRepository;
 	}
 
@@ -139,5 +119,5 @@ public abstract class ExperimentContextService {
 
 	public void setImageRepository(ImageRepositoryInterface image) {
 		this.image = image;
-	}
+	}*/
 }

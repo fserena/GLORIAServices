@@ -1,5 +1,7 @@
 package eu.gloria.gs.services.experiment.base.contexts;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,6 +22,8 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 
 	private ExperimentDBAdapter adapter;
 	private ApplicationContext applicationContext;
+	private Logger log = LoggerFactory.getLogger(ExperimentContextFactory.class
+			.getSimpleName());
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
 		this.adapter = adapter;
@@ -75,6 +79,9 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 			throw ex;
 		}
 
+		log.info("context created for reservation id " + rid + ", user "
+				+ username + " and " + experimentInfo.getName() + " experiment");
+
 		return context;
 	}
 
@@ -83,7 +90,7 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 		ParameterContext parameterContext = null;
 
 		parameterContext = (ParameterContext) applicationContext
-				.getBean("PARAMETER_CONTEXT");
+				.getBean(paramInfo.getParameter().getContextBeanName());
 
 		parameterContext.setExperimentParameter(paramInfo.getParameter());
 		parameterContext.setExperimentContext(context);
@@ -98,8 +105,10 @@ public class ExperimentContextFactory implements ApplicationContextAware {
 
 		OperationContext operationContext = null;
 
-		operationContext = (OperationContext) applicationContext
-				.getBean("OPERATION_CONTEXT");
+		// operationContext = opInfo.getOperation().getContext();
+
+		operationContext = (OperationContext) applicationContext.getBean(opInfo
+				.getOperation().getContextBeanName());
 
 		operationContext.setExperimentOperation(opInfo.getOperation());
 		operationContext.setExperimentContext(context);
