@@ -77,8 +77,8 @@ public class RTSHandler implements ServerHandler {
 
 		URL urlWsdl = null;
 		try {
-			urlWsdl = new URL(host + ":" + port + "/"
-					+ serviceName + "/gloria_rti.wsdl");
+			urlWsdl = new URL(host + ":" + port + "/" + serviceName
+					+ "/gloria_rti.wsdl");
 		} catch (MalformedURLException e) {
 		}
 
@@ -646,8 +646,8 @@ public class RTSHandler implements ServerHandler {
 			} else if (e.getMessage().equals("FAILED")) {
 				throw new ImageTransferFailedException(camera, imageId);
 			} else
-				throw new DeviceOperationFailedException(camera,
-						device.getType().name(), "get url", e.getMessage());
+				throw new DeviceOperationFailedException(camera, device
+						.getType().name(), "get url", e.getMessage());
 		}
 	}
 
@@ -907,7 +907,8 @@ public class RTSHandler implements ServerHandler {
 					TrackingRateType.valueOf(rate.name()));
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(mount,
-					DeviceType.MOUNT.name(), "set tracking rate", e.getMessage());
+					DeviceType.MOUNT.name(), "set tracking rate",
+					e.getMessage());
 		}
 	}
 
@@ -953,7 +954,8 @@ public class RTSHandler implements ServerHandler {
 
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(mount,
-					DeviceType.MOUNT.name(), "slew to coordinates", e.getMessage());
+					DeviceType.MOUNT.name(), "slew to coordinates",
+					e.getMessage());
 		}
 	}
 
@@ -995,6 +997,14 @@ public class RTSHandler implements ServerHandler {
 		}
 
 		try {
+
+			boolean parked = rtsPort.mntIsParked(null, mount);
+			boolean slewing = rtsPort.mntIsSlewing(null, mount);
+
+			if (parked)
+				return ActivityStateMount.PARKED;
+			if (slewing)
+				return ActivityStateMount.MOVING;
 
 			DeviceMount mountDevice = (DeviceMount) rtsPort.devGetDevice(null,
 					mount, false);
@@ -1113,11 +1123,10 @@ public class RTSHandler implements ServerHandler {
 			return rtsPort.rhsGetMeasure(null, rhSensor);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(rhSensor,
-					DeviceType.RH_SENSOR.name(), "get rh",
-					e.getMessage());
+					DeviceType.RH_SENSOR.name(), "get rh", e.getMessage());
 		}
 	}
-	
+
 	public boolean isRHSensorInAlarm(String rhSensor)
 			throws TeleoperationException {
 
@@ -1127,11 +1136,10 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, rhSensor, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(rhSensor,
-					DeviceType.RH_SENSOR.name(), "get rh alarm",
-					e.getMessage());
+					DeviceType.RH_SENSOR.name(), "get rh alarm", e.getMessage());
 		}
 	}
 
@@ -1145,11 +1153,10 @@ public class RTSHandler implements ServerHandler {
 			return rtsPort.barGetMeasure(null, barometer);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(barometer,
-					DeviceType.BAROMETER.name(), "get pressure",
-					e.getMessage());
+					DeviceType.BAROMETER.name(), "get pressure", e.getMessage());
 		}
 	}
-	
+
 	public boolean isPressureSensorInAlarm(String barometer)
 			throws TeleoperationException {
 
@@ -1159,10 +1166,10 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, barometer, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(barometer,
-					DeviceType.RH_SENSOR.name(), "get pressure alarm",
+					DeviceType.BAROMETER.name(), "get pressure alarm",
 					e.getMessage());
 		}
 	}
@@ -1172,17 +1179,17 @@ public class RTSHandler implements ServerHandler {
 
 		if (rtsPort == null) {
 			throw new ServerNotAvailableException(host, port, null);
-		}		
+		}
 
 		try {
-			return rtsPort.tempGetMeasure(null, tempSensor);	
+			return rtsPort.tempGetMeasure(null, tempSensor);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(tempSensor,
 					DeviceType.TEMPERATURE_SENSOR.name(), "get temperature",
 					e.getMessage());
 		}
 	}
-	
+
 	public boolean isTemperatureSensorInAlarm(String tempSensor)
 			throws TeleoperationException {
 
@@ -1192,10 +1199,10 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, tempSensor, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(tempSensor,
-					DeviceType.RH_SENSOR.name(), "get temperature alarm",
+					DeviceType.TEMPERATURE_SENSOR.name(), "get temperature alarm",
 					e.getMessage());
 		}
 	}
@@ -1214,7 +1221,7 @@ public class RTSHandler implements ServerHandler {
 					e.getMessage());
 		}
 	}
-	
+
 	public boolean isWindSensorInAlarm(String wind)
 			throws TeleoperationException {
 
@@ -1224,7 +1231,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, wind, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);			
+			return sensor.getAlarmState().equals(AlarmState.WEATHER);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(wind,
 					DeviceType.RH_SENSOR.name(), "get temperature alarm",

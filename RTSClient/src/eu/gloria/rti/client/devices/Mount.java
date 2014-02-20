@@ -80,7 +80,7 @@ public class Mount extends DeviceHandler implements MountInterface {
 	@Override
 	public MountState getState() throws TeleoperationException {
 		ActivityStateMount state = rts.getMountState(mount);
-
+		
 		if (state.equals(ActivityStateMount.MOVING)) {
 			return MountState.MOVING;
 		} else if (state.equals(ActivityStateMount.TRACKING)) {
@@ -93,6 +93,8 @@ public class Mount extends DeviceHandler implements MountInterface {
 			return MountState.PARKING;
 		} else if (state.equals(ActivityStateMount.READY)) {
 			return MountState.READY;
+		} else if (state.equals(ActivityStateMount.STOP)) {
+			return MountState.STOP;
 		}
 
 		return MountState.UNDEFINED;
