@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.gloria.gs.services</groupId>
-	<artifactId>UserRepository</artifactId>
+	<artifactId>user-repository</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA User Repository</name>
 	<build>
@@ -37,7 +37,7 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>GLORIAInterfaces</artifactId>
+			<artifactId>gloria-commons</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
