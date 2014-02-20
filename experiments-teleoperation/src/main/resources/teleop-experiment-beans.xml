@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="teleoperation-context-service"
+		class="eu.gloria.gs.services.experiment.operations.TeleOperationContextService"
+		parent="experiment-context-service">
+		<property name="image" ref="imageRepository"></property>
+		<property name="ccd" ref="ccdTeleoperation"></property>
+		<property name="mount" ref="mountTeleoperation"></property>
+		<property name="scam" ref="scamTeleoperation"></property>
+		<property name="dome" ref="domeTeleoperation"></property>
+		<property name="fw" ref="fwTeleoperation"></property>
+		<property name="focus" ref="focuserTeleoperation"></property>
+		<property name="rt" ref="rtRepository"></property>
+		<property name="weather" ref="weatherTeleoperation"></property>
+	</bean>
+
+	<bean id="tele-operation-context" parent="operation-context">
+		<property name="contextService" ref="teleoperation-context-service"></property>
+	</bean>
+
+	<bean id="tele-operation" parent="experiment-operation">
+		<property name="contextBeanName" value="tele-operation-context"></property>
+	</bean>
+
+	<bean id="PointToObject" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.PointToObject">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="PointToCoordinates" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.PointToCoordinates">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetStream" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetStream">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadRTName" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadRTName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadDeviceName" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadDeviceName">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadDevicesNumber" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.LoadDevicesNumber">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadRTNames" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadAllRTNames">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="StartExposure" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.StartExposure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDGamma" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetCCDGamma">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDGain" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetCCDGain">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDExposure" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetCCDExposure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDContrast" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetCCDContrast">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDGamma" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetCCDGamma">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDGain" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetCCDGain">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDExposure" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetCCDExposure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDContrast" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetCCDContrast">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDBining" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetCCDBining">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetCCDBining" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetCCDBining">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetWindSpeed" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetWindSpeed">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetWindSpeedAlarm" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetWindSpeedAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetTemperature" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetTemperature">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetTemperatureAlarm" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetTemperatureAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetPressure" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetPressure">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetPressureAlarm" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetPressureAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetRelativeHumidity" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetRelativeHumidity">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetRelativeHumidityAlarm" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetRelativeHumidityAlarm">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadContinuousImage" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.LoadContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="StopContinuousImage" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.StopContinuousImage">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadCCDStatus" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadCCDStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Park" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.ParkTelescope">
+					<list>
+						<value>arg0</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MoveWest" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.MoveWest">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MoveEast" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.MoveEast">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MoveNorth" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.MoveNorth">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="MoveSouth" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.MoveSouth">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetRADEC" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.GetRADEC">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadFilters" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadFilters">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SelectFilter" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SelectFilter">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="OpenDome" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.OpenDome">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="CloseDome" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.CloseDome">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadDomeStatus" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadDomeStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadMountStatus" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadMountStatus">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="FocusRelativeMove" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.FocusRelativeMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetTrackingRate" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetTrackingRate">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SetSlewRate" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.SetSlewRate">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>
