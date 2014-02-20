@@ -6,18 +6,8 @@ import eu.gloria.gs.services.experiment.base.operations.OperationContext;
 
 public class OperationContextService extends ExperimentContextService {
 
-	private void makeUpService(ServiceOperation service) {
+	protected void makeUpService(ServiceOperation service) {
 		service.setAdapter(this.getAdapter());
-		service.setCCDTeleoperation(this.getCCDTeleoperation());
-		service.setDomeTeleoperation(this.getDomeTeleoperation());
-		service.setSCamTeleoperation(this.getSCamTeleoperation());
-		service.setFilterWheelTeleoperation(this.getFilterWheelTeleoperation());
-		service.setFocuserTeleoperation(this.getFocuserTeleoperation());
-		service.setImageRepository(this.getImageRepository());
-		service.setMountTeleoperation(this.getMountTeleoperation());
-		service.setRTRepository(this.getRTRepository());
-		service.setUserRepository(this.getUserRepository());
-		service.setWeatherTeleoperation(this.getWeatherTeleoperation());
 		service.setUsername(this.getUsername());
 		service.setPassword(this.getPassword());
 	}
@@ -30,9 +20,7 @@ public class OperationContextService extends ExperimentContextService {
 
 		try {
 
-			Class<?> serviceClass = Class
-					.forName("eu.gloria.gs.services.experiment.operations."
-							+ operation);
+			Class<?> serviceClass = Class.forName(operation);
 
 			try {
 				service = (ServiceOperation) serviceClass.newInstance();
