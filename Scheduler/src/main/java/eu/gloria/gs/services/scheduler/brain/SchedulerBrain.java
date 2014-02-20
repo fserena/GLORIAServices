@@ -261,6 +261,10 @@ public class SchedulerBrain {
 
 					log.info("Previously ADVERTISED plan " + schInfo.getId()
 							+ " is now " + planState.name());
+					
+					if (planState.equals(PlanState.ERROR)) {
+						planState = PlanState.REJECTED;
+					}
 
 					this.adapter.setState(schInfo.getId(), planState.name());
 					this.adapter.setLastDate(schInfo.getId(), new Date());
@@ -316,6 +320,10 @@ public class SchedulerBrain {
 						|| planState.equals(PlanState.DONE)
 						|| planState.equals(PlanState.ERROR)) {
 
+					if (planState.equals(PlanState.ERROR)) {
+						planState = PlanState.REJECTED;
+					}
+					
 					log.info("Previously QUEUED plan " + schInfo.getId()
 							+ " is now " + planState.name());
 

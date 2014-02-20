@@ -23,14 +23,10 @@ public class UserRepositoryServerPasswordHandler extends ServerPasswordHandler {
 
 		try {
 
-			if (!adapter.containsName(user)) {
-				System.out.println("User " + pc.getIdentifier()
-						+ " does not exist");
+			if (!adapter.containsName(user)) {				
 			} else {
 				if (adapter.isAdministrator(user)) {
 					pc.setPassword(adapter.getPassword(user));
-				} else {
-					System.out.println("User role not allowed for " + user);
 				}
 			}
 		} catch (UserRepositoryAdapterException e) {

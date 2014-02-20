@@ -35,7 +35,7 @@ public class UserServerPasswordHandler extends ServerPasswordHandler {
 			UnsupportedCallbackException {
 
 		WSPasswordCallback pc = (WSPasswordCallback) arg0[0];
-		
+
 		GSClientProvider.setCredentials(this.username, this.password);
 		try {
 
@@ -43,23 +43,13 @@ public class UserServerPasswordHandler extends ServerPasswordHandler {
 
 			userInfo = repository.getUserCredentials(pc.getIdentifier());
 
-			boolean granted = false;
-
 			if (userInfo != null) {
 
 				if (this.grantUser(userInfo)) {
 					String password = userInfo.getPassword();
 					pc.setPassword(password);
-					granted = true;
 				}
 
-				if (!granted) {
-					System.out.println("User role not allowed for "
-							+ userInfo.getName());
-				}
-			} else {
-				System.out.println("User " + pc.getIdentifier()
-						+ " does not exist");
 			}
 		} catch (UserRepositoryException e) {
 			e.printStackTrace();

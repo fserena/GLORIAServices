@@ -15,8 +15,6 @@ import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiat
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
-import eu.gloria.gs.services.teleoperation.dome.DomeOpeningState;
-import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
 
 /**
@@ -66,33 +64,12 @@ public class PointToCoordinates extends TeleOperation {
 					this.getPassword());
 
 			List<String> mounts;
-			List<String> domes;
 
 			try {
 				mounts = this.getRTRepository().getRTDeviceNames(rtName,
 						DeviceType.MOUNT);
-				domes = this.getRTRepository().getRTDeviceNames(rtName,
-						DeviceType.DOME);
 			} catch (RTRepositoryException e) {
 				throw new ExperimentOperationException(e.getAction());
-			}
-
-			if (domes != null && domes.size() > 0) {
-				String domeName = domes.get(0);
-				try {
-					DomeOpeningState domeState = this.getDomeTeleoperation()
-							.getState(rtName, domeName);
-
-					System.out.println(domeState.name());
-
-					// if (domeState.equals(DomeOpeningState.UNDEFINED)
-					// || domeState.equals(DomeOpeningState.CLOSED)) {
-					this.getDomeTeleoperation().open(rtName, domeName);
-					// }
-				} catch (DomeTeleoperationException e) {
-					throw new ExperimentOperationException(e.getAction());
-				} catch (DeviceOperationFailedException e) {
-				}
 			}
 
 			if (mounts != null && mounts.size() > 0) {

@@ -7,6 +7,8 @@ import java.util.concurrent.RejectedExecutionException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -18,7 +20,7 @@ public abstract class ServerTask implements ServletContextListener {
 
 	protected abstract ServerThread createServerThread(
 			ApplicationContext context);
-
+		
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
