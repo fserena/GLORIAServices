@@ -14,6 +14,7 @@ public class UserRepository extends GSLogProducerService implements
 	private UserRepositoryAdapter adapter;
 
 	public UserRepository() {
+		this.createLogger(UserRepository.class);
 	}
 
 	public void setAdapter(UserRepositoryAdapter adapter) {

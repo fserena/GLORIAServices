@@ -26,6 +26,7 @@ public class RTRepository extends GSLogProducerService implements
 	private RTRepositoryAdapter adapter;
 
 	public RTRepository() {
+		this.createLogger(RTRepository.class);
 	}
 
 	public void setAdapter(RTRepositoryAdapter adapter) {
@@ -99,17 +100,6 @@ public class RTRepository extends GSLogProducerService implements
 		action.put("owner", this.getClientUsername());
 		action.put("rt", rt);
 
-		try {
-			adapter.registerInteractiveRT(rt, owner, url, port, user, password);
-		} catch (RTRepositoryAdapterException e) {
-
-			action.put("cause", e.getAction());
-			this.logError(this.getClientUsername(), action);
-			this.logError(getClientUsername(), action);
-			action.put("more", action);
-			throw new RTRepositoryException(action);
-		}
-
 		GloriaRti rti;
 		try {
 
@@ -126,6 +116,17 @@ public class RTRepository extends GSLogProducerService implements
 			try {
 				List<Device> devices = rti.devGetDevices(null, false);
 
+				try {
+					adapter.registerInteractiveRT(rt, owner, url, port, user, password);
+				} catch (RTRepositoryAdapterException e) {
+
+					action.put("cause", e.getAction());
+					this.logError(this.getClientUsername(), action);
+					this.logError(getClientUsername(), action);
+					action.put("more", action);
+					throw new RTRepositoryException(action);
+				}
+				
 				for (Device device : devices) {
 					DeviceType type = DeviceType.valueOf(device.getType()
 							.name());
@@ -138,7 +139,7 @@ public class RTRepository extends GSLogProducerService implements
 
 					this.addRTDevice(type, rt, device.getShortName(),
 							device.getShortName());
-				}
+				}				
 				
 				this.logInfo(this.getClientUsername(), action);
 

@@ -18,6 +18,7 @@ public class ImageRepository extends GSLogProducerService implements
 	private ImageRepositoryAdapter adapter;
 
 	public ImageRepository() {
+		this.createLogger(ImageRepository.class);
 	}
 
 	public void setAdapter(ImageRepositoryAdapter adapter) {
@@ -142,10 +143,10 @@ public class ImageRepository extends GSLogProducerService implements
 			throw new ImageRepositoryException(e.getAction());
 		}
 	}
-	
+
 	@Override
-	public List<ImageInformation> getRandomUserImagesInformation(String user, int count)
-			throws ImageRepositoryException {
+	public List<ImageInformation> getRandomUserImagesInformation(String user,
+			int count) throws ImageRepositoryException {
 		try {
 			return this.adapter.getRandomUserImagesInformation(user, count);
 		} catch (ImageDatabaseException e) {
@@ -208,76 +209,6 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "dateTo") Date to) {
 
 		return this.adapter.getAllImagesBetween(from, to, 100);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
-	 * setExperimentReservationByJpg(java.lang.String, int)
-	 */
-	@Override
-	public void setExperimentReservationByJpg(
-			@WebParam(name = "jpg") String jpg, @WebParam(name = "rid") int rid)
-			throws ImageRepositoryException {
-		try {
-			this.adapter.setExperimentReservationByJpg(jpg, rid);
-		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getAction());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.gloria.gs.services.repository.image.ImageRepositoryInterface#
-	 * setExperimentReservationByFits(java.lang.String, int)
-	 */
-	@Override
-	public void setExperimentReservationByFits(
-			@WebParam(name = "fits") String fits,
-			@WebParam(name = "rid") int rid) throws ImageRepositoryException {
-		try {
-			this.adapter.setExperimentReservationByFits(fits, rid);
-		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getAction());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.gloria.gs.services.repository.image.ImageRepositoryInterface#setUserByJpg
-	 * (java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void setUserByJpg(@WebParam(name = "jpg") String jpg,
-			@WebParam(name = "user") String user)
-			throws ImageRepositoryException {
-		try {
-			this.adapter.setUserByJpg(jpg, user);
-		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getAction());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.gloria.gs.services.repository.image.ImageRepositoryInterface#setUserByFits
-	 * (java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void setUserByFits(@WebParam(name = "fits") String fits,
-			@WebParam(name = "user") String user)
-			throws ImageRepositoryException {
-		try {
-			this.adapter.setUserByFits(fits, user);
-		} catch (ImageDatabaseException e) {
-			throw new ImageRepositoryException(e.getAction());
-		}
 	}
 
 	/*

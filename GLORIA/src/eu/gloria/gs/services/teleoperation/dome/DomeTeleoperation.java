@@ -20,6 +20,10 @@ import eu.gloria.gs.services.teleoperation.dome.operations.SetTrackingOperation;
 public class DomeTeleoperation extends AbstractTeleoperation implements
 		DomeTeleoperationInterface {
 
+	public DomeTeleoperation() {
+		this.createLogger(DomeTeleoperation.class);
+	}
+	
 	@Override
 	public DomeOpeningState getState(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {

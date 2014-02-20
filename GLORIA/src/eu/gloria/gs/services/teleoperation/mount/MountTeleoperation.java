@@ -26,6 +26,10 @@ import eu.gloria.gs.services.teleoperation.mount.operations.SlewToObjectOperatio
 public class MountTeleoperation extends AbstractTeleoperation implements
 		MountTeleoperationInterface {
 
+	public MountTeleoperation() {
+		this.createLogger(MountTeleoperation.class);
+	}
+	
 	@Override
 	public MountState getState(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {

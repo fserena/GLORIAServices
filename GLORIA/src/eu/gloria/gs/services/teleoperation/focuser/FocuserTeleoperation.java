@@ -14,6 +14,10 @@ import eu.gloria.gs.services.teleoperation.focuser.operations.MoveRelativeOperat
 public class FocuserTeleoperation extends AbstractTeleoperation implements
 		FocuserTeleoperationInterface {
 
+	public FocuserTeleoperation() {
+		this.createLogger(FocuserTeleoperation.class);
+	}
+	
 	@Override
 	public long getPosition(String rt, String focuser)
 			throws DeviceOperationFailedException,

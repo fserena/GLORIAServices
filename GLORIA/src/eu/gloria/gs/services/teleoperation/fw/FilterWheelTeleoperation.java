@@ -13,6 +13,10 @@ import eu.gloria.gs.services.teleoperation.fw.operations.SelectFilterOperation;
 
 public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 		FilterWheelTeleoperationInterface {
+	
+	public FilterWheelTeleoperation() {
+		this.createLogger(FilterWheelTeleoperation.class);
+	}
 
 	@Override
 	public List<String> getFilters(String rt, String filterWheel)

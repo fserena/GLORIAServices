@@ -19,6 +19,10 @@ import eu.gloria.gs.services.teleoperation.weather.operations.IsWindOnAlarmOpera
 public class WeatherTeleoperation extends AbstractTeleoperation implements
 		WeatherTeleoperationInterface {
 
+	public WeatherTeleoperation() {
+		this.createLogger(WeatherTeleoperation.class);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

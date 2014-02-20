@@ -13,24 +13,21 @@ import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.ExperimentInterface;
+import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextManager;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
-import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
-import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.data.ResultInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
-import eu.gloria.gs.services.experiment.base.models.CustomExperimentException;
 import eu.gloria.gs.services.experiment.base.models.CustomExperimentModel;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
-import eu.gloria.gs.services.experiment.base.models.ExperimentFeature;
 import eu.gloria.gs.services.experiment.base.models.ExperimentModelManager;
 import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
@@ -67,6 +64,7 @@ public class Experiment extends GSLogProducerService implements
 	private UserRepositoryInterface userRepository;
 
 	public Experiment() {
+		this.createLogger(Experiment.class);
 	}
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
@@ -89,8 +87,16 @@ public class Experiment extends GSLogProducerService implements
 		this.userRepository = userRepository;
 	}
 
-	private void buildErrorLog(LogAction action, ActionException e,
-			String origin, String... reasons) {
+	private void buildErrorLog(LogAction action, String origin,
+			String... reasons) {
+		LogAction error = new LogAction();
+		action.put("error", error);
+		error.put("origin", origin);
+		error.put("reasons", reasons);
+	}
+
+	private void buildErrorLogFromException(LogAction action,
+			ActionException e, String origin, String... reasons) {
 		LogAction error = new LogAction();
 		action.put("error", error);
 		if (e != null) {
@@ -154,7 +160,7 @@ public class Experiment extends GSLogProducerService implements
 			modelManager.createModel(experiment, this.getClientUsername(),
 					"OFFLINE");
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(this.getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -174,7 +180,7 @@ public class Experiment extends GSLogProducerService implements
 			expInfo = adapter.getExperimentInformation(experiment);
 			return expInfo;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -194,7 +200,7 @@ public class Experiment extends GSLogProducerService implements
 					.getParameter(parameter);
 			return paramInfo;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -212,10 +218,11 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			throw new ExperimentException(action);
 		} catch (NoSuchExperimentException e) {
-			buildErrorLog(action, e, "database", "experiment does not exist");
+			buildErrorLogFromException(action, e, "database",
+					"experiment does not exist");
 			this.logError(this.getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -241,7 +248,7 @@ public class Experiment extends GSLogProducerService implements
 
 			return experiments;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -266,7 +273,7 @@ public class Experiment extends GSLogProducerService implements
 
 			return experiments;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -285,7 +292,7 @@ public class Experiment extends GSLogProducerService implements
 			return adapter.containsExperiment(experiment);
 
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -305,7 +312,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getPendingReservations(null, adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -326,7 +333,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getPendingReservations("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -346,7 +353,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getPendingReservations("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -420,7 +427,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.anyReservationActiveNow(null, adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -439,7 +446,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.anyReservationActiveNow("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -458,7 +465,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.anyReservationActiveNow("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -478,7 +485,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getCurrentReservations("ONLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -499,7 +506,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getCurrentReservations("OFFLINE", adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -519,7 +526,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			return this.getCurrentReservations(null, adminMode);
 		} catch (ExperimentException e) {
-			buildErrorLog(action, e, "logic", "internal problem");
+			buildErrorLogFromException(action, e, "logic", "internal problem");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -567,7 +574,7 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			experimentBooker.applyFor(experiment, this.getClientUsername());
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -594,7 +601,7 @@ public class Experiment extends GSLogProducerService implements
 			experimentBooker.reserve(experiment, this.getClientUsername(),
 					telescopes, timeSlot, adminMode);
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -620,13 +627,14 @@ public class Experiment extends GSLogProducerService implements
 					experiment, telescopes, adminMode);
 
 			if (timeSlots == null | timeSlots.size() == 0) {
-				buildErrorLog(action, null, "logic", "not available");
+				buildErrorLogFromException(action, null, "logic",
+						"not available");
 				throw new ExperimentException(action);
 			}
 
 			return timeSlots;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -635,7 +643,8 @@ public class Experiment extends GSLogProducerService implements
 
 	@Override
 	public void cancelExperimentReservation(int reservationId)
-			throws ExperimentException, NoSuchReservationException {
+			throws ExperimentException, NoSuchReservationException,
+			InvalidUserContextException {
 
 		LogAction action = new LogAction();
 		buildOperationLog(action, "cancel", reservationId);
@@ -646,9 +655,52 @@ public class Experiment extends GSLogProducerService implements
 			experimentBooker.cancelReservation(this.getClientUsername(),
 					reservationId);
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
+		} catch (InvalidUserContextException e) {
+			buildErrorLogFromException(action, e, "logic", "invalid user");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw new InvalidUserContextException(action);
+		} catch (NoSuchReservationException e) {
+			buildErrorLogFromException(action, e, "logic", "invalid rid");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw new NoSuchReservationException(action);
+		}
+
+		this.logContextInfo(getClientUsername(), reservationId, action);
+	}
+
+	@Override
+	public void resetExperimentContext(int reservationId)
+			throws ExperimentException, NoSuchReservationException,
+			InvalidUserContextException, ExperimentNotInstantiatedException {
+
+		LogAction action = new LogAction();
+		buildOperationLog(action, "reset context", reservationId);
+
+		try {
+			if (adapter.isReservationContextReady(reservationId)) {
+				adapter.deleteExperimentContext(reservationId);
+			} else if (adapter.reservationIsActiveNowForUser(reservationId,
+					getClientUsername())) {
+				buildErrorLog(action, "logic", "invalid user");
+				this.logContextError(getClientUsername(), reservationId, action);
+				throw new ExperimentNotInstantiatedException(action);
+			} else if (adapter.isReservationActiveNow(reservationId)) {
+				buildErrorLog(action, "logic", "invalid user");
+				this.logContextError(getClientUsername(), reservationId, action);
+				throw new InvalidUserContextException(action);
+			}
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database", "query problem",
+					"invalid reservation?");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw new ExperimentException(action);
+		} catch (NoSuchReservationException e) {
+			buildErrorLogFromException(action, e, "logic", "invalid rid");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw new NoSuchReservationException(action);
 		}
 
 		this.logContextInfo(getClientUsername(), reservationId, action);
@@ -672,19 +724,27 @@ public class Experiment extends GSLogProducerService implements
 
 		} catch (ExperimentDatabaseException
 				| UndefinedExperimentParameterException e) {
-			buildErrorLog(action, e, "database", "query problem",
+			buildErrorLogFromException(action, e, "database", "query problem",
 					"invalid parameter?");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentOperationException(action);
 		} catch (ExperimentParameterException e) {
-			buildErrorLog(action, e, "logic", "parameter problem");
+			buildErrorLogFromException(action, e, "logic", "parameter problem");
 			this.logContextError(getClientUsername(), reservationId, action);
 			action.put("details", e.getAction());
 			throw new ExperimentOperationException(action);
 		} catch (InvalidUserContextException e) {
-			buildErrorLog(action, e, "logic", "invalid user");
+			buildErrorLogFromException(action, e, "logic", "invalid user");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
+		} catch (ExperimentOperationException e) {
+			buildErrorLogFromException(action, e, "logic", "operation error");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw e;
+		} catch (NoSuchOperationException e) {
+			buildErrorLogFromException(action, e, "logic", "unknown operation");
+			this.logContextError(getClientUsername(), reservationId, action);
+			throw e;
 		}
 
 		this.logContextInfo(getClientUsername(), reservationId, action);
@@ -712,24 +772,25 @@ public class Experiment extends GSLogProducerService implements
 			}
 
 			if (!grantAccess) {
-				buildErrorLog(action, null, "logic", "0 active");
+				buildErrorLogFromException(action, null, "logic", "0 active");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
 
 		try {
 			if (!adapter.isReservationContextReady(reservationId)) {
-				buildErrorLog(action, null, "logic", "context not ready");
+				buildErrorLogFromException(action, null, "logic",
+						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
@@ -740,7 +801,7 @@ public class Experiment extends GSLogProducerService implements
 
 			return context;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
@@ -761,12 +822,13 @@ public class Experiment extends GSLogProducerService implements
 			expInfo = adapter.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				buildErrorLog(action, null, "logic", "invalid owner");
+				buildErrorLogFromException(action, null, "logic",
+						"invalid owner");
 				this.logError(getClientUsername(), action);
 				throw new NoSuchExperimentException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -775,9 +837,10 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			model = modelManager.getModel(experiment);
 			model.buildOperation(operation);
+			contextManager.deleteExperimentContexts(experiment);
 		} catch (OperationTypeNotAvailableException
 				| ExperimentOperationException | ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -800,12 +863,13 @@ public class Experiment extends GSLogProducerService implements
 					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				buildErrorLog(action, null, "logic", "invalid owner");
+				buildErrorLogFromException(action, null, "logic",
+						"invalid owner");
 				this.logError(getClientUsername(), action);
 				throw new NoSuchExperimentException(action);
 			}
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -822,14 +886,15 @@ public class Experiment extends GSLogProducerService implements
 
 				parameter.setArguments(argsArray);
 			} catch (IOException e) {
-				buildErrorLog(action, null, "json", "arguments conversion");
+				buildErrorLogFromException(action, null, "json",
+						"arguments conversion");
 				this.logError(getClientUsername(), action);
 				throw new NoSuchParameterException(action);
 			}
 			model.buildParameter(parameter);
 		} catch (ParameterTypeNotAvailableException
 				| ExperimentDatabaseException | ExperimentParameterException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -852,7 +917,7 @@ public class Experiment extends GSLogProducerService implements
 					Object.class, null);
 
 		} catch (IOException e) {
-			buildErrorLog(action, null, "json", "value conversion");
+			buildErrorLogFromException(action, null, "json", "value conversion");
 			this.logContextError(getClientUsername(), reservationId, action);
 		}
 
@@ -860,25 +925,27 @@ public class Experiment extends GSLogProducerService implements
 				objValue);
 
 		try {
-			if (!adapter.isReservationIsActiveNowForUser(reservationId,
+			if (!adapter.reservationIsActiveNowForUser(reservationId,
 					this.getClientUsername())) {
 
 				boolean active = adapter.isReservationActiveNow(reservationId);
 
 				if (active) {
-					buildErrorLog(action, null, "logic", "invalid user");
+					buildErrorLogFromException(action, null, "logic",
+							"invalid user");
 					this.logContextError(getClientUsername(), reservationId,
 							action);
 					throw new InvalidUserContextException(action);
 				}
 
-				buildErrorLog(action, null, "logic", "no context");
+				buildErrorLogFromException(action, null, "logic", "no context");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				buildErrorLog(action, null, "logic", "context not ready");
+				buildErrorLogFromException(action, null, "logic",
+						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
@@ -891,15 +958,16 @@ public class Experiment extends GSLogProducerService implements
 			this.logContextInfo(getClientUsername(), reservationId, action);
 
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentParameterException(action);
 		} catch (InvalidUserContextException e) {
-			buildErrorLog(action, e, "logic", "invalid user");
+			buildErrorLogFromException(action, e, "logic", "invalid user");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			buildErrorLog(action, e, "logic", "parameter not valid");
+			buildErrorLogFromException(action, e, "logic",
+					"parameter not valid");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
@@ -925,24 +993,26 @@ public class Experiment extends GSLogProducerService implements
 			if (adminMode) {
 				grantAccess = active;
 			} else {
-				grantAccess = adapter.isReservationIsActiveNowForUser(
+				grantAccess = adapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
 			if (!grantAccess) {
 				if (active) {
-					buildErrorLog(action, null, "logic", "invalid user");
+					buildErrorLogFromException(action, null, "logic",
+							"invalid user");
 					this.logContextError(getClientUsername(), reservationId,
 							action);
 					throw new InvalidUserContextException(action);
 				}
-				buildErrorLog(action, null, "logic", "no context");
+				buildErrorLogFromException(action, null, "logic", "no context");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				buildErrorLog(action, null, "logic", "context not ready");
+				buildErrorLogFromException(action, null, "logic",
+						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
@@ -967,7 +1037,8 @@ public class Experiment extends GSLogProducerService implements
 				response = new ObjectResponse(
 						JSONConverter.toJSON(contextValues));
 			} catch (IOException e) {
-				buildErrorLog(action, null, "json", "value conversion");
+				buildErrorLogFromException(action, null, "json",
+						"value conversion");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentException(action);
 			}
@@ -975,15 +1046,16 @@ public class Experiment extends GSLogProducerService implements
 			return response;
 
 		} catch (ExperimentDatabaseException | ExperimentParameterException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		} catch (InvalidUserContextException e) {
-			buildErrorLog(action, e, "logic", "invalid user");
+			buildErrorLogFromException(action, e, "logic", "invalid user");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			buildErrorLog(action, e, "logic", "parameter not valid");
+			buildErrorLogFromException(action, e, "logic",
+					"parameter not valid");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
@@ -991,8 +1063,7 @@ public class Experiment extends GSLogProducerService implements
 
 	@Override
 	public boolean isExperimentContextReady(int reservationId)
-			throws ExperimentException,
-			NoSuchReservationException {
+			throws ExperimentException, NoSuchReservationException {
 
 		LogAction action = new LogAction();
 		buildOperationLog(action, "is context ready", reservationId);
@@ -1006,12 +1077,12 @@ public class Experiment extends GSLogProducerService implements
 			if (adminMode) {
 				grantAccess = adapter.isReservationActiveNow(reservationId);
 			} else {
-				grantAccess = adapter.isReservationIsActiveNowForUser(
+				grantAccess = adapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
 			if (!grantAccess) {
-				buildErrorLog(action, null, "logic", "no context");
+				buildErrorLogFromException(action, null, "logic", "no context");
 				this.logContextError(getClientUsername(), reservationId, action);
 				return false;
 			}
@@ -1019,7 +1090,7 @@ public class Experiment extends GSLogProducerService implements
 			return adapter.isReservationContextReady(reservationId);
 
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
@@ -1043,18 +1114,19 @@ public class Experiment extends GSLogProducerService implements
 			if (adminMode) {
 				grantAccess = adapter.isReservationActiveNow(reservationId);
 			} else {
-				grantAccess = adapter.isReservationIsActiveNowForUser(
+				grantAccess = adapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
 			if (!grantAccess) {
-				buildErrorLog(action, null, "logic", "no context");
+				buildErrorLogFromException(action, null, "logic", "no context");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new NoSuchReservationException(action);
 			}
 
 			if (!adapter.isReservationContextReady(reservationId)) {
-				buildErrorLog(action, null, "logic", "context not ready");
+				buildErrorLogFromException(action, null, "logic",
+						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
@@ -1073,7 +1145,8 @@ public class Experiment extends GSLogProducerService implements
 			try {
 				response = new ObjectResponse(JSONConverter.toJSON(value));
 			} catch (IOException e) {
-				buildErrorLog(action, null, "json", "value conversion");
+				buildErrorLogFromException(action, null, "json",
+						"value conversion");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentParameterException(action);
 			}
@@ -1081,32 +1154,51 @@ public class Experiment extends GSLogProducerService implements
 			return response;
 
 		} catch (ExperimentDatabaseException | ExperimentParameterException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentParameterException(action);
 		} catch (InvalidUserContextException e) {
-			buildErrorLog(action, e, "logic", "invalid user");
+			buildErrorLogFromException(action, e, "logic", "invalid user");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new InvalidUserContextException(action);
 		} catch (NoSuchParameterException e) {
-			buildErrorLog(action, e, "logic", "parameter not valid");
+			buildErrorLogFromException(action, e, "logic",
+					"parameter not valid");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new NoSuchParameterException(action);
 		}
 	}
 
 	@Override
-	public void removeExperiment(
+	public void deleteExperiment(
 			@WebParam(name = "experiment") String experiment)
 			throws ExperimentException, NoSuchExperimentException {
 
 		LogAction action = new LogAction();
 		buildOperationLog(action, "remove experiment", experiment);
 
+		ExperimentInformation expInfo;
 		try {
-			modelManager.removeModel(experiment);
+			expInfo = adapter.getBasicExperimentInformation(experiment);
+
+			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
+				buildErrorLogFromException(action, null, "logic",
+						"invalid owner");
+				this.logError(getClientUsername(), action);
+				throw new NoSuchExperimentException(action);
+			}
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+		try {
+			modelManager.deleteModel(experiment);
+			contextManager.deleteExperimentContexts(experiment);
+			this.logInfo(getClientUsername(), action);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -1133,14 +1225,15 @@ public class Experiment extends GSLogProducerService implements
 			if (!adminMode
 					&& !reservationInfo.getUser().equals(
 							this.getClientUsername())) {
-				buildErrorLog(action, null, "logic", "invalid user");
+				buildErrorLogFromException(action, null, "logic",
+						"invalid user");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new InvalidUserContextException(action);
 			}
 
 			return reservationInfo;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, e, "database");
+			buildErrorLogFromException(action, e, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
@@ -1165,7 +1258,7 @@ public class Experiment extends GSLogProducerService implements
 	@Override
 	public ExperimentParameter getExperimentParameter(
 			@WebParam(name = "parameterName") String name)
-			throws ExperimentException {
+			throws ExperimentException, NoSuchParameterException {
 
 		return modelManager.getExperimentParameter(name);
 	}
@@ -1173,101 +1266,8 @@ public class Experiment extends GSLogProducerService implements
 	@Override
 	public ExperimentOperation getExperimentOperation(
 			@WebParam(name = "operationName") String name)
-			throws ExperimentException {
+			throws ExperimentException, NoSuchOperationException {
 		return modelManager.getExperimentOperation(name);
-	}
-
-	@Override
-	public void addExperimentFeature(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "segment") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException,
-			OperationTypeNotAvailableException,
-			ParameterTypeNotAvailableException {
-
-		LogAction action = new LogAction();
-		buildOperationLog(action, "add feature", experiment, feature.getName());
-
-		ExperimentInformation expInfo;
-		try {
-			expInfo = adapter.getBasicExperimentInformation(experiment);
-
-			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
-				buildErrorLog(action, null, "logic", "invalid user");
-				this.logError(getClientUsername(), action);
-				throw new NoSuchExperimentException(action);
-			}
-		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, null, "database");
-			this.logError(getClientUsername(), action);
-			throw new ExperimentException(action);
-		}
-
-		CustomExperimentModel model;
-		try {
-			model = modelManager.getModel(experiment);
-			model.buildFeature(feature);
-
-			this.logInfo(getClientUsername(), action);
-
-		} catch (CustomExperimentException | ExperimentDatabaseException e) {
-			buildErrorLog(action, null, "database");
-			this.logError(getClientUsername(), action);
-			throw new ExperimentException(action);
-		}
-	}
-
-	@Override
-	public boolean testExperimentFeature(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException {
-
-		CustomExperimentModel model;
-		try {
-			model = modelManager.getModel(experiment);
-			return model.testFeature(feature);
-		} catch (CustomExperimentException | ExperimentDatabaseException e) {
-			throw new ExperimentException(e.getAction());
-		}
-	}
-
-	@Override
-	public FeatureCompliantInformation getFeatureCompliantInformation(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException {
-		CustomExperimentModel model;
-		try {
-			model = modelManager.getModel(experiment);
-			return model.getFeatureCompliantInformation(feature);
-		} catch (CustomExperimentException | ExperimentDatabaseException e) {
-			throw new ExperimentException(e.getAction());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.gloria.gs.services.experiment.online.OnlineExperimentInterface#
-	 * getAllExperimentFeatures()
-	 */
-	@Override
-	public Set<String> getAllExperimentFeatures() throws ExperimentException {
-		return modelManager.getAllExperimentFeatures().keySet();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.gloria.gs.services.experiment.online.OnlineExperimentInterface#
-	 * getExperimentFeature(java.lang.String)
-	 */
-	@Override
-	public ExperimentFeature getExperimentFeature(
-			@WebParam(name = "featureName") String name)
-			throws ExperimentException {
-		return modelManager.getExperimentFeature(name);
 	}
 
 	/*
@@ -1289,7 +1289,7 @@ public class Experiment extends GSLogProducerService implements
 			modelManager.createModel(experiment, this.getClientUsername(),
 					"ONLINE");
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, null, "database");
+			buildErrorLogFromException(action, null, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
@@ -1318,7 +1318,7 @@ public class Experiment extends GSLogProducerService implements
 
 			return results;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, null, "database");
+			buildErrorLogFromException(action, null, "database");
 			this.logContextError(getClientUsername(), reservationId, action);
 			throw new ExperimentException(action);
 		}
@@ -1345,9 +1345,100 @@ public class Experiment extends GSLogProducerService implements
 
 			return results;
 		} catch (ExperimentDatabaseException e) {
-			buildErrorLog(action, null, "database");
+			buildErrorLogFromException(action, null, "database");
 			this.logError(getClientUsername(), action);
 			throw new ExperimentException(action);
 		}
+	}
+
+	@Override
+	public void deleteExperimentParameter(String experiment, String parameter)
+			throws ExperimentException, NoSuchExperimentException {
+		LogAction action = new LogAction();
+		buildOperationLog(action, "remove experiment parameter", experiment);
+
+		ExperimentInformation expInfo;
+		try {
+			expInfo = adapter.getBasicExperimentInformation(experiment);
+
+			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
+				buildErrorLogFromException(action, null, "logic",
+						"invalid owner");
+				this.logError(getClientUsername(), action);
+				throw new NoSuchExperimentException(action);
+			}
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+		try {
+			modelManager.deleteParameter(experiment, parameter);
+			contextManager.deleteExperimentContexts(experiment);
+			this.logInfo(getClientUsername(), action);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+		this.logInfo(getClientUsername(), action);
+
+	}
+
+	@Override
+	public void deleteExperimentOperation(String experiment, String operation)
+			throws ExperimentException, NoSuchExperimentException {
+		LogAction action = new LogAction();
+		buildOperationLog(action, "remove experiment operation", experiment);
+
+		ExperimentInformation expInfo;
+		try {
+			expInfo = adapter.getBasicExperimentInformation(experiment);
+
+			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
+				buildErrorLogFromException(action, null, "logic",
+						"invalid owner");
+				this.logError(getClientUsername(), action);
+				throw new NoSuchExperimentException(action);
+			}
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+		try {
+			modelManager.deleteOperation(experiment, operation);
+			contextManager.deleteExperimentContexts(experiment);
+			this.logInfo(getClientUsername(), action);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+		this.logInfo(getClientUsername(), action);
+
+	}
+
+	@Override
+	public void emptyExperiment(String experiment) throws ExperimentException,
+			NoSuchExperimentException {
+		LogAction action = new LogAction();
+		buildOperationLog(action, "empty experiment", experiment);
+
+		try {
+			adapter.emptyExperiment(experiment);
+			contextManager.deleteExperimentContexts(experiment);
+
+			this.logInfo(getClientUsername(), action);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
 	}
 }

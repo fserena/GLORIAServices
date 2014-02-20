@@ -29,6 +29,7 @@ public class Scheduler extends GSLogProducerService implements
 	}
 
 	public Scheduler() {
+		this.createLogger(Scheduler.class);
 	}
 
 	public void setAdapter(SchedulerAdapter adapter) {
@@ -167,7 +168,8 @@ public class Scheduler extends GSLogProducerService implements
 			@WebParam(name = "rt") String rt) throws SchedulerException,
 			ScheduleNotFoundException {
 		try {
-			List<ScheduleInformation> schInfos = adapter.getSchedulesByRT(rt, 100);
+			List<ScheduleInformation> schInfos = adapter.getSchedulesByRT(rt,
+					100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
 			throw new SchedulerException(e.getAction());
@@ -184,22 +186,28 @@ public class Scheduler extends GSLogProducerService implements
 	public List<ScheduleInformation> getAllActivePlans()
 			throws SchedulerException, ScheduleNotFoundException {
 		try {
-			List<ScheduleInformation> schInfos = adapter.getAllActiveSchedules();
+			List<ScheduleInformation> schInfos = adapter
+					.getAllActiveSchedules();
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
 			throw new SchedulerException(e.getAction());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.gloria.gs.services.scheduler.SchedulerInterface#getActiveRTPlans(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.gloria.gs.services.scheduler.SchedulerInterface#getActiveRTPlans(java
+	 * .lang.String)
 	 */
 	@Override
 	public List<ScheduleInformation> getActiveRTPlans(
 			@WebParam(name = "rt") String rt) throws SchedulerException,
 			ScheduleNotFoundException {
 		try {
-			List<ScheduleInformation> schInfos = adapter.getActiveSchedulesByRT(rt, 100);
+			List<ScheduleInformation> schInfos = adapter
+					.getActiveSchedulesByRT(rt, 100);
 			return schInfos;
 		} catch (SchedulerDatabaseException e) {
 			throw new SchedulerException(e.getAction());

@@ -36,9 +36,13 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		CCDTeleoperationInterface {
 
 	private ImageRepositoryInterface imageRepository;
-
+	
 	public void setImageRepository(ImageRepositoryInterface repository) {
 		this.imageRepository = repository;
+	}
+	
+	public CCDTeleoperation() {
+		this.createLogger(CCDTeleoperation.class);
 	}
 
 	@Override
@@ -63,6 +67,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		} catch (Exception e) {
 			this.processBadArgs(rt, ccd, operationName, args.getArguments());
 
+			log.error(e.getMessage());
 			throw new CCDTeleoperationException(
 					"bad request");
 		}
@@ -83,6 +88,7 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		} catch (TeleoperationException e) {
 			this.processInternalError(e, rt, ccd, operationName, args.getArguments());
 
+			log.error(String.valueOf(e.getAction()));
 			throw new CCDTeleoperationException(e.getAction());
 		}
 	}

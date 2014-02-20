@@ -8,6 +8,9 @@
 	<import resource="classpath*:imagebeans.xml" />
 	<import resource="classpath*:schedulerbeans.xml" />
 	<import resource="classpath*:experimentbeans.xml" />
+	<import resource="classpath*:image-experiment-beans.xml" />
+	<import resource="classpath*:teleop-experiment-beans.xml" />
+
 
 	<bean id="actionLog" class="eu.gloria.gs.services.log.action.ActionLogInterface"
 		factory-bean="actionLogWSClientFactory" factory-method="create"
@@ -408,10 +411,10 @@
 		address="/ExperimentPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.experiment.Experiment">
-				<property name="adapter" ref="experimentAdapter"></property>
-				<property name="booker" ref="experimentBooker"></property>
-				<property name="contextManager" ref="contextManager"></property>
-				<property name="modelManager" ref="modelManager"></property>
+				<property name="adapter" ref="experiment-adapter"></property>
+				<property name="booker" ref="experiment-booker"></property>
+				<property name="contextManager" ref="context-manager"></property>
+				<property name="modelManager" ref="model-manager"></property>
 				<property name="username" ref="experimentUsername"></property>
 				<property name="password" ref="experimentPassword"></property>
 				<property name="logStore" ref="logStore"></property>
@@ -480,8 +483,8 @@
 
 	<bean id="experimentExecutor" class="eu.gloria.gs.services.experiment.ExperimentExecutor"
 		scope="singleton" lazy-init="true">
-		<property name="adapter" ref="experimentAdapter"></property>
-		<property name="contextManager" ref="contextManager"></property>
+		<property name="adapter" ref="experiment-adapter"></property>
+		<property name="contextManager" ref="context-manager"></property>
 		<property name="logStore" ref="logStore"></property>
 		<property name="genericTeleoperation" ref="genericTeleoperation"></property>
 		<property name="username" ref="experimentUsername"></property>

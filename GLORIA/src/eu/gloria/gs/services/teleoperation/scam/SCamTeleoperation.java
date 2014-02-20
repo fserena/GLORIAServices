@@ -23,6 +23,10 @@ import eu.gloria.gs.services.teleoperation.scam.operations.SetGainOperation;
 public class SCamTeleoperation extends AbstractTeleoperation implements
 		SCamTeleoperationInterface {
 
+	public SCamTeleoperation() {
+		this.createLogger(SCamTeleoperation.class);
+	}
+	
 	@Override
 	public String getImageURL(String rt, String scam)
 			throws DeviceOperationFailedException, SCamTeleoperationException {

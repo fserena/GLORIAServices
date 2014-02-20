@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
 import eu.gloria.gs.services.core.LogEntry;
@@ -30,6 +33,12 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	private String password;
 	private boolean thereArePending;
 	private Map<Integer, Integer> recoverRetries = null;
+	private static Logger log;
+
+	static {
+		log = LoggerFactory.getLogger(ImageURLRetrieveExecutor.class
+				.getSimpleName());
+	}
 
 	public void setAdapter(ImageRepositoryAdapter adapter) {
 		this.adapter = adapter;
@@ -80,8 +89,8 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			notUrlCompleted = this.adapter.getAllWithoutUrl(100);
 
 			if (notUrlCompleted.size() > 0) {
-
 				preAction.put("pending", notUrlCompleted.size());
+				//log.info("Images with no URL: " + notUrlCompleted.size());
 			}
 
 		} catch (ImageDatabaseException e) {
@@ -105,8 +114,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			double exposure = imageInfo.getExposure();
 			Date currentDate = new Date();
 
-			if (currentDate.getTime() - creationDate.getTime()
-					+ (exposure * 1000.0) > 0) {
+			if (currentDate.getTime() - creationDate.getTime() > (exposure * 1000.0)) {
 
 				action.put("exposure", "should end");
 				try {

@@ -8,6 +8,10 @@ import eu.gloria.rti.client.RTSHandler;
 public class GenericTeleoperation extends AbstractTeleoperation implements
 		GenericTeleoperationInterface {
 
+	public GenericTeleoperation() {
+		this.createLogger(GenericTeleoperation.class);
+	}
+	
 	@Override
 	public void startTeleoperation(String rt)
 			throws GenericTeleoperationException {

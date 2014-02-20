@@ -1,7 +1,11 @@
 package eu.gloria.gs.services.experiment;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
@@ -21,6 +25,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
+import eu.gloria.gs.services.utils.JSONConverter;
 
 public class ExperimentExecutor extends ServerThread {
 
@@ -30,6 +35,8 @@ public class ExperimentExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
+	protected Logger log = LoggerFactory.getLogger(ExperimentExecutor.class
+			.getSimpleName());
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
 		this.adapter = adapter;
@@ -78,7 +85,7 @@ public class ExperimentExecutor extends ServerThread {
 			for (ReservationInformation reservation : reservations) {
 
 				int reservationId = reservation.getReservationId();
-				
+
 				LogAction action = new LogAction();
 				action.put("sender", "experiments daemon");
 
@@ -93,7 +100,7 @@ public class ExperimentExecutor extends ServerThread {
 					action.put("client", reservation.getUser());
 
 					if (!instantiated) {
-						
+
 						adapter.deleteExperimentContext(reservation
 								.getReservationId());
 
@@ -126,6 +133,7 @@ public class ExperimentExecutor extends ServerThread {
 
 							errorState = true;
 							action.put("init", "failed");
+							action.put("details", e.getAction());
 						}
 
 						if (instantiationDone) {
@@ -144,6 +152,7 @@ public class ExperimentExecutor extends ServerThread {
 
 								errorState = true;
 								action.put("init", "failed");
+								action.put("details", e.getAction());
 							}
 						}
 
@@ -166,6 +175,7 @@ public class ExperimentExecutor extends ServerThread {
 
 								errorState = true;
 								action.put("end", "failed");
+								action.put("details", e.getAction());
 							}
 						}
 					}
@@ -189,6 +199,7 @@ public class ExperimentExecutor extends ServerThread {
 					}
 				} catch (ExperimentDatabaseException e) {
 					action.put("cause", "internal error");
+					action.put("details", e.getAction());
 					this.logError(username, reservationId, action);
 				}
 			}
@@ -207,7 +218,7 @@ public class ExperimentExecutor extends ServerThread {
 
 	}
 
-	private void processLogEntry(LogEntry entry, String username, Integer rid, 
+	private void processLogEntry(LogEntry entry, String username, Integer rid,
 			LogAction action) {
 		entry.setUsername(username);
 		entry.setDate(new Date());
@@ -222,17 +233,21 @@ public class ExperimentExecutor extends ServerThread {
 
 		LogEntry entry = new ErrorLogEntry();
 		this.processLogEntry(entry, username, rid, action);
+
+		try {
+			log.error(JSONConverter.toJSON(action));
+		} catch (IOException e) {
+		}
 	}
 
 	private void logInfo(String username, Integer rid, LogAction action) {
 
 		LogEntry entry = new InfoLogEntry();
 		this.processLogEntry(entry, username, rid, action);
+
+		try {
+			log.info(JSONConverter.toJSON(action));
+		} catch (IOException e) {
+		}
 	}
-
-	/*private void logWarning(String username, LogAction action) {
-
-		LogEntry entry = new WarningLogEntry();
-		this.processLogEntry(entry, username, action);
-	}*/
 }
