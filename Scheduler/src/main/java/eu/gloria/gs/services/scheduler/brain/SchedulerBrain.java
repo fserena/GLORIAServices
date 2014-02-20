@@ -5,10 +5,16 @@
  */
 package eu.gloria.gs.services.scheduler.brain;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
@@ -31,6 +37,7 @@ import eu.gloria.gs.services.scheduler.local.SchHandler;
 import eu.gloria.gs.services.scheduler.local.SchServerManager;
 import eu.gloria.gs.services.scheduler.local.SchServerNotAvailableException;
 import eu.gloria.gs.services.scheduler.op.ObservingPlan;
+import eu.gloria.gs.services.utils.JSONConverter;
 import eu.gloria.rt.entity.db.File;
 import eu.gloria.rt.entity.db.FileFormat;
 import eu.gloria.rt.entity.db.Format;
@@ -47,6 +54,8 @@ public class SchedulerBrain {
 	private RTRepositoryInterface rtRepository;
 	private ImageRepositoryInterface imageRepository;
 	private static Random rand = new Random();
+	private Logger log = LoggerFactory.getLogger(SchedulerBrain.class
+			.getSimpleName());
 
 	public int prepare(ObservingPlanInformation op) throws SchedulerException,
 			SchedulerDatabaseException, MaxUserSchedulesException,
@@ -55,13 +64,20 @@ public class SchedulerBrain {
 		String user = op.getUser();
 
 		if (this.adapter.getUserActiveSchedulesCount(user) >= 5) {
+			log.error(user + " has reached its maximum active plans");
 			throw new MaxUserSchedulesException();
 		}
 
-		return this.adapter.prepareSchedule(user, op);
+		int id = this.adapter.prepareSchedule(user, op);
+		try {
+			log.info("Plan prepared for " + user + ": "
+					+ JSONConverter.toJSON(op));
+		} catch (IOException e) {
+		}
+		return id;
 	}
 
-	public String selectRTCandidate(List<String> exclude)
+	private String selectRTCandidate(List<String> exclude)
 			throws SchedulerException {
 		List<String> rts = null;
 		try {
@@ -89,12 +105,20 @@ public class SchedulerBrain {
 	private void treatPreparedSchedule(ScheduleInformation schInfo)
 			throws SchedulerException, RTRepositoryException {
 
+		log.info("Advertising plan " + schInfo.getId() + "...");
+
 		List<String> candidates = schInfo.getCandidates();
 		if (candidates == null) {
 			candidates = new ArrayList<>();
 		}
 
 		String candidate = this.selectRTCandidate(schInfo.getCandidates());
+		if (candidate != null) {
+			log.info(candidate + " selected as candidate for plan "
+					+ schInfo.getId());
+		} else {
+			log.info("No candidate selected for plan " + schInfo.getId());
+		}
 
 		if (candidate != null) {
 
@@ -127,30 +151,32 @@ public class SchedulerBrain {
 				plan.build();
 				plan.advertise();
 
+				log.debug("uuid " + schInfo.getOpInfo().getUuid()
+						+ " obtained for plan " + schInfo.getId());
+				log.info("Plan " + schInfo.getId() + " ADVERTISED to "
+						+ candidate);
 				this.adapter.setUuid(schInfo.getId(), schInfo.getOpInfo()
 						.getUuid());
 				this.adapter.setRT(schInfo.getId(), candidate);
 				this.adapter.setPlan(schInfo.getId(), schInfo.getOpInfo());
 				this.adapter.setLastDate(schInfo.getId(), new Date());
 				this.adapter.setState(schInfo.getId(), "ADVERTISED");
-
 			} catch (SchedulerDatabaseException e) {
 				throw new SchedulerException();
-			} catch (SchServerNotAvailableException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (GenericSchException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (SchServerNotAvailableException | GenericSchException e) {
+				log.error(candidate + " returned an error: " + e.getMessage());
 			} catch (Exception e) {
 				if (!e.getMessage().contains("already")) {
 					throw e;
 				} else {
+					log.warn(candidate
+							+ " said it has this OP already registered");
 					rejection = true;
 				}
 			}
 
 			if (rejection) {
+				log.error(candidate + " rejected the plan " + schInfo.getId());
 				try {
 					this.adapter.setState(schInfo.getId(), "REJECTED");
 				} catch (SchedulerDatabaseException e) {
@@ -158,6 +184,10 @@ public class SchedulerBrain {
 				}
 			}
 		} else {
+
+			log.error("Plan " + schInfo.getId()
+					+ " is impossible by now. There are no candidates.");
+
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
 			} catch (SchedulerDatabaseException e) {
@@ -175,12 +205,16 @@ public class SchedulerBrain {
 		}
 
 		if (candidates.size() >= 5) {
+			log.error("Max candidates reached. Plan " + schInfo.getId()
+					+ " is impossible by now");
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
 			} catch (SchedulerDatabaseException e) {
 				throw new SchedulerException();
 			}
 		} else {
+			log.info("Preparing to request the plan " + schInfo.getId()
+					+ " to another telescope...");
 			try {
 				this.adapter.setState(schInfo.getId(), "PREPARED");
 			} catch (SchedulerDatabaseException e) {
@@ -211,6 +245,9 @@ public class SchedulerBrain {
 			SchHandler schHandler = SchServerManager.getReference().getSch(
 					keyData);
 
+			/*log.info("Asking " + schInfo.getRt() + " about ADVERTISED plan "
+					+ schInfo.getId() + "...");*/
+			
 			PlanInfo planInfo = null;
 			try {
 				planInfo = schHandler.getOPInformationByUuid(uuid);
@@ -221,6 +258,10 @@ public class SchedulerBrain {
 						|| planState.equals(PlanState.QUEUED)
 						|| planState.equals(PlanState.RUNNING)
 						|| planState.equals(PlanState.ERROR)) {
+
+					log.info("Previously ADVERTISED plan " + schInfo.getId()
+							+ " is now " + planState.name());
+
 					this.adapter.setState(schInfo.getId(), planState.name());
 					this.adapter.setLastDate(schInfo.getId(), new Date());
 				}
@@ -258,8 +299,12 @@ public class SchedulerBrain {
 		keyData.setCredentials(credentials);
 
 		try {
+
 			SchHandler schHandler = SchServerManager.getReference().getSch(
 					keyData);
+
+			/*log.info("Asking " + schInfo.getRt() + " about QUEUED plan "
+					+ schInfo.getId() + "...");*/
 
 			PlanInfo planInfo = null;
 			try {
@@ -270,12 +315,19 @@ public class SchedulerBrain {
 				if (planState.equals(PlanState.ABORTED)
 						|| planState.equals(PlanState.DONE)
 						|| planState.equals(PlanState.ERROR)) {
+
+					log.info("Previously QUEUED plan " + schInfo.getId()
+							+ " is now " + planState.name());
+
 					schInfo.setState(planState.name());
 					this.adapter.setState(schInfo.getId(), planState.name());
 					this.adapter.setLastDate(schInfo.getId(), new Date());
 				}
 
 				if (planState.equals(PlanState.DONE)) {
+
+					log.info("Plan " + schInfo.getId() + " is DONE!");
+
 					List<File> files = schHandler.getOPResultFiles(schInfo
 							.getUuid());
 

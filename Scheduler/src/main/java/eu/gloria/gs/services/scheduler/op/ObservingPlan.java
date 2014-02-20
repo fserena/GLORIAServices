@@ -76,7 +76,7 @@ public class ObservingPlan {
 		OpExposeData exposeData = new OpExposeData();
 		exposeData.setRepetitionCount(true);
 		exposeData.setTime(String.valueOf(this.opInfo.getExposure()));
-		exposeData.setRepeat("1");
+		exposeData.setRepeat("3");
 		exposeData.setSelectedFilter(this.opInfo.getFilter());
 
 		form.getExposures().add(exposeData);

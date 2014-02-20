@@ -37,7 +37,7 @@ public class SchHandler {
 
 	private GloriaRtiScheduler schProxy;
 	private GloriaRtiDb dbProxy;
-	//private static String port;
+	// private static String port;
 	private static String schServiceName;
 	private static String dbServiceName;
 
@@ -51,7 +51,7 @@ public class SchHandler {
 			properties.load(in);
 			in.close();
 
-			//port = (String) properties.get("port");
+			// port = (String) properties.get("port");
 			schServiceName = (String) properties.get("sch_service_name");
 			dbServiceName = (String) properties.get("db_service_name");
 		} catch (IOException e) {
@@ -121,7 +121,7 @@ public class SchHandler {
 
 		try {
 			List<PlanInfo> plansInfo = schProxy.planSearchByUuid(uuids);
-			
+
 			if (plansInfo.size() > 0) {
 				return plansInfo.get(0);
 			}
@@ -132,16 +132,15 @@ public class SchHandler {
 		}
 	}
 
-	public List<File> getOPResultFiles(String uuid)
-			throws GenericSchException {
+	public List<File> getOPResultFiles(String uuid) throws GenericSchException {
 
 		try {
 			return dbProxy.opGet(uuid).getFiles();
 		} catch (RtiDbError e) {
 			throw new GenericSchException(e.getMessage());
-		}		
+		}
 	}
-	
+
 	public List<PlanInfo> getOPInformationByUser(String user)
 			throws GenericSchException, EmptySchFilterResultException {
 
@@ -154,10 +153,10 @@ public class SchHandler {
 		try {
 			PlanSearchFilterResult filterResult = schProxy.planSearchByFilter(
 					filter, pagination);
-			
+
 			List<PlanInfo> plansInfo = filterResult.getItems();
 
-			return plansInfo;			
+			return plansInfo;
 		} catch (RtiSchError e) {
 			throw new GenericSchException(e.getMessage());
 		}

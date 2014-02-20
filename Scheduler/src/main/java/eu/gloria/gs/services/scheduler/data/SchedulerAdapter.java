@@ -150,6 +150,9 @@ public class SchedulerAdapter {
 			schInfo.setOpInfo((ObservingPlanInformation) JSONConverter
 					.fromJSON(entry.getPlan(), ObservingPlanInformation.class,
 							null));
+
+			schInfo.getOpInfo().setPriority(100);
+
 		} catch (IOException e) {
 			throw new SchedulerDatabaseException();
 		}
@@ -259,7 +262,7 @@ public class SchedulerAdapter {
 
 		return schInfos;
 	}
-	
+
 	public List<ScheduleInformation> getActiveSchedulesByRT(String rt, int limit)
 			throws SchedulerDatabaseException {
 
