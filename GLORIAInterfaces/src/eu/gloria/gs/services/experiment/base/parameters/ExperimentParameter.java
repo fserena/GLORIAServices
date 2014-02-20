@@ -13,6 +13,24 @@ public class ExperimentParameter {
 	private Map<String, String[]> initOperations;
 	private Map<String, Object> properties;
 	private String concreteName;
+	private String contextBeanName;
+	private String description;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getContextBeanName() {
+		return contextBeanName;
+	}
+
+	public void setContextBeanName(String contextBeanName) {
+		this.contextBeanName = contextBeanName;
+	}
 
 	public ParameterType getType() {
 		return this.type;

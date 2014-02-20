@@ -10,7 +10,35 @@ public class ExperimentOperation {
 	private Map<String, String[]> behaviour;
 
 	private ExperimentParameter[] parameterTypes;
+	private String[] parameterNames;
 	private String concreteName;
+	private String description;
+
+	private String contextBeanName;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String[] getParameterNames() {
+		return parameterNames;
+	}
+
+	public void setParameterNames(String[] parameterNames) {
+		this.parameterNames = parameterNames;
+	}
+
+	public String getContextBeanName() {
+		return contextBeanName;
+	}
+
+	public void setContextBeanName(String contextBeanName) {
+		this.contextBeanName = contextBeanName;
+	}
 
 	public ExperimentParameter[] getParameterTypes() {
 		return parameterTypes;

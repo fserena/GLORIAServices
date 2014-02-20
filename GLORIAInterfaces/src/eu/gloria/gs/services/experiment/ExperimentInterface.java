@@ -8,8 +8,6 @@ import javax.jws.WebService;
 
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
-import eu.gloria.gs.services.experiment.base.data.FeatureCompliantInformation;
-import eu.gloria.gs.services.experiment.base.data.FeatureInformation;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
@@ -17,16 +15,13 @@ import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.data.ResultInformation;
 import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
-import eu.gloria.gs.services.experiment.base.models.ExperimentFeature;
 import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
-import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
-import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
@@ -45,8 +40,21 @@ public interface ExperimentInterface {
 			@WebParam(name = "experiment") String experiment)
 			throws ExperimentException, DuplicateExperimentException;
 
-	public void removeExperiment(
+	public void deleteExperiment(
 			@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, NoSuchExperimentException;
+
+	public void emptyExperiment(@WebParam(name = "experiment") String experiment)
+			throws ExperimentException, NoSuchExperimentException;
+
+	public void deleteExperimentParameter(
+			@WebParam(name = "experiment") String experiment,
+			@WebParam(name = "parameter") String parameter)
+			throws ExperimentException, NoSuchExperimentException;
+
+	public void deleteExperimentOperation(
+			@WebParam(name = "experiment") String experiment,
+			@WebParam(name = "operation") String operation)
 			throws ExperimentException, NoSuchExperimentException;
 
 	public void addExperimentOperation(
@@ -54,26 +62,11 @@ public interface ExperimentInterface {
 			@WebParam(name = "operation") OperationInformation operation)
 			throws ExperimentException, NoSuchExperimentException;
 
-	public void addExperimentFeature(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException,
-			OperationTypeNotAvailableException, ParameterTypeNotAvailableException;
-
-	public boolean testExperimentFeature(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException;
-
-	public FeatureCompliantInformation getFeatureCompliantInformation(
-			@WebParam(name = "experiment") String experiment,
-			@WebParam(name = "feature") FeatureInformation feature)
-			throws ExperimentException, NoSuchExperimentException;
-
 	public void addExperimentParameter(
 			@WebParam(name = "experiment") String experiment,
 			@WebParam(name = "operation") ParameterInformation parameter)
-			throws ExperimentException, NoSuchExperimentException, NoSuchParameterException;
+			throws ExperimentException, NoSuchExperimentException,
+			NoSuchParameterException;
 
 	public ExperimentInformation getExperimentInformation(
 			@WebParam(name = "experiment") String experiment)
@@ -142,7 +135,8 @@ public interface ExperimentInterface {
 
 	public void cancelExperimentReservation(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException, NoSuchReservationException;
+			throws ExperimentException, NoSuchReservationException,
+			InvalidUserContextException;
 
 	public ReservationInformation getReservationInformation(
 			@WebParam(name = "reservationId") int reservationId)
@@ -190,19 +184,13 @@ public interface ExperimentInterface {
 
 	public Set<String> getAllExperimentOperations() throws ExperimentException;
 
-	public Set<String> getAllExperimentFeatures() throws ExperimentException;
-
 	public ExperimentParameter getExperimentParameter(
 			@WebParam(name = "parameterName") String name)
-			throws ExperimentException;
+			throws ExperimentException, NoSuchParameterException;
 
 	public ExperimentOperation getExperimentOperation(
 			@WebParam(name = "operationName") String name)
-			throws ExperimentException;
-
-	public ExperimentFeature getExperimentFeature(
-			@WebParam(name = "featureName") String name)
-			throws ExperimentException;
+			throws ExperimentException, NoSuchOperationException;
 
 	/**
 	 * @param reservationId
@@ -226,9 +214,12 @@ public interface ExperimentInterface {
 	 * @throws ExperimentNotInstantiatedException
 	 * @throws NoSuchReservationException
 	 */
-	boolean isExperimentContextReady(
+	public boolean isExperimentContextReady(
 			@WebParam(name = "reservationId") int reservationId)
-			throws ExperimentException,
-			NoSuchReservationException;
+			throws ExperimentException, NoSuchReservationException;
+
+	public void resetExperimentContext(int reservationId) throws ExperimentException,
+			NoSuchReservationException, InvalidUserContextException,
+			ExperimentNotInstantiatedException;
 
 }

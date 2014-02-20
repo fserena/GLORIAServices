@@ -32,14 +32,6 @@ public interface ImageRepositoryInterface {
 	public void setExperimentReservation(@WebParam(name = "id") int id,
 			@WebParam(name = "rid") int rid) throws ImageRepositoryException;
 
-	public void setExperimentReservationByJpg(
-			@WebParam(name = "jpg") String jpg, @WebParam(name = "rid") int rid)
-			throws ImageRepositoryException;
-
-	public void setExperimentReservationByFits(
-			@WebParam(name = "fits") String fits,
-			@WebParam(name = "rid") int rid) throws ImageRepositoryException;
-
 	public void setJpg(@WebParam(name = "id") int id,
 			@WebParam(name = "jpg") String jpg) throws ImageRepositoryException;
 
@@ -62,14 +54,6 @@ public interface ImageRepositoryInterface {
 			throws ImageRepositoryException;
 
 	public void setUser(@WebParam(name = "id") int id,
-			@WebParam(name = "user") String user)
-			throws ImageRepositoryException;
-
-	public void setUserByJpg(@WebParam(name = "jpg") String jpg,
-			@WebParam(name = "user") String user)
-			throws ImageRepositoryException;
-
-	public void setUserByFits(@WebParam(name = "fits") String fits,
 			@WebParam(name = "user") String user)
 			throws ImageRepositoryException;
 

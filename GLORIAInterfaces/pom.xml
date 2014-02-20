@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.gloria.gs.services</groupId>
-	<artifactId>GLORIAInterfaces</artifactId>
+	<artifactId>gloria-commons</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA Services Interfaces</name>
+	<name>gloria-commons</name>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
