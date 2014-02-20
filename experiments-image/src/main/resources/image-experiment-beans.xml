@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="image-context-service"
+		class="eu.gloria.gs.services.experiment.operations.ImageOperationContextService"
+		parent="experiment-context-service">
+		<property name="image" ref="imageRepository"></property>
+	</bean>
+
+	<bean id="image-operation-context" parent="operation-context">
+		<property name="contextService" ref="image-context-service"></property>
+	</bean>
+
+	<bean id="image-operation" parent="experiment-operation">
+		<property name="contextBeanName" value="image-operation-context"></property>
+	</bean>
+
+	<bean id="LoadImage" parent="image-operation">
+		<property name="description"
+			value="Loads an id of any image taken at a specified date"></property>
+		<property name="parameterNames">
+			<list>
+				<value>date</value>
+				<value>id</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="date"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.LoadImageFromRepository">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadObjectImage" parent="image-operation">
+		<property name="description"
+			value="Loads an id of an object image taken at a specified date"></property>
+		<property name="parameterNames">
+			<list>
+				<value>date</value>
+				<value>id</value>
+				<value>object</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="date"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.LoadObjectImageFromRepository">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="LoadImageUrls" parent="image-operation">
+		<property name="description"
+			value="Loads both JPG and FITS urls related to a certain image id"></property>
+		<property name="parameterNames">
+			<list>
+				<value>date</value>
+				<value>id</value>
+				<value>object</value>
+			</list>
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.LoadImageUrls">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>
