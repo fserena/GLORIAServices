@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.gloria.gs.services</groupId>
-	<artifactId>ServiceTools</artifactId>
+	<artifactId>service-tools</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA Service Tools</name>
 	<build>
@@ -31,6 +31,12 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.11</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
 			<version>${cxf.version}</version>
@@ -55,16 +61,6 @@
 			<version>2.7.8</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>SClientTools</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>GLORIAInterfaces</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
 		<!-- Spring framework -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -77,6 +73,16 @@
 					<groupId>org.springframework</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>gloria-commons</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>client-tools</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<parent>
