@@ -17,14 +17,43 @@ public class ImageEntry implements Serializable {
 	private int idimage;
 	private String user;
 	private Date date;
-	private String jpg;
-	private String fits;
+	private Integer jpg_gen;
+	private Integer fits_gen;
+	private String host;
 	private int rid;
 	private String local_id;
 	private String rt;
 	private String ccd;
 	private String target;
 	private double exposure;
+	
+	public Integer getJpg_gen() {
+		return jpg_gen;
+	}
+
+	public void setJpg_gen(Integer jpg_gen) {
+		this.jpg_gen = jpg_gen;
+	}
+
+	public Integer getFits_gen() {
+		return fits_gen;
+	}
+
+	public void setFits_gen(Integer fits_gen) {
+		this.fits_gen = fits_gen;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	public double getExposure() {
 		return exposure;
@@ -56,22 +85,6 @@ public class ImageEntry implements Serializable {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public String getJpg() {
-		return jpg;
-	}
-
-	public void setJpg(String jpg) {
-		this.jpg = jpg;
-	}
-
-	public String getFits() {
-		return fits;
-	}
-
-	public void setFits(String fits) {
-		this.fits = fits;
 	}
 
 	public int getRid() {

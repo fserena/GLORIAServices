@@ -7,49 +7,26 @@
 
 	<update id="create">
 		CREATE TABLE IF NOT EXISTS `image` (
-		`idimage` int(11)
-		NOT NULL AUTO_INCREMENT,
+		`idimage` int(11) NOT NULL AUTO_INCREMENT,
 		`rt` varchar(50) NOT NULL,
-		`user` varchar(40)
-		NOT NULL,
+		`user` varchar(40) NOT NULL,
 		`jpg` varchar(200) DEFAULT NULL,
 		`date` datetime NOT NULL,
 		`rid` int(11) DEFAULT NULL,
-		`exposure` double NOT NULL,
-		`local_id`
-		varchar(50) NOT NULL,
-		`ccd`
-		varchar(40) NOT
-		NULL,
-		`fits` varchar(200)
-		DEFAULT NULL,
+		`local_id` varchar(50) NOT NULL,
+		`ccd` varchar(40) NOT NULL,
+		`fits` varchar(200) DEFAULT NULL,
 		`target` text,
-		PRIMARY KEY
-		(`idimage`),
-		KEY `fk_image_rt`
-		(`rt`),
-		KEY `fk_image_user`
-		(`user`),
-		KEY
-		`fk_image_rid` (`rid`),
-		KEY
-		`fk_image_ccd` (`ccd`),
-		CONSTRAINT
-		`fk_image_rid` FOREIGN KEY (`rid`)
-		REFERENCES `reservation`
-		(`idreservation`) ON DELETE NO ACTION ON
-		UPDATE NO ACTION,
-		CONSTRAINT
-		`fk_image_rt` FOREIGN KEY (`rt`) REFERENCES
-		`rt` (`name`) ON DELETE
-		CASCADE ON UPDATE CASCADE,
-		CONSTRAINT
-		`fk_image_user` FOREIGN KEY
-		(`user`) REFERENCES `user` (`name`) ON
-		DELETE NO ACTION ON UPDATE NO
-		ACTION
-		) ENGINE=InnoDB AUTO_INCREMENT=29
-		DEFAULT CHARSET=utf8
+		`exposure` double NOT NULL,
+		`host` varchar(200) DEFAULT NULL,
+		`jpg_gen` int(1) DEFAULT NULL,
+		`fits_gen` int(1) DEFAULT NULL,		
+		PRIMARY KEY (`idimage`),
+		KEY `fk_image_rt` (`rt`),
+		KEY `fk_image_user` (`user`),
+		KEY `fk_image_rid` (`rid`),
+		KEY `fk_image_ccd` (`ccd`)
+		) ENGINE=InnoDB AUTO_INCREMENT=11223 DEFAULT CHARSET=utf8;
 	</update>
 
 	<select id="get"
@@ -64,15 +41,16 @@
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
 		`image`
-		WHERE NOT(jpg is NULL) ORDER BY RAND()
+		WHERE NOT(host is NULL) ORDER BY RAND()
 		LIMIT #{count_}
 	</select>
-	
+
 	<select id="getUserRandom"
 		resultType="eu.gloria.gs.services.repository.image.data.dbservices.ImageEntry">
 		SELECT * FROM
 		`image`
-		WHERE NOT(jpg is NULL) AND user=#{user_} ORDER BY RAND()
+		WHERE NOT(host is NULL) AND
+		user=#{user_} ORDER BY RAND()
 		LIMIT #{count_}
 	</select>
 
@@ -89,7 +67,8 @@
 		SELECT * FROM
 		`image`
 		WHERE
-		jpg=#{jpg_}
+		host=#{host_} AND local_id=#{lid_}
+		AND jpg_gen=1
 	</select>
 
 	<select id="getByFits"
@@ -97,7 +76,8 @@
 		SELECT * FROM
 		`image`
 		WHERE
-		fits=#{fits_}
+		host=#{host_} AND local_id=#{lid_}
+		AND fits_gen=1
 	</select>
 
 	<select id="getByRT"
@@ -191,7 +171,7 @@
 	<update id="setJpg">
 		UPDATE `image`
 		SET
-		jpg=#{jpg_}
+		host=#{host_}, jpg_gen=1
 		WHERE
 		idimage
 		=#{id_}
@@ -200,7 +180,7 @@
 	<update id="setFits">
 		UPDATE `image`
 		SET
-		fits=#{fits_}
+		host=#{host_}, fits_gen=1
 		WHERE
 		idimage
 		=#{id_}
@@ -209,7 +189,7 @@
 	<update id="setJpgByRTLocalId">
 		UPDATE `image`
 		SET
-		jpg=#{jpg_}
+		host=#{host_}, jpg_gen=1
 		WHERE
 		rt=#{rt_} AND
 		local_id=#{lid_}
@@ -218,7 +198,7 @@
 	<update id="setFitsByRTLocalId">
 		UPDATE `image`
 		SET
-		fits=#{fits_}
+		host=#{host_}, fits_gen=1
 		WHERE
 		rt=#{rt_} AND
 		local_id=#{lid_}
@@ -244,14 +224,14 @@
 		SELECT count(*)>0 FROM
 		`image`
 		WHERE
-		jpg=#{jpg_}
+		host=#{host_} AND local_id=#{lid_} AND jpg_gen=1
 	</select>
 
 	<select id="containsFits" resultType="boolean">
 		SELECT count(*)>0 FROM
 		`image`
 		WHERE
-		fits=#{fits_}
+		host=#{host_} AND local_id=#{lid_} AND fits_gen=1
 	</select>
 
 	<select id="containsRTLocalId" resultType="boolean">
@@ -266,7 +246,7 @@
 		SELECT * FROM
 		`image`
 		WHERE
-		jpg IS NULL AND fits is NULL
+		host IS NULL
 	</select>
 
 </mapper>

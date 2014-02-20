@@ -14,22 +14,27 @@ public interface ImageDBService {
 	public void create();
 
 	public ImageEntry get(@Param(value = "id_") int id);
-	
+
 	public List<ImageEntry> getRandom(@Param(value = "count_") int count);
-	
-	public List<ImageEntry> getUserRandom(@Param(value = "user_") String user, @Param(value = "count_") int count);
 
-	public ImageEntry getByFits(@Param(value = "fits_") String fits);
+	public List<ImageEntry> getUserRandom(@Param(value = "user_") String user,
+			@Param(value = "count_") int count);
 
-	public ImageEntry getByJpg(@Param(value = "jpg_") String jpg);
+	public ImageEntry getByFits(@Param(value = "host_") String host,
+			@Param(value = "lid_") String lid);
+
+	public ImageEntry getByJpg(@Param(value = "host_") String host,
+			@Param(value = "lid_") String lid);
 
 	public void save(ImageEntry entry);
 
 	public boolean contains(@Param(value = "id_") int id);
 
-	public boolean containsJpg(@Param(value = "jpg_") String jpg);
+	public boolean containsJpg(@Param(value = "host_") String host,
+			@Param(value = "lid_") String lid);
 
-	public boolean containsFits(@Param(value = "fits_") String fits);
+	public boolean containsFits(@Param(value = "host_") String host,
+			@Param(value = "lid_") String lid);
 
 	public boolean containsRTLocalId(@Param(value = "rt_") String rt,
 			@Param(value = "lid_") String lid);
@@ -43,17 +48,18 @@ public interface ImageDBService {
 			@Param(value = "user_") String user);
 
 	public void setJpg(@Param(value = "id_") int id,
-			@Param(value = "jpg_") String jpg);
+			@Param(value = "host_") String host);
 
 	public void setFits(@Param(value = "id_") int id,
-			@Param(value = "fits_") String fits);
+			@Param(value = "host_") String host);
 
 	public void setJpgByRTLocalId(@Param(value = "rt_") String rt,
-			@Param(value = "lid_") String lid, @Param(value = "jpg_") String jpg);
+			@Param(value = "lid_") String lid,
+			@Param(value = "host_") String host);
 
 	public void setFitsByRTLocalId(@Param(value = "rt_") String rt,
 			@Param(value = "lid_") String lid,
-			@Param(value = "fits_") String fits);
+			@Param(value = "host_") String host);
 
 	public void setTargetByRTLocalId(@Param(value = "rt_") String rt,
 			@Param(value = "lid_") String lid,

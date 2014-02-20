@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.gloria.gs.services</groupId>
-	<artifactId>ImageRepository</artifactId>
+	<artifactId>image-repository</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA Image Repository</name>
 	<build>
@@ -48,20 +48,20 @@
 
 
 		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>GLORIAInterfaces</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>RTSClient</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.11</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>gloria-commons</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>rts-client</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
