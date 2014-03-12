@@ -86,7 +86,13 @@ public interface ImageRepositoryInterface {
 
 	public List<Integer> getAllImageIdentifiersByDate(
 			@WebParam(name = "dateFrom") Date from,
-			@WebParam(name = "dateTo") Date to) throws ImageRepositoryException;
+			@WebParam(name = "dateTo") Date to, int limit)
+			throws ImageRepositoryException;
+
+	public List<Integer> getRandomImageIdentifiersByDate(
+			@WebParam(name = "dateFrom") Date from,
+			@WebParam(name = "dateTo") Date to, int limit)
+			throws ImageRepositoryException;
 
 	public List<Integer> getAllObjectImages(
 			@WebParam(name = "object") String object)

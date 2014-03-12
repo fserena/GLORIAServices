@@ -27,6 +27,10 @@ import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationAr
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.experiment.script.NoSuchScriptException;
+import eu.gloria.gs.services.experiment.script.OverlapRTScriptException;
+import eu.gloria.gs.services.experiment.script.data.RTScriptInformation;
+import eu.gloria.gs.services.repository.user.InvalidUserException;
 import eu.gloria.gs.services.utils.ObjectResponse;
 
 @WebService(name = "ExperimentInterface", targetNamespace = "http://experiment.services.gs.gloria.eu/")
@@ -218,8 +222,28 @@ public interface ExperimentInterface {
 			@WebParam(name = "reservationId") int reservationId)
 			throws ExperimentException, NoSuchReservationException;
 
-	public void resetExperimentContext(int reservationId) throws ExperimentException,
-			NoSuchReservationException, InvalidUserContextException,
-			ExperimentNotInstantiatedException;
+	public void resetExperimentContext(int reservationId)
+			throws ExperimentException, NoSuchReservationException,
+			InvalidUserContextException, ExperimentNotInstantiatedException;
 
+	public int registerRTScript(@WebParam(name = "telescope") String telescope,
+			@WebParam(name = "slot") ScriptSlot slot,
+			@WebParam(name = "operation") String operation,
+			@WebParam(name = "init") String init,
+			@WebParam(name = "result") String result,
+			@WebParam(name = "notify") boolean notify)
+			throws NoSuchExperimentException, ExperimentException,
+			OverlapRTScriptException, InvalidUserException;
+
+	public List<String> getRTScriptAvailableOperations(
+			@WebParam(name = "telescope") String telescope)
+			throws ExperimentException, NoSuchScriptException;
+
+	public RTScriptInformation getRTScriptInformation(int sid)
+			throws NoSuchScriptException, ExperimentException;
+
+	public List<Integer> getAllRTScripts(String rt) throws ExperimentException;
+
+	public void removeRTScript(int sid) throws NoSuchScriptException,
+			InvalidUserException, ExperimentException;
 }
