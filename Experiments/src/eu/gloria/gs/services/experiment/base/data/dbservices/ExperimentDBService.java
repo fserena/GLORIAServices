@@ -504,4 +504,5 @@ public interface ExperimentDBService {
 	public void setReservationStatus(@Param(value = "rid_") int rid,
 			@Param(value = "status_") String status);
 
+	public List<ReservationEntry> getAllReservationsShouldBeObsolete();
 }

@@ -1000,9 +1000,12 @@ public class RTSHandler implements ServerHandler {
 
 			boolean parked = rtsPort.mntIsParked(null, mount);
 			boolean slewing = rtsPort.mntIsSlewing(null, mount);
+			boolean tracking = rtsPort.mntGetTracking(null, mount);
 
 			if (parked)
 				return ActivityStateMount.PARKED;
+			if (tracking)
+				return ActivityStateMount.TRACKING;
 			if (slewing)
 				return ActivityStateMount.MOVING;
 
@@ -1202,8 +1205,8 @@ public class RTSHandler implements ServerHandler {
 			return sensor.getAlarmState().equals(AlarmState.WEATHER);
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(tempSensor,
-					DeviceType.TEMPERATURE_SENSOR.name(), "get temperature alarm",
-					e.getMessage());
+					DeviceType.TEMPERATURE_SENSOR.name(),
+					"get temperature alarm", e.getMessage());
 		}
 	}
 

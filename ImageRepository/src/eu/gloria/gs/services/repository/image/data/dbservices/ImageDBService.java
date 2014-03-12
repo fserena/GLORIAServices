@@ -77,8 +77,11 @@ public interface ImageDBService {
 			@Param(value = "from_") Date from, @Param(value = "to_") Date to);
 
 	public List<Integer> getAllBetweenDates(@Param(value = "from_") Date from,
-			@Param(value = "to_") Date to);
+			@Param(value = "to_") Date to, @Param(value = "limit_") int limit);
 
+	public List<Integer> getRandomBetweenDates(@Param(value = "from_") Date from,
+			@Param(value = "to_") Date to, @Param(value = "limit_") int limit);
+	
 	public List<ImageEntry> getByRT(@Param(value = "rt_") String rt);
 
 	public ImageEntry getByRTLocalId(@Param(value = "rt_") String rt,

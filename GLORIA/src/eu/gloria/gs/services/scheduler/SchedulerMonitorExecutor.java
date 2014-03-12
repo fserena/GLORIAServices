@@ -49,6 +49,13 @@ public class SchedulerMonitorExecutor extends ServerThread {
 	@Override
 	protected void doWork() {
 
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		GSClientProvider.setCredentials(this.username, this.password);
 
 		try {
@@ -63,13 +70,6 @@ public class SchedulerMonitorExecutor extends ServerThread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

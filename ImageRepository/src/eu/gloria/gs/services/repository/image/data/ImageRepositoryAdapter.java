@@ -416,7 +416,20 @@ public class ImageRepositoryAdapter {
 
 	public List<Integer> getAllImagesBetween(Date from, Date to, int limit) {
 
-		List<Integer> imageIds = imageService.getAllBetweenDates(from, to);
+		List<Integer> imageIds = imageService.getAllBetweenDates(from, to,
+				limit);
+
+		if (imageIds == null) {
+			imageIds = new ArrayList<>();
+		}
+
+		return imageIds;
+	}
+
+	public List<Integer> getRandomImagesBetween(Date from, Date to, int limit) {
+
+		List<Integer> imageIds = imageService.getRandomBetweenDates(from, to,
+				limit);
 
 		if (imageIds == null) {
 			imageIds = new ArrayList<>();

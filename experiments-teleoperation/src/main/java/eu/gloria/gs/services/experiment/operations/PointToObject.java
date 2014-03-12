@@ -16,6 +16,7 @@ import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.DeviceType;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.mount.MountTeleoperationException;
+import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -34,11 +35,14 @@ public class PointToObject extends TeleOperation {
 		try {
 			String rtNameParameter = (String) this.getArguments()[0];
 			String objectParameter = (String) this.getArguments()[1];
+			String trackingParameter = (String) this.getArguments()[2];
 
 			String rtName = (String) this.getContext().getExperimentContext()
 					.getParameterValue(rtNameParameter);
 			String object = (String) this.getContext().getExperimentContext()
 					.getParameterValue(objectParameter);
+			String tracking = (String) this.getContext().getExperimentContext()
+					.getParameterValue(trackingParameter);
 
 			GSClientProvider.setCredentials(this.getUsername(),
 					this.getPassword());
@@ -72,21 +76,25 @@ public class PointToObject extends TeleOperation {
 			if (mounts != null && mounts.size() > 0) {
 
 				String mountName = mounts.get(0);
+				try {
+					this.getMountTeleoperation().setTracking(rtName, mountName,
+							false);
+				} catch (DeviceOperationFailedException
+						| MountTeleoperationException e) {
+				}
 
 				try {
+					this.getMountTeleoperation().setTrackingRate(rtName,
+							mountName, TrackingRate.valueOf(tracking));
 
-					/*
-					 * this.getMountTeleoperation().setTrackingRate(rtName,
-					 * mountName, TrackingRate.DRIVE_SOLAR);
-					 * 
-					 * this.getMountTeleoperation().setTracking(rtName,
-					 * mountName, true);
-					 */
+					this.getMountTeleoperation().setTracking(rtName, mountName,
+							true);
 
-					/*
-					 * this.getMountTeleoperation().setSlewRate(rtName,
-					 * mountName, "CENTER");
-					 */
+				} catch (MountTeleoperationException
+						| DeviceOperationFailedException e) {
+				}
+
+				try {
 
 					this.getMountTeleoperation().slewToObject(rtName,
 							mountName, object);

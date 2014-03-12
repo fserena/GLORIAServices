@@ -16,12 +16,25 @@
 		<property name="sqlSessionFactory" ref="sql-experiment-session-factory" />
 	</bean>
 
+	<bean id="rt-script-mapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+			value="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptDBService" />
+		<property name="sqlSessionFactory" ref="sql-experiment-session-factory" />
+	</bean>
+
 	<bean id="experiment-adapter"
 		class="eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter"
 		scope="singleton" lazy-init="true">
 		<property name="experimentDBService" ref="experiment-mapper"></property>
 		<property name="parameterFactory" ref="parameter-factory"></property>
 		<property name="operationFactory" ref="operation-factory"></property>
+	</bean>
+
+	<bean id="rt-script-adapter"
+		class="eu.gloria.gs.services.experiment.script.data.RTScriptDBAdapter"
+		scope="singleton" lazy-init="true">
+		<property name="experimentDBService" ref="experiment-mapper"></property>
+		<property name="RTScriptDBService" ref="rt-script-mapper"></property>		
 	</bean>
 
 	<bean id="model-factory"

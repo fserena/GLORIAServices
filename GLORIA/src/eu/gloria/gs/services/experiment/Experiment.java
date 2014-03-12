@@ -1,6 +1,7 @@
 package eu.gloria.gs.services.experiment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +14,6 @@ import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.ExperimentInterface;
-import eu.gloria.gs.services.experiment.base.contexts.ContextNotReadyException;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContext;
 import eu.gloria.gs.services.experiment.base.contexts.ExperimentContextManager;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
@@ -45,8 +45,15 @@ import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeExcep
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.experiment.reservation.ExperimentBooker;
+import eu.gloria.gs.services.experiment.script.NoSuchScriptException;
+import eu.gloria.gs.services.experiment.script.OverlapRTScriptException;
+import eu.gloria.gs.services.experiment.script.data.RTScriptDBAdapter;
+import eu.gloria.gs.services.experiment.script.data.RTScriptInformation;
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.LogAction;
+import eu.gloria.gs.services.repository.rt.RTRepositoryException;
+import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
+import eu.gloria.gs.services.repository.user.InvalidUserException;
 import eu.gloria.gs.services.repository.user.UserRepositoryException;
 import eu.gloria.gs.services.repository.user.UserRepositoryInterface;
 import eu.gloria.gs.services.repository.user.data.UserInformation;
@@ -57,18 +64,24 @@ import eu.gloria.gs.services.utils.ObjectResponse;
 public class Experiment extends GSLogProducerService implements
 		ExperimentInterface {
 
-	private ExperimentDBAdapter adapter;
+	private ExperimentDBAdapter experimentAdapter;
+	private RTScriptDBAdapter scriptAdapter;
 	private ExperimentBooker experimentBooker;
 	private ExperimentModelManager modelManager;
 	private ExperimentContextManager contextManager;
 	private UserRepositoryInterface userRepository;
+	private RTRepositoryInterface rtRepository;
 
 	public Experiment() {
 		this.createLogger(Experiment.class);
 	}
 
-	public void setAdapter(ExperimentDBAdapter adapter) {
-		this.adapter = adapter;
+	public void setExperimentAdapter(ExperimentDBAdapter adapter) {
+		this.experimentAdapter = adapter;
+	}
+
+	public void setRTScriptAdapter(RTScriptDBAdapter adapter) {
+		this.scriptAdapter = adapter;
 	}
 
 	public void setBooker(ExperimentBooker booker) {
@@ -85,6 +98,10 @@ public class Experiment extends GSLogProducerService implements
 
 	public void setUserRepository(UserRepositoryInterface userRepository) {
 		this.userRepository = userRepository;
+	}
+
+	public void setRTRepository(RTRepositoryInterface rtRepository) {
+		this.rtRepository = rtRepository;
 	}
 
 	private void buildErrorLog(LogAction action, String origin,
@@ -177,7 +194,7 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentInformation expInfo;
 		try {
-			expInfo = adapter.getExperimentInformation(experiment);
+			expInfo = experimentAdapter.getExperimentInformation(experiment);
 			return expInfo;
 		} catch (ExperimentDatabaseException e) {
 			buildErrorLogFromException(action, e, "database");
@@ -196,7 +213,7 @@ public class Experiment extends GSLogProducerService implements
 
 		ParameterInformation paramInfo;
 		try {
-			paramInfo = adapter.getExperimentInformation(experiment)
+			paramInfo = experimentAdapter.getExperimentInformation(experiment)
 					.getParameter(parameter);
 			return paramInfo;
 		} catch (ExperimentDatabaseException e) {
@@ -214,7 +231,7 @@ public class Experiment extends GSLogProducerService implements
 		buildOperationLog(action, "set experiment description", experiment);
 
 		try {
-			adapter.setExperimentDescription(experiment, description);
+			experimentAdapter.setExperimentDescription(experiment, description);
 			this.logInfo(this.getClientUsername(), action);
 
 		} catch (ExperimentDatabaseException e) {
@@ -237,7 +254,7 @@ public class Experiment extends GSLogProducerService implements
 
 		List<String> experiments = null;
 		try {
-			experiments = adapter.getAllExperiments("ONLINE");
+			experiments = experimentAdapter.getAllExperiments("ONLINE");
 
 			if (experiments == null || experiments.size() == 0) {
 
@@ -263,7 +280,7 @@ public class Experiment extends GSLogProducerService implements
 
 		List<String> experiments = null;
 		try {
-			experiments = adapter.getAllExperiments("OFFLINE");
+			experiments = experimentAdapter.getAllExperiments("OFFLINE");
 
 			if (experiments == null || experiments.size() == 0) {
 				buildWarningLog(action, null, "logic", "no experiments");
@@ -289,7 +306,7 @@ public class Experiment extends GSLogProducerService implements
 
 		try {
 
-			return adapter.containsExperiment(experiment);
+			return experimentAdapter.containsExperiment(experiment);
 
 		} catch (ExperimentDatabaseException e) {
 			buildErrorLogFromException(action, e, "database");
@@ -366,18 +383,18 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			if (adminMode) {
 				if (type == null) {
-					resInfo = adapter.getAllPendingReservations();
+					resInfo = experimentAdapter.getAllPendingReservations();
 				} else {
-					resInfo = adapter.getAllPendingReservations(type);
+					resInfo = experimentAdapter.getAllPendingReservations(type);
 				}
 			} else {
 				if (type == null) {
-					resInfo = adapter.getUserPendingReservations(this
+					resInfo = experimentAdapter.getUserPendingReservations(this
 							.getClientUsername());
 
 				} else {
-					resInfo = adapter.getUserPendingReservations(type,
-							this.getClientUsername());
+					resInfo = experimentAdapter.getUserPendingReservations(
+							type, this.getClientUsername());
 				}
 			}
 
@@ -394,17 +411,20 @@ public class Experiment extends GSLogProducerService implements
 
 			if (adminMode) {
 				if (type == null) {
-					anyActiveNow = adapter.anyReservationActiveNow();
+					anyActiveNow = experimentAdapter.anyReservationActiveNow();
 				} else {
-					anyActiveNow = adapter.anyReservationActiveNow(type);
+					anyActiveNow = experimentAdapter
+							.anyReservationActiveNow(type);
 				}
 			} else {
 				if (type == null) {
-					anyActiveNow = adapter.anyUserReservationActiveNow(this
-							.getClientUsername());
+					anyActiveNow = experimentAdapter
+							.anyUserReservationActiveNow(this
+									.getClientUsername());
 				} else {
-					anyActiveNow = adapter.anyUserReservationActiveNow(type,
-							this.getClientUsername());
+					anyActiveNow = experimentAdapter
+							.anyUserReservationActiveNow(type,
+									this.getClientUsername());
 				}
 			}
 
@@ -541,17 +561,21 @@ public class Experiment extends GSLogProducerService implements
 
 			if (adminMode) {
 				if (type == null) {
-					reservations = adapter.getAllReservationsActiveNow();
+					reservations = experimentAdapter
+							.getAllReservationsActiveNow();
 				} else {
-					reservations = adapter.getAllReservationsActiveNow(type);
+					reservations = experimentAdapter
+							.getAllReservationsActiveNow(type);
 				}
 			} else {
 				if (type == null) {
-					reservations = adapter.getUserReservationsActiveNow(this
-							.getClientUsername());
+					reservations = experimentAdapter
+							.getUserReservationsActiveNow(this
+									.getClientUsername());
 				} else {
-					reservations = adapter.getUserReservationsActiveNow(type,
-							this.getClientUsername());
+					reservations = experimentAdapter
+							.getUserReservationsActiveNow(type,
+									this.getClientUsername());
 				}
 			}
 
@@ -680,14 +704,14 @@ public class Experiment extends GSLogProducerService implements
 		buildOperationLog(action, "reset context", reservationId);
 
 		try {
-			if (adapter.isReservationContextReady(reservationId)) {
-				adapter.deleteExperimentContext(reservationId);
-			} else if (adapter.reservationIsActiveNowForUser(reservationId,
-					getClientUsername())) {
+			if (experimentAdapter.isReservationContextReady(reservationId)) {
+				experimentAdapter.deleteExperimentContext(reservationId);
+			} else if (experimentAdapter.reservationIsActiveNowForUser(
+					reservationId, getClientUsername())) {
 				buildErrorLog(action, "logic", "invalid user");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new ExperimentNotInstantiatedException(action);
-			} else if (adapter.isReservationActiveNow(reservationId)) {
+			} else if (experimentAdapter.isReservationActiveNow(reservationId)) {
 				buildErrorLog(action, "logic", "invalid user");
 				this.logContextError(getClientUsername(), reservationId, action);
 				throw new InvalidUserContextException(action);
@@ -765,10 +789,10 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			boolean grantAccess;
 			if (adminMode) {
-				grantAccess = adapter.anyReservationActiveNow();
+				grantAccess = experimentAdapter.anyReservationActiveNow();
 			} else {
-				grantAccess = adapter.anyUserReservationActiveNow(this
-						.getClientUsername());
+				grantAccess = experimentAdapter
+						.anyUserReservationActiveNow(this.getClientUsername());
 			}
 
 			if (!grantAccess) {
@@ -783,7 +807,7 @@ public class Experiment extends GSLogProducerService implements
 		}
 
 		try {
-			if (!adapter.isReservationContextReady(reservationId)) {
+			if (!experimentAdapter.isReservationContextReady(reservationId)) {
 				buildErrorLogFromException(action, null, "logic",
 						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
@@ -797,7 +821,8 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentRuntimeInformation context;
 		try {
-			context = adapter.getExperimentRuntimeContext(reservationId);
+			context = experimentAdapter
+					.getExperimentRuntimeContext(reservationId);
 
 			return context;
 		} catch (ExperimentDatabaseException e) {
@@ -819,7 +844,8 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentInformation expInfo;
 		try {
-			expInfo = adapter.getBasicExperimentInformation(experiment);
+			expInfo = experimentAdapter
+					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
 				buildErrorLogFromException(action, null, "logic",
@@ -859,7 +885,7 @@ public class Experiment extends GSLogProducerService implements
 				parameter.getArguments());
 
 		try {
-			ExperimentInformation expInfo = adapter
+			ExperimentInformation expInfo = experimentAdapter
 					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
@@ -925,10 +951,11 @@ public class Experiment extends GSLogProducerService implements
 				objValue);
 
 		try {
-			if (!adapter.reservationIsActiveNowForUser(reservationId,
+			if (!experimentAdapter.reservationIsActiveNowForUser(reservationId,
 					this.getClientUsername())) {
 
-				boolean active = adapter.isReservationActiveNow(reservationId);
+				boolean active = experimentAdapter
+						.isReservationActiveNow(reservationId);
 
 				if (active) {
 					buildErrorLogFromException(action, null, "logic",
@@ -943,7 +970,7 @@ public class Experiment extends GSLogProducerService implements
 				throw new NoSuchReservationException(action);
 			}
 
-			if (!adapter.isReservationContextReady(reservationId)) {
+			if (!experimentAdapter.isReservationContextReady(reservationId)) {
 				buildErrorLogFromException(action, null, "logic",
 						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
@@ -987,13 +1014,14 @@ public class Experiment extends GSLogProducerService implements
 
 		try {
 
-			boolean active = adapter.isReservationActiveNow(reservationId);
+			boolean active = experimentAdapter
+					.isReservationActiveNow(reservationId);
 			boolean grantAccess;
 
 			if (adminMode) {
 				grantAccess = active;
 			} else {
-				grantAccess = adapter.reservationIsActiveNowForUser(
+				grantAccess = experimentAdapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
@@ -1010,7 +1038,7 @@ public class Experiment extends GSLogProducerService implements
 				throw new NoSuchReservationException(action);
 			}
 
-			if (!adapter.isReservationContextReady(reservationId)) {
+			if (!experimentAdapter.isReservationContextReady(reservationId)) {
 				buildErrorLogFromException(action, null, "logic",
 						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
@@ -1019,7 +1047,7 @@ public class Experiment extends GSLogProducerService implements
 
 			ExperimentContext context;
 
-			ReservationInformation resInfo = this.adapter
+			ReservationInformation resInfo = this.experimentAdapter
 					.getReservationInformation(reservationId);
 
 			context = contextManager.getContext(resInfo.getUser(),
@@ -1075,9 +1103,10 @@ public class Experiment extends GSLogProducerService implements
 
 			boolean grantAccess;
 			if (adminMode) {
-				grantAccess = adapter.isReservationActiveNow(reservationId);
+				grantAccess = experimentAdapter
+						.isReservationActiveNow(reservationId);
 			} else {
-				grantAccess = adapter.reservationIsActiveNowForUser(
+				grantAccess = experimentAdapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
@@ -1087,7 +1116,7 @@ public class Experiment extends GSLogProducerService implements
 				return false;
 			}
 
-			return adapter.isReservationContextReady(reservationId);
+			return experimentAdapter.isReservationContextReady(reservationId);
 
 		} catch (ExperimentDatabaseException e) {
 			buildErrorLogFromException(action, e, "database");
@@ -1112,9 +1141,10 @@ public class Experiment extends GSLogProducerService implements
 
 			boolean grantAccess;
 			if (adminMode) {
-				grantAccess = adapter.isReservationActiveNow(reservationId);
+				grantAccess = experimentAdapter
+						.isReservationActiveNow(reservationId);
 			} else {
-				grantAccess = adapter.reservationIsActiveNowForUser(
+				grantAccess = experimentAdapter.reservationIsActiveNowForUser(
 						reservationId, this.getClientUsername());
 			}
 
@@ -1124,7 +1154,7 @@ public class Experiment extends GSLogProducerService implements
 				throw new NoSuchReservationException(action);
 			}
 
-			if (!adapter.isReservationContextReady(reservationId)) {
+			if (!experimentAdapter.isReservationContextReady(reservationId)) {
 				buildErrorLogFromException(action, null, "logic",
 						"context not ready");
 				this.logContextError(getClientUsername(), reservationId, action);
@@ -1133,7 +1163,7 @@ public class Experiment extends GSLogProducerService implements
 
 			ExperimentContext context;
 
-			ReservationInformation resInfo = this.adapter
+			ReservationInformation resInfo = this.experimentAdapter
 					.getReservationInformation(reservationId);
 
 			context = contextManager.getContext(resInfo.getUser(),
@@ -1179,7 +1209,8 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentInformation expInfo;
 		try {
-			expInfo = adapter.getBasicExperimentInformation(experiment);
+			expInfo = experimentAdapter
+					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
 				buildErrorLogFromException(action, null, "logic",
@@ -1219,7 +1250,7 @@ public class Experiment extends GSLogProducerService implements
 		action.put("admin mode", adminMode);
 
 		try {
-			ReservationInformation reservationInfo = adapter
+			ReservationInformation reservationInfo = experimentAdapter
 					.getReservationInformation(reservationId);
 
 			if (!adminMode
@@ -1313,7 +1344,7 @@ public class Experiment extends GSLogProducerService implements
 		buildOperationLog(action, "get context results", reservationId);
 
 		try {
-			List<ResultInformation> results = adapter
+			List<ResultInformation> results = experimentAdapter
 					.getContextResults(reservationId);
 
 			return results;
@@ -1340,7 +1371,7 @@ public class Experiment extends GSLogProducerService implements
 		buildOperationLog(action, "get experiment results", experiment);
 
 		try {
-			List<ResultInformation> results = adapter
+			List<ResultInformation> results = experimentAdapter
 					.getExperimentResults(experiment);
 
 			return results;
@@ -1359,7 +1390,8 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentInformation expInfo;
 		try {
-			expInfo = adapter.getBasicExperimentInformation(experiment);
+			expInfo = experimentAdapter
+					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
 				buildErrorLogFromException(action, null, "logic",
@@ -1395,7 +1427,8 @@ public class Experiment extends GSLogProducerService implements
 
 		ExperimentInformation expInfo;
 		try {
-			expInfo = adapter.getBasicExperimentInformation(experiment);
+			expInfo = experimentAdapter
+					.getBasicExperimentInformation(experiment);
 
 			if (!expInfo.getAuthor().equals(this.getClientUsername())) {
 				buildErrorLogFromException(action, null, "logic",
@@ -1430,7 +1463,7 @@ public class Experiment extends GSLogProducerService implements
 		buildOperationLog(action, "empty experiment", experiment);
 
 		try {
-			adapter.emptyExperiment(experiment);
+			experimentAdapter.emptyExperiment(experiment);
 			contextManager.deleteExperimentContexts(experiment);
 
 			this.logInfo(getClientUsername(), action);
@@ -1440,5 +1473,132 @@ public class Experiment extends GSLogProducerService implements
 			throw new ExperimentException(action);
 		}
 
+	}
+
+	@Override
+	public int registerRTScript(String telescope, ScriptSlot scriptSlot,
+			String operation, String init, String result, boolean notify)
+			throws NoSuchExperimentException, ExperimentException,
+			OverlapRTScriptException, InvalidUserException {
+		LogAction action = new LogAction();
+		buildOperationLog(action, "register script", telescope, scriptSlot,
+				operation);
+
+		GSClientProvider.setCredentials(this.getUsername(), this.getPassword());
+
+		boolean adminMode = this.isAdminMode(action);
+
+		action.put("admin mode", adminMode);
+
+		if (!adminMode) {
+			throw new InvalidUserException(action);
+		}
+
+		String experiment = telescope + "Script";
+
+		try {
+			if (!experimentAdapter.containsExperiment(experiment)) {
+				throw new NoSuchExperimentException(action);
+			}
+
+			if (!rtRepository.containsRT(telescope)) {
+				action.put("wrong telescope", telescope);
+				throw new ExperimentException(action);
+			}
+
+			int sid = scriptAdapter.addRTScript(this.getClientUsername(),
+					experiment, telescope, operation, scriptSlot, init, result,
+					notify);
+
+			this.logInfo(getClientUsername(), action);
+
+			return sid;
+		} catch (ExperimentDatabaseException | RTRepositoryException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+	}
+
+	@Override
+	public RTScriptInformation getRTScriptInformation(int sid)
+			throws NoSuchScriptException, ExperimentException {
+		LogAction action = new LogAction();
+
+		try {
+			return scriptAdapter.getRTScriptInformation(sid);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+	}
+
+	@Override
+	public List<Integer> getAllRTScripts(String rt) throws ExperimentException {
+		LogAction action = new LogAction();
+
+		try {
+			return scriptAdapter.getAllRTScripts(rt);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+	}
+
+	@Override
+	public void removeRTScript(int sid) throws NoSuchScriptException,
+			InvalidUserException, ExperimentException {
+		LogAction action = new LogAction();
+
+		try {
+			RTScriptInformation scriptInfo = scriptAdapter
+					.getRTScriptInformation(sid);
+			if (scriptInfo == null) {
+				throw new NoSuchScriptException(sid);
+			}
+
+			if (!scriptInfo.getUsername().equals(this.getClientUsername())) {
+				throw new InvalidUserException("wrong user");
+			}
+
+			scriptAdapter.removeRTScript(sid);
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		}
+
+	}
+
+	@Override
+	public List<String> getRTScriptAvailableOperations(String telescope)
+			throws ExperimentException, NoSuchScriptException {
+
+		LogAction action = new LogAction();
+
+		try {
+			ExperimentInformation expInfo = experimentAdapter
+					.getExperimentInformation(telescope + "Script");
+
+			List<OperationInformation> operations = expInfo.getOperations();
+			List<String> names = new ArrayList<String>();
+
+			for (OperationInformation op : operations) {
+				names.add(op.getName());
+			}
+
+			return names;
+
+		} catch (ExperimentDatabaseException e) {
+			buildErrorLogFromException(action, e, "database");
+			this.logError(getClientUsername(), action);
+			throw new ExperimentException(action);
+		} catch (NoSuchExperimentException e) {
+			action.put("rt", telescope);
+			action.put("cause", "no experiment");
+			throw new NoSuchScriptException(action);
+		}
 	}
 }

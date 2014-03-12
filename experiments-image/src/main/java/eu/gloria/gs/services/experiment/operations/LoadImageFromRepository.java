@@ -56,7 +56,7 @@ public class LoadImageFromRepository extends ImageOperation {
 			int imageId = -1;
 			try {
 				imageIds = this.getImageRepository()
-						.getAllImageIdentifiersByDate(from, to);
+						.getAllImageIdentifiersByDate(from, to, 1);
 
 				if (imageIds != null) {
 					imageId = imageIds.get((int) (Math.random() * imageIds

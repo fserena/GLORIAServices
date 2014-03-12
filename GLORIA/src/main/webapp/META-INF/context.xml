@@ -34,6 +34,12 @@
 
     <ResourceLink global="jdbc/gloriaDB" name="jdbc/gloriaDB" type="javax.sql.DataSource" />
 
+    <ResourceLink global="hostEmailAddress" name="hostEmailAddress"
+		type="java.lang.String" />
+
+    <ResourceLink global="hostEmailPassword" name="hostEmailPassword"
+		type="java.lang.String" />
+
     <ResourceLink global="coreHostAddress" name="coreHostAddress"
 	type="java.lang.String" />
 

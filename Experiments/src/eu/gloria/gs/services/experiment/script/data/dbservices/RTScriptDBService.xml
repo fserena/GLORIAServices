@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptDBService">
+
+	<update id="createRTScriptTable">
+		CREATE TABLE IF NOT EXISTS `rt_script` (
+		`idrt_script` int(11) NOT NULL AUTO_INCREMENT,
+		`experiment` int(11) NOT
+		NULL,
+		`rt` varchar(50) NOT NULL,
+		`type` varchar(45) NOT NULL,
+		`operation` varchar(100) NOT NULL,
+		`begin` datetime NOT NULL,
+		`end`
+		datetime NOT NULL,
+		`status` varchar(1) NOT NULL,
+		`rid` int(11) DEFAULT
+		NULL,
+		`user` varchar(50) NOT NULL,
+		`init` text NOT NULL,
+		`notify` int(1)
+		NOT NULL,
+		PRIMARY KEY (`idrt_script`),
+		KEY `script_exp_fk_idx`
+		(`experiment`),
+		CONSTRAINT `script_exp_fk` FOREIGN KEY (`experiment`)
+		REFERENCES `experiment`
+		(`idexperiment`) ON DELETE CASCADE ON UPDATE
+		CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8
+	</update>
+
+	<update id="createRTScriptRidTable">
+		CREATE TABLE IF NOT EXISTS `rt_script_rid` (
+		`sid`
+		int(11) NOT NULL,
+		`rid` int(11) NOT NULL,
+		PRIMARY KEY (`sid`,`rid`),
+		KEY
+		`reservation_fk_idx` (`rid`),
+		CONSTRAINT `rt_script_fk_` FOREIGN KEY
+		(`sid`) REFERENCES `rt_script`
+		(`idrt_script`) ON DELETE CASCADE ON
+		UPDATE CASCADE,
+		CONSTRAINT `rt_reservation_fk_` FOREIGN KEY (`rid`)
+		REFERENCES `reservation`
+		(`idreservation`) ON DELETE NO ACTION ON
+		UPDATE NO ACTION
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+	</update>
+
+	<select id="getRTScript"
+		resultType="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptEntry">
+		SELECT * FROM
+		`rt_script`
+		WHERE
+		idrt_script=#{id_}
+	</select>
+
+	<insert id="saveRTScriptRid">
+		INSERT INTO
+		`rt_script_rid`
+		(sid, rid)
+		VALUE
+		(#{sid_},
+		#{rid_})
+	</insert>
+
+	<insert id="saveRTScript"
+		parameterType="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptEntry">
+		INSERT INTO
+		`rt_script`
+		(user, rt,
+		experiment, begin, end,
+		operation, type, status, init, notify)
+		VALUE (#{user},
+		#{rt},
+		#{experiment},
+		#{begin},
+		#{end},
+		#{operation}, #{type}, 'P', #{init},
+		#{notify})
+	</insert>
+
+	<select id="getScriptId" resultType="int">
+		SELECT *
+		FROM
+		`rt_script`
+		WHERE
+		begin=#{begin_} AND rt=#{rt_}
+	</select>
+
+	<select id="getAllRTScripts" resultType="int">
+		SELECT idrt_script
+		FROM
+		`rt_script`
+		WHERE rt=#{rt_}
+	</select>
+
+	<select id="getAllScriptRids" resultType="int">
+		SELECT rid
+		FROM
+		`rt_script_rid`
+		WHERE sid=#{sid_}
+	</select>
+
+	<select id="getAllDailyScriptsAt"
+		resultType="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptEntry">
+		SELECT *
+		FROM
+		`rt_script`
+		WHERE
+		TIME(begin) &lt;=
+		TIME(#{when_}) AND TIME(end)
+		&gt;=
+		TIME(#{when_}) AND type='DAILY'
+	</select>
+
+	<select id="getAllTimelyScriptsAt"
+		resultType="eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptEntry">
+		SELECT *
+		FROM
+		`rt_script`
+		WHERE
+		begin &lt;=
+		#{when_} AND end
+		&gt;=
+		#{when_} AND type='TIMELY'
+	</select>
+
+	<update id="setScriptStatus" parameterType="string">
+		UPDATE `rt_script`
+		SET
+		status=#{status_}
+		WHERE
+		idrt_script=#{sid_}
+	</update>
+
+	<update id="setReservation" parameterType="int">
+		UPDATE `rt_script`
+		SET
+		rid=#{rid_}
+		WHERE
+		idrt_script=#{sid_}
+	</update>
+
+	<select id="getScriptStatus" resultType="string">
+		SELECT status FROM
+		`rt_script`
+		WHERE
+		idrt_script=#{sid_}
+	</select>
+
+	<select id="anyRTScriptBetween" resultType="boolean">
+		SELECT
+		count(*)>0
+		FROM
+		`rt_script`
+		WHERE
+		rt=#{rt_} AND ((TIME(begin) &lt;
+		TIME(#{from_}) AND
+		TIME(end) &gt;
+		TIME(#{from_})) OR
+		(TIME(begin) &gt; TIME(#{from_}) AND
+		TIME(begin) &lt;
+		TIME(#{to_})) OR (TIME(begin) &lt;=
+		TIME(#{from_})
+		AND
+		TIME(end)
+		&gt;= TIME(#{to_})))
+	</select>
+
+	<delete id="removeScript">
+		DELETE FROM `rt_script`
+		WHERE
+		idrt_script=#{sid_}
+	</delete>
+
+	<update id="prepareAllDailyNotActive">
+		UPDATE `rt_script`
+		SET
+		status='P', rid=NULL
+		WHERE
+		(status != 'P' OR (rid IS NOT NULL))
+		AND
+		(TIME(begin) &gt;TIME(NOW()) OR
+		TIME(end) &lt;TIME(NOW())) AND
+		type='DAILY'
+	</update>
+
+</mapper>

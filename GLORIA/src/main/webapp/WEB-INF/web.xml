@@ -16,8 +16,7 @@
 		<description>Apache CXF Endpoint</description>
 		<display-name>cxf</display-name>
 		<servlet-name>cxf</servlet-name>
-		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet
-		</servlet-class>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -32,24 +31,22 @@
 		<param-value>WEB-INF/cxf-beans.xml</param-value>
 	</context-param>
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener
-		</listener-class>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eu.gloria.gs.services.experiment.ExperimentExecutorTask
-		</listener-class>
+		<listener-class>eu.gloria.gs.services.experiment.ExperimentExecutorTask</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eu.gloria.gs.services.repository.image.ImageExecutorTask
-		</listener-class>
+		<listener-class>eu.gloria.gs.services.experiment.RTScriptExecutorTask</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eu.gloria.gs.services.scheduler.SchedulerExecutorTask
-		</listener-class>
+		<listener-class>eu.gloria.gs.services.repository.image.ImageExecutorTask</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eu.gloria.gs.services.log.action.LogStoreExecutorTask
-		</listener-class>
+		<listener-class>eu.gloria.gs.services.scheduler.SchedulerExecutorTask</listener-class>
+	</listener>
+	<listener>
+		<listener-class>eu.gloria.gs.services.log.action.LogStoreExecutorTask</listener-class>
 	</listener>
 	<security-constraint>
 		<web-resource-collection>

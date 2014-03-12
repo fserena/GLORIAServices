@@ -111,7 +111,16 @@
 		WHERE date &gt;=
 		#{from_}
 		AND date
-		&lt;=#{to_}
+		&lt;=#{to_} LIMIT #{limit_}
+	</select>
+	
+	<select id="getRandomBetweenDates" resultType="int">
+		SELECT idimage FROM
+		`image`
+		WHERE date &gt;=
+		#{from_}
+		AND date
+		&lt;=#{to_} ORDER BY RAND() LIMIT #{limit_}
 	</select>
 
 	<select id="getAllObjectImages" resultType="int">

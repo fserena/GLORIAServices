@@ -367,7 +367,7 @@ public class ExperimentDBAdapter {
 		try {
 
 			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsBefore(new Date());
+					.getAllReservationsShouldBeObsolete();
 
 			for (ReservationEntry entry : reservationEntries) {
 				service.removeReservationContext(entry.getIdreservation());
@@ -1117,12 +1117,16 @@ public class ExperimentDBAdapter {
 	 * @param timeSlot
 	 * @throws ExperimentDatabaseException
 	 */
-	public void makeReservation(String experiment, List<String> telescopes,
-			String username, TimeSlot timeSlot)
+	public synchronized int makeReservation(String experiment,
+			List<String> telescopes, String username, TimeSlot timeSlot)
 			throws ExperimentDatabaseException {
 
 		try {
 			int experimentId = service.getExperimentId(experiment);
+
+			if (this.anyRTReservationBetween(telescopes, timeSlot)) {
+				throw new ExperimentDatabaseException("already reserved");
+			}
 
 			ReservationEntry reservationEntry = new ReservationEntry();
 
@@ -1145,6 +1149,8 @@ public class ExperimentDBAdapter {
 							reservationEntry.getIdreservation(), rt);
 				}
 			}
+
+			return reservationEntry.getIdreservation();
 
 		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException();

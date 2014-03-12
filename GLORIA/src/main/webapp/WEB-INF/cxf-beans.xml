@@ -411,7 +411,8 @@
 		address="/ExperimentPort">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.experiment.Experiment">
-				<property name="adapter" ref="experiment-adapter"></property>
+				<property name="experimentAdapter" ref="experiment-adapter"></property>
+				<property name="RTScriptAdapter" ref="rt-script-adapter"></property>
 				<property name="booker" ref="experiment-booker"></property>
 				<property name="contextManager" ref="context-manager"></property>
 				<property name="modelManager" ref="model-manager"></property>
@@ -419,6 +420,7 @@
 				<property name="password" ref="experimentPassword"></property>
 				<property name="logStore" ref="logStore"></property>
 				<property name="userRepository" ref="userRepository"></property>
+				<property name="RTRepository" ref="rtRepository"></property>
 			</bean>
 		</jaxws:implementor>
 		<jaxws:dataBinding>
@@ -489,6 +491,32 @@
 		<property name="genericTeleoperation" ref="genericTeleoperation"></property>
 		<property name="username" ref="experimentUsername"></property>
 		<property name="password" ref="experimentPassword"></property>
+	</bean>
+
+	<bean id="hostEmailAddress" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/hostEmailAddress" />
+	</bean>
+
+	<bean id="hostEmailPassword" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/hostEmailPassword" />
+	</bean>
+
+	<bean id="mailSender" class="eu.gloria.gs.services.experiment.SendMailSSL"
+		scope="singleton">
+		<property name="hostAddress" ref="hostEmailAddress"></property>
+		<property name="hostPassword" ref="hostEmailPassword"></property>
+	</bean>
+
+	<bean id="rtScriptExecutor" class="eu.gloria.gs.services.experiment.RTScriptExecutor"
+		scope="singleton" lazy-init="true">
+		<property name="experimentAdapter" ref="experiment-adapter"></property>
+		<property name="RTScriptAdapter" ref="rt-script-adapter"></property>
+		<property name="contextManager" ref="context-manager"></property>
+		<property name="logStore" ref="logStore"></property>
+		<property name="username" ref="experimentUsername"></property>
+		<property name="password" ref="experimentPassword"></property>
+		<property name="mailSender" ref="mailSender"></property>
+		<property name="imageRepository" ref="imageRepository"></property>
 	</bean>
 
 	<bean id="serverResolver" class="eu.gloria.gs.services.teleoperation.rts.RTSResolver"

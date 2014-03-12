@@ -570,6 +570,13 @@
 		&gt; #{from_} ORDER BY begin
 	</select>
 
+	<select id="getAllReservationsShouldBeObsolete"
+		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
+		SELECT * FROM
+		`reservation`
+		WHERE end &lt;= NOW() AND status !='OBSOLETE'
+	</select>
+
 	<select id="getAllReservationsFromByType"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">
 		SELECT * FROM

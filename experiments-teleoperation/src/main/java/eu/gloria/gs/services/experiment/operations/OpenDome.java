@@ -50,7 +50,9 @@ public class OpenDome extends TeleOperation {
 					this.getPassword());
 
 			this.getDomeTeleoperation().open(rtName, domeName);
-		} catch (DomeTeleoperationException | DeviceOperationFailedException e) {
+		} catch (DeviceOperationFailedException e) {
+
+		} catch (DomeTeleoperationException e) {
 			throw new ExperimentOperationException(e.getAction());
 		}
 	}

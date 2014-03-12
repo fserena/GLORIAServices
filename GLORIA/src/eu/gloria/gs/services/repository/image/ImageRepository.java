@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.repository.image;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -191,7 +192,10 @@ public class ImageRepository extends GSLogProducerService implements
 			@WebParam(name = "rid") int rid) throws ImageRepositoryException {
 
 		try {
-			return this.adapter.getImagesByReservation(rid, 100);
+			List<ImageInformation> images = this.adapter
+					.getImagesByReservation(rid, 100);
+
+			return images;
 		} catch (ImageDatabaseException e) {
 			throw new ImageRepositoryException(e.getAction());
 		}
@@ -206,9 +210,17 @@ public class ImageRepository extends GSLogProducerService implements
 	@Override
 	public List<Integer> getAllImageIdentifiersByDate(
 			@WebParam(name = "dateFrom") Date from,
-			@WebParam(name = "dateTo") Date to) {
+			@WebParam(name = "dateTo") Date to, int limit) {
 
-		return this.adapter.getAllImagesBetween(from, to, 100);
+		return this.adapter.getAllImagesBetween(from, to, limit);
+	}
+
+	@Override
+	public List<Integer> getRandomImageIdentifiersByDate(
+			@WebParam(name = "dateFrom") Date from,
+			@WebParam(name = "dateTo") Date to, int limit) {
+
+		return this.adapter.getRandomImagesBetween(from, to, limit);
 	}
 
 	/*

@@ -44,6 +44,34 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="Schedule" parent="basic-operation">
+		<property name="description"
+			value="">
+		</property>
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="pointer"></ref>
+			</list>
+		</property>
+		<property name="parameterNames">
+			<list>
+				<value>delay</value>
+				<value>operation</value>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry key="eu.gloria.gs.services.experiment.operations.Schedule">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
 
 	<bean id="SaveResult" parent="basic-operation">
 		<property name="description" value="Persists the value of a context parameter">
@@ -74,7 +102,7 @@
 		</property>
 		<property name="parameterTypes">
 			<list>
-				<ref bean="object"></ref>
+				<ref bean="pointer"></ref>
 			</list>
 		</property>
 		<property name="parameterNames">

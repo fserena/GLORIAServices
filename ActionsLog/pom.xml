@@ -63,9 +63,4 @@
 			<url>http://repo.springsource.org/release</url>
 		</repository>
 	</repositories>
-	<parent>
-		<groupId>eu.gloriaproject</groupId>
-		<artifactId>gloria</artifactId>
-		<version>1.0.0</version>
-	</parent>
 </project>

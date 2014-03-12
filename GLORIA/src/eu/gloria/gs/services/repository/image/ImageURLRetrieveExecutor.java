@@ -69,7 +69,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 		try {
 			if (thereArePending) {
-				Thread.sleep(100);
+				Thread.sleep(1000);
 				// System.out.println("Image daemon alive...images pending!");
 			} else {
 				Thread.sleep(1000);
@@ -146,7 +146,7 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 						action.put("retries", recoverRetries.get(gid));
 
-						if (recoverRetries.get(gid) == 10) {
+						if (recoverRetries.get(gid) == 20) {
 							try {
 								action.put("operation", "remove");
 								adapter.removeImage(imageInfo.getId());

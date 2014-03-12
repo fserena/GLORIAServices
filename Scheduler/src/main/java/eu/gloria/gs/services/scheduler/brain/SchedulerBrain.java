@@ -63,7 +63,7 @@ public class SchedulerBrain {
 
 		String user = op.getUser();
 
-		if (this.adapter.getUserActiveSchedulesCount(user) >= 5) {
+		if (this.adapter.getUserActiveSchedulesCount(user) >= 15) {
 			log.error(user + " has reached its maximum active plans");
 			throw new MaxUserSchedulesException();
 		}

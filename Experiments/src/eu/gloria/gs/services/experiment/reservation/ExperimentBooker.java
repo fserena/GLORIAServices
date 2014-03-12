@@ -108,7 +108,7 @@ public class ExperimentBooker {
 		return timeSlots;
 	}
 
-	public void reserve(String experiment, String username,
+	public synchronized void reserve(String experiment, String username,
 			List<String> telescopes, TimeSlot timeSlot, boolean adminMode)
 			throws NoReservationsAvailableException,
 			ExperimentReservationArgumentException,
@@ -165,9 +165,15 @@ public class ExperimentBooker {
 				}
 			}
 		}
+		
+		long limitMs = MILLISECONDS_PER_30MIN;
+		
+		if (adminMode) {
+			limitMs = limitMs * 4;
+		}
 
 		try {
-			if (msReserved + msReservation <= MILLISECONDS_PER_30MIN) {
+			if (msReserved + msReservation <= limitMs) {
 
 				if (!adapter.anyRTReservationBetween(telescopes, timeSlot)) {
 					adapter.makeReservation(experiment, telescopes, username,

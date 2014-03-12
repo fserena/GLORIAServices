@@ -18,7 +18,7 @@ import eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationException;
  * 
  */
 public class CloseDome extends TeleOperation {
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -50,7 +50,8 @@ public class CloseDome extends TeleOperation {
 					this.getPassword());
 
 			this.getDomeTeleoperation().close(rtName, domeName);
-		} catch (DomeTeleoperationException | DeviceOperationFailedException e) {
+		} catch (DeviceOperationFailedException e) {
+		} catch (DomeTeleoperationException e) {
 			throw new ExperimentOperationException(e.getAction());
 		}
 	}
