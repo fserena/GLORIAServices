@@ -20,6 +20,13 @@ public class LogStoreExecutor extends ServerThread {
 	private ActionLogInterface alog;
 	private String username;
 	private String password;
+	
+	/**
+	 * @param name
+	 */
+	public LogStoreExecutor() {
+		super(LogStoreExecutor.class.getSimpleName());
+	}
 
 	public void setLogStore(LogStore logStore) {
 		this.logStore = logStore;
@@ -86,6 +93,7 @@ public class LogStoreExecutor extends ServerThread {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
+			log.warn(e.getMessage());
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);

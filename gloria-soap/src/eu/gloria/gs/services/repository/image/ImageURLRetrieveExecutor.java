@@ -4,10 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
 import eu.gloria.gs.services.core.LogEntry;
@@ -33,11 +29,12 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	private String password;
 	private boolean thereArePending;
 	private Map<Integer, Integer> recoverRetries = null;
-	private static Logger log;
 
-	static {
-		log = LoggerFactory.getLogger(ImageURLRetrieveExecutor.class
-				.getSimpleName());
+	/**
+	 * @param name
+	 */
+	public ImageURLRetrieveExecutor() {
+		super(ImageURLRetrieveExecutor.class.getSimpleName());
 	}
 
 	public void setAdapter(ImageRepositoryAdapter adapter) {
@@ -70,12 +67,11 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		try {
 			if (thereArePending) {
 				Thread.sleep(1000);
-				// System.out.println("Image daemon alive...images pending!");
 			} else {
 				Thread.sleep(1000);
-				// System.out.println("Image daemon alive...no images pending!");
 			}
 		} catch (InterruptedException e) {
+			log.warn(e.getMessage());
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);
@@ -90,7 +86,6 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 			if (notUrlCompleted.size() > 0) {
 				preAction.put("pending", notUrlCompleted.size());
-				//log.info("Images with no URL: " + notUrlCompleted.size());
 			}
 
 		} catch (ImageDatabaseException e) {

@@ -3,10 +3,6 @@ package eu.gloria.gs.services.experiment;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
 import eu.gloria.gs.services.core.LogEntry;
@@ -35,8 +31,13 @@ public class ExperimentExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
-	protected Logger log = LoggerFactory.getLogger(ExperimentExecutor.class
-			.getSimpleName());
+
+	/**
+	 * @param name
+	 */
+	public ExperimentExecutor() {
+		super(ExperimentExecutor.class.getSimpleName());
+	}
 
 	public void setAdapter(ExperimentDBAdapter adapter) {
 		this.adapter = adapter;
@@ -68,7 +69,7 @@ public class ExperimentExecutor extends ServerThread {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			log.warn(e.getMessage());
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);

@@ -10,10 +10,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
 import eu.gloria.gs.services.core.LogEntry;
@@ -42,11 +38,16 @@ public class RTScriptExecutor extends ServerThread {
 	private LogStore logStore;
 	private String username;
 	private String password;
-	protected Logger log = LoggerFactory.getLogger(RTScriptExecutor.class
-			.getSimpleName());
 	private ExperimentContextManager manager;
 	private SendMailSSL mailSender;
 	private ImageRepositoryInterface image;
+
+	/**
+	 * @param name
+	 */
+	public RTScriptExecutor() {
+		super(RTScriptExecutor.class.getSimpleName());
+	}
 
 	private static Map<Integer, Future<?>> scriptTasks = new HashMap<Integer, Future<?>>();
 	private static ExecutorService pool = Executors.newCachedThreadPool();
@@ -243,7 +244,7 @@ public class RTScriptExecutor extends ServerThread {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			log.warn(e.getMessage());
 		}
 
 		GSClientProvider.setCredentials(this.username, this.password);

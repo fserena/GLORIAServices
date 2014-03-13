@@ -100,85 +100,85 @@
 	</bean>
 
 	<bean id="ccdTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="CCDTeleoperationPort"></property>
+		<property name="portName" value="ccd-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="rtRepositoryWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="RTRepositoryPort"></property>
+		<property name="portName" value="rt-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.rt.RTRepositoryInterface"></property>
 	</bean>
 
 	<bean id="userRepositoryWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="UserRepositoryPort"></property>
+		<property name="portName" value="user-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.user.UserRepositoryInterface"></property>
 	</bean>
 
 	<bean id="actionLogWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="ActionLogPort"></property>
+		<property name="portName" value="action-log"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.log.action.ActionLogInterface"></property>
 	</bean>
 
 	<bean id="domeTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="DomeTeleoperationPort"></property>
+		<property name="portName" value="dome-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="mountTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="MountTeleoperationPort"></property>
+		<property name="portName" value="mount-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="scamTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="SCamTeleoperationPort"></property>
+		<property name="portName" value="scam-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="focuserTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="FocuserTeleoperationPort"></property>
+		<property name="portName" value="focuser-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="weatherTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="WeatherTeleoperationPort"></property>
+		<property name="portName" value="weather-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="fwTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="FilterWheelTeleoperationPort"></property>
+		<property name="portName" value="fw-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="genericTeleoperationWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="GenericTeleoperationPort"></property>
+		<property name="portName" value="generic-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="experimentWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="ExperimentPort"></property>
+		<property name="portName" value="experiment"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.experiment.ExperimentInterface"></property>
 	</bean>
 
 	<bean id="imageRepositoryWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="ImageRepositoryPort"></property>
+		<property name="portName" value="image-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"></property>
 	</bean>
 
 	<bean id="schedulerWSClientFactory" parent="WSClientFactory">
-		<property name="portName" value="SchedulerPort"></property>
+		<property name="portName" value="scheduler"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.scheduler.SchedulerInterface"></property>
 	</bean>
@@ -261,8 +261,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://action.log.services.gs.gloria.eu/"
-		id="actionlogsrv" endpointName="tns:ActionLogPort" serviceName="tns:ActionLogService"
-		address="/ActionLogPort">
+		id="actionlogsrv" endpointName="tns:action-log" serviceName="tns:action-log-service"
+		address="/action-log">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.log.action.ActionLog">
 				<property name="adapter" ref="actionLogAdapter"></property>
@@ -300,8 +300,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://user.repository.services.gs.gloria.eu/"
-		id="userrepositorysrv" endpointName="tns:UserRepositoryPort"
-		serviceName="tns:UserRepositoryService" address="/UserRepositoryPort">
+		id="userrepositorysrv" endpointName="tns:user-repository"
+		serviceName="tns:user-repository-service" address="/user-repository">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.user.UserRepository">
 				<property name="adapter" ref="userAdapter"></property>
@@ -341,8 +341,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://rt.repository.services.gs.gloria.eu/"
-		id="rtrepositorysrv" endpointName="tns:RTRepositoryPort" serviceName="tns:RTRepositoryService"
-		address="/RTRepositoryPort">
+		id="rtrepositorysrv" endpointName="tns:rt-repository" serviceName="tns:RTRepositoryService"
+		address="/rt-repository">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.rt.RTRepository">
 				<property name="adapter" ref="rtAdapter"></property>
@@ -369,8 +369,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://image.repository.services.gs.gloria.eu/"
-		id="imagerepositorysrv" endpointName="tns:ImageRepositoryPort"
-		serviceName="tns:ImageRepositoryService" address="/ImageRepositoryPort">
+		id="imagerepositorysrv" endpointName="tns:image-repository"
+		serviceName="tns:image-repository-service" address="/image-repository">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.repository.image.ImageRepository">
 				<property name="adapter" ref="imageAdapter"></property>
@@ -407,8 +407,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://experiment.services.gs.gloria.eu/"
-		id="experimentsrv" endpointName="tns:ExperimentPort" serviceName="tns:ExperimentService"
-		address="/ExperimentPort">
+		id="experimentsrv" endpointName="tns:experiment" serviceName="tns:experiment-service"
+		address="/experiment">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.experiment.Experiment">
 				<property name="experimentAdapter" ref="experiment-adapter"></property>
@@ -441,8 +441,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://scheduler.services.gs.gloria.eu/"
-		id="schedulersrv" endpointName="tns:SchedulerPort" serviceName="tns:SchedulerService"
-		address="/SchedulerPort">
+		id="schedulersrv" endpointName="tns:scheduler" serviceName="tns:scheduler-service"
+		address="/scheduler">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.scheduler.Scheduler">
 				<property name="adapter" ref="schedulerAdapter"></property>
@@ -475,7 +475,6 @@
 	<bean id="schedulerMonitorExecutor"
 		class="eu.gloria.gs.services.scheduler.SchedulerMonitorExecutor"
 		scope="singleton">
-		<property name="adapter" ref="schedulerAdapter"></property>
 		<property name="brain" ref="schedulerBrain"></property>
 		<property name="logStore" ref="logStore"></property>
 		<property name="username" ref="imageRepositoryUsername"></property>
@@ -525,8 +524,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://scam.teleoperation.services.gs.gloria.eu/"
-		id="scamteleoperationsrvsrv" endpointName="tns:SCamTeleoperationPort"
-		serviceName="tns:SCamTeleoperationService" address="/SCamTeleoperationPort">
+		id="scamteleoperationsrvsrv" endpointName="tns:scam-teleoperation"
+		serviceName="tns:scam-teleoperation-service" address="/scam-teleoperation">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperation">
 				<property name="username" ref="teleoperationUsername"></property>
@@ -549,8 +548,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://mount.teleoperation.services.gs.gloria.eu/"
-		id="mountteleoperationsrv" endpointName="tns:MountTeleoperationPort"
-		serviceName="tns:MountTeleoperationService" address="/MountTeleoperationPort">
+		id="mountteleoperationsrv" endpointName="tns:mount-teleoperation"
+		serviceName="tns:mount-teleoperation-service" address="/mount-teleoperation">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.mount.MountTeleoperation">
 				<property name="username" ref="teleoperationUsername"></property>
@@ -573,8 +572,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://dome.teleoperation.services.gs.gloria.eu/"
-		id="dometeleoperationsrv" endpointName="tns:DomeTeleoperationPort"
-		serviceName="tns:DomeTeleoperationService" address="/DomeTeleoperationPort">
+		id="dometeleoperationsrv" endpointName="tns:dome-teleoperation"
+		serviceName="tns:dome-teleoperation-service" address="/dome-teleoperation">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperation">
 				<property name="username" ref="teleoperationUsername"></property>
@@ -639,8 +638,8 @@
 	</bean>
 
 	<jaxws:endpoint xmlns:tns="http://ccd.teleoperation.services.gs.gloria.eu/"
-		id="ccdteleoperationsrv" endpointName="tns:CCDTeleoperationPort"
-		serviceName="tns:CCDTeleoperationService" address="/CCDTeleoperationPort">
+		id="ccdteleoperationsrv" endpointName="tns:ccd-teleoperation"
+		serviceName="tns:ccd-teleoperation-service" address="/ccd-teleoperation">
 		<jaxws:implementor>
 			<bean class="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperation">
 				<property name="username" ref="teleoperationUsername"></property>
@@ -664,8 +663,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://focuser.teleoperation.services.gs.gloria.eu/"
-		id="focuserteleoperationsrv" endpointName="tns:FocuserTeleoperationPort"
-		serviceName="tns:FocuserTeleoperationService" address="/FocuserTeleoperationPort">
+		id="focuserteleoperationsrv" endpointName="tns:focuser-teleoperation"
+		serviceName="tns:focuser-teleoperation-service" address="/focuser-teleoperation">
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperation">
@@ -689,8 +688,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://weather.teleoperation.services.gs.gloria.eu/"
-		id="weatherteleoperationsrv" endpointName="tns:WeatherTeleoperationPort"
-		serviceName="tns:WeatherTeleoperationService" address="/WeatherTeleoperationPort">
+		id="weatherteleoperationsrv" endpointName="tns:weather-teleoperation"
+		serviceName="tns:weather-teleoperation-service" address="/weather-teleoperation">
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperation">
@@ -714,8 +713,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://fw.teleoperation.services.gs.gloria.eu/"
-		id="fwrteleoperationsrv" endpointName="tns:FilterWheelTeleoperationPort"
-		serviceName="tns:FilterWeelTeleoperationService" address="/FilterWheelTeleoperationPort">
+		id="fwrteleoperationsrv" endpointName="tns:fw-teleoperation"
+		serviceName="tns:fw-teleoperation-service" address="/fw-teleoperation">
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperation">
@@ -739,8 +738,8 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint xmlns:tns="http://generic.teleoperation.services.gs.gloria.eu/"
-		id="genericteleoperationsrv" endpointName="tns:CCDTeleoperationPort"
-		serviceName="tns:GenericTeleoperationService" address="/GenericTeleoperationPort">
+		id="genericteleoperationsrv" endpointName="tns:generic-teleoperation"
+		serviceName="tns:generic-teleoperation-service" address="/generic-teleoperation">
 		<jaxws:implementor>
 			<bean
 				class="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperation">

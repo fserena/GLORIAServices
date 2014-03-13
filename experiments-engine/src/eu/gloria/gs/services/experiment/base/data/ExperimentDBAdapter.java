@@ -6,16 +6,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
-import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
-import eu.gloria.gs.services.experiment.base.data.ExperimentRuntimeInformation;
-import eu.gloria.gs.services.experiment.base.data.ExperimentType;
-import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
-import eu.gloria.gs.services.experiment.base.data.OperationInformation;
-import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
-import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
-import eu.gloria.gs.services.experiment.base.data.TimeSlot;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ContextEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentDBService;
@@ -26,10 +19,10 @@ import eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ResultEntry;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationFactory;
-import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
@@ -45,12 +38,14 @@ public class ExperimentDBAdapter {
 	private ExperimentDBService service;
 	private ExperimentParameterFactory parameterFactory;
 	private ExperimentOperationFactory operationFactory;
+	private Logger log = LoggerFactory.getLogger(ExperimentDBAdapter.class
+			.getSimpleName());
 
 	/**
 	 * 
 	 */
 	public ExperimentDBAdapter() {
-
+		log.info("ExperimentDBAdapter created");
 	}
 
 	/**
@@ -75,11 +70,15 @@ public class ExperimentDBAdapter {
 				entry.setOperation(operationInfo.getName());
 
 				service.saveExperimentOperation(entry);
-
-			} else
-				throw new NoSuchExperimentException(experiment);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
+			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -110,69 +109,14 @@ public class ExperimentDBAdapter {
 
 				entry.setType(type);
 				service.saveExperimentParameter(entry);
-
-			} else
-				throw new NoSuchExperimentException(experiment);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
+			}
 
 		} catch (PersistenceException | IOException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	public void removeExperimentParameter(String experiment, String paramName)
-			throws ExperimentDatabaseException, NoSuchExperimentException {
-
-		try {
-
-			if (service.containsExperiment(experiment)) {
-
-				int experimentId = service.getExperimentId(experiment);
-
-				service.removeDependantOperations(experimentId, paramName);
-				service.removeExperimentParameter(experimentId, paramName);
-				service.removeExperimentContexts(experimentId);
-			} else
-				throw new NoSuchExperimentException(experiment);
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	public void removeExperimentOperation(String experiment, String opName)
-			throws ExperimentDatabaseException, NoSuchExperimentException {
-
-		try {
-
-			if (service.containsExperiment(experiment)) {
-
-				int experimentId = service.getExperimentId(experiment);
-				service.removeExperimentOperation(experimentId, opName);
-				service.removeExperimentContexts(experimentId);
-			} else
-				throw new NoSuchExperimentException(experiment);
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	public void emptyExperiment(String experiment)
-			throws ExperimentDatabaseException, NoSuchExperimentException {
-
-		try {
-
-			if (service.containsExperiment(experiment)) {
-
-				int experimentId = service.getExperimentId(experiment);
-
-				service.removeAllExperimentOperations(experimentId);
-				service.removeAllExperimentParameters(experimentId);
-				service.removeExperimentContexts(experimentId);
-			} else
-				throw new NoSuchExperimentException(experiment);
-
-		} catch (PersistenceException e) {
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -203,21 +147,63 @@ public class ExperimentDBAdapter {
 					entry.setValue(null);
 
 					service.saveParameterContext(entry);
-
 				} else {
 					ExperimentDatabaseException ex = new ExperimentDatabaseException(
 							"parameter does not exist");
 					ex.getAction().put("name", parameter);
 					ex.getAction().put("rid", rid);
 
+					log.warn(ex.getAction().toString());
 					throw ex;
 				}
-			} else
-				throw new NoSuchExperimentException(experiment);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
+			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean anyReservationActiveNow() throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.anyReservationAt(new Date());
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+
+		return anyActive;
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean anyReservationActiveNow(String type)
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.anyReservationAtByType(type, new Date());
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+
+		return anyActive;
 	}
 
 	/**
@@ -242,6 +228,7 @@ public class ExperimentDBAdapter {
 				}
 			}
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -249,71 +236,19 @@ public class ExperimentDBAdapter {
 	}
 
 	/**
+	 * @param username
 	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public boolean isReservationActiveNow(int rid)
+	public boolean anyUserReservationActiveNow(String username)
 			throws ExperimentDatabaseException {
 
 		boolean anyActive = false;
 		try {
-			anyActive = service.isReservationActiveNow(rid, new Date());
+			anyActive = service.anyUserReservationAt(username, new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-
-		return anyActive;
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 */
-	public boolean reservationIsActiveNowForUser(int rid, String user)
-			throws ExperimentDatabaseException {
-
-		boolean anyActive = false;
-		try {
-			anyActive = service.isReservationActiveNowForUser(rid, user,
-					new Date());
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-
-		return anyActive;
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 */
-	public boolean anyReservationActiveNow(String type)
-			throws ExperimentDatabaseException {
-
-		boolean anyActive = false;
-		try {
-			anyActive = service.anyReservationAtByType(type, new Date());
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-
-		return anyActive;
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 */
-	public boolean anyReservationActiveNow() throws ExperimentDatabaseException {
-
-		boolean anyActive = false;
-		try {
-			anyActive = service.anyReservationAt(new Date());
-
-		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -334,25 +269,7 @@ public class ExperimentDBAdapter {
 					new Date());
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-
-		return anyActive;
-	}
-
-	/**
-	 * @param username
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 */
-	public boolean anyUserReservationActiveNow(String username)
-			throws ExperimentDatabaseException {
-
-		boolean anyActive = false;
-		try {
-			anyActive = service.anyUserReservationAt(username, new Date());
-
-		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -376,6 +293,7 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -397,6 +315,7 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -414,26 +333,11 @@ public class ExperimentDBAdapter {
 		try {
 			alreadyContained = service.containsExperiment(experiment);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
 		return alreadyContained;
-	}
-
-	/**
-	 * @param experiment
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 */
-	public String getExperimentType(String experiment)
-			throws ExperimentDatabaseException {
-
-		try {
-			ExperimentEntry expEntry = service.getExperiment(experiment);
-			return expEntry.getType();
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
 	}
 
 	/**
@@ -460,11 +364,15 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
 		if (alreadyContained) {
-			throw new DuplicateExperimentException(experiment);
+			DuplicateExperimentException e = new DuplicateExperimentException(
+					experiment);
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -480,9 +388,13 @@ public class ExperimentDBAdapter {
 			if (service.containsExperiment(experiment)) {
 				service.removeExperiment(experiment);
 			} else {
-				throw new NoSuchExperimentException(experiment);
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
 			}
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -499,6 +411,7 @@ public class ExperimentDBAdapter {
 
 			service.removeReservationContext(rid);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -515,6 +428,32 @@ public class ExperimentDBAdapter {
 			service.removeReservation(rid);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	public void emptyExperiment(String experiment)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+
+				service.removeAllExperimentOperations(experimentId);
+				service.removeAllExperimentParameters(experimentId);
+				service.removeExperimentContexts(experimentId);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error("Trying to empty experiment: " + e.getMessage());
+				throw e;
+			}
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -532,10 +471,111 @@ public class ExperimentDBAdapter {
 			experiments = service.getAllTypeExperiments(type);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
 		return experiments;
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllPendingReservations()
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsFrom(new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("pending");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllPendingReservations(String type)
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsFromByType(type, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("pending");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllReservationsActiveNow()
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsAt(new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("active");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 * @throws NoReservationsAvailableException
+	 */
+	public List<ReservationInformation> getAllReservationsActiveNow(String type)
+			throws ExperimentDatabaseException,
+			NoReservationsAvailableException {
+
+		try {
+			List<ReservationEntry> reservationEntries = service
+					.getAllReservationsAtByType(type, new Date());
+
+			if (reservationEntries == null || reservationEntries.size() == 0) {
+				throw new NoReservationsAvailableException("active");
+			}
+
+			return this.processReservationEntries(reservationEntries);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
 	}
 
 	/**
@@ -561,10 +601,52 @@ public class ExperimentDBAdapter {
 				return expInfo;
 			}
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
 		throw new NoSuchExperimentException(experiment);
+	}
+
+	public List<ResultInformation> getContextResults(int context)
+			throws ExperimentDatabaseException, NoSuchReservationException {
+
+		try {
+
+			List<ResultInformation> results = new ArrayList<>();
+
+			List<ResultEntry> contextResults = service
+					.getContextResults(context);
+
+			ReservationEntry resEntry = service.getReservationById(context);
+
+			if (resEntry == null) {
+
+				NoSuchReservationException e = new NoSuchReservationException(
+						context);
+				log.warn("Getting context results: " + e.getMessage());
+				throw e;
+			}
+
+			int expId = resEntry.getExperiment();
+			String experiment = service.getExperimentById(expId).getName();
+
+			for (ResultEntry res : contextResults) {
+				ResultInformation resInfo = new ResultInformation();
+				resInfo.setDate(res.getDate());
+				resInfo.setExperiment(experiment);
+				resInfo.setReservationId(context);
+				resInfo.setUser(res.getUser());
+				resInfo.setValue(res.getValue());
+
+				results.add(resInfo);
+			}
+
+			return results;
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
 	}
 
 	/**
@@ -692,16 +774,18 @@ public class ExperimentDBAdapter {
 						}
 
 					} else {
-						throw new ParameterTypeNotAvailableException(
+						ParameterTypeNotAvailableException e = new ParameterTypeNotAvailableException(
 								experiment, parameterEntry.getParameter(),
 								typePattern);
+						log.error(e.getMessage());
+						throw e;
 					}
 
 					paramInfo.setType(parameterType);
 					paramInfo.setParameter(parameterFactory
 							.createParameter(parameterType));
 
-					paramInfo.setArguments((String[]) arguments);
+					paramInfo.setArguments(arguments);
 					parameters.add(paramInfo);
 				}
 
@@ -711,10 +795,44 @@ public class ExperimentDBAdapter {
 				| ParameterTypeNotAvailableException
 				| ExperimentParameterException
 				| OperationTypeNotAvailableException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
 		throw new NoSuchExperimentException(experiment);
+	}
+
+	public List<ResultInformation> getExperimentResults(String experiment)
+			throws ExperimentDatabaseException {
+
+		try {
+
+			List<ResultInformation> results = new ArrayList<>();
+
+			List<Integer> contexts = service
+					.getAllExperimentContexts(experiment);
+
+			for (Integer context : contexts) {
+				List<ResultEntry> contextResults = service
+						.getContextResults(context);
+
+				for (ResultEntry res : contextResults) {
+					ResultInformation resInfo = new ResultInformation();
+					resInfo.setDate(res.getDate());
+					resInfo.setExperiment(experiment);
+					resInfo.setReservationId(context);
+					resInfo.setUser(res.getUser());
+					resInfo.setValue(res.getValue());
+
+					results.add(resInfo);
+				}
+			}
+
+			return results;
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
 	}
 
 	/**
@@ -748,6 +866,24 @@ public class ExperimentDBAdapter {
 			return runtimeContext;
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @param experiment
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public String getExperimentType(String experiment)
+			throws ExperimentDatabaseException {
+
+		try {
+			ExperimentEntry expEntry = service.getExperiment(experiment);
+			return expEntry.getType();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -768,7 +904,11 @@ public class ExperimentDBAdapter {
 		try {
 
 			if (!service.isReservationContextInstantiated(rid)) {
-				throw new ExperimentNotInstantiatedException(rid);
+
+				ExperimentNotInstantiatedException e = new ExperimentNotInstantiatedException(
+						rid);
+				log.error(e.getMessage());
+				throw e;
 			}
 
 			ReservationEntry resEntry = service.getReservationById(rid);
@@ -783,10 +923,14 @@ public class ExperimentDBAdapter {
 						parameterEntry.getIdparameter(), rid);
 
 			} else {
-				throw new ExperimentDatabaseException("parameter problem");
+				ExperimentDatabaseException e = new ExperimentDatabaseException(
+						"parameter problem");
+				log.error(e.getMessage());
+				throw e;
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -831,11 +975,16 @@ public class ExperimentDBAdapter {
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
-		if (reservation == null)
-			throw new NoSuchReservationException(rid);
+		if (reservation == null) {
+
+			NoSuchReservationException e = new NoSuchReservationException(rid);
+			log.error(e.getMessage());
+			throw e;
+		}
 
 		return reservation;
 	}
@@ -861,6 +1010,7 @@ public class ExperimentDBAdapter {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -886,135 +1036,7 @@ public class ExperimentDBAdapter {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	/**
-	 * @param username
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 * @throws NoReservationsAvailableException
-	 */
-	public List<ReservationInformation> getAllPendingReservations(String type)
-			throws ExperimentDatabaseException,
-			NoReservationsAvailableException {
-
-		try {
-			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsFromByType(type, new Date());
-
-			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("pending");
-			}
-
-			return this.processReservationEntries(reservationEntries);
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	/**
-	 * @param username
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 * @throws NoReservationsAvailableException
-	 */
-	public List<ReservationInformation> getAllPendingReservations()
-			throws ExperimentDatabaseException,
-			NoReservationsAvailableException {
-
-		try {
-			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsFrom(new Date());
-
-			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("pending");
-			}
-
-			return this.processReservationEntries(reservationEntries);
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	private List<ReservationInformation> processReservationEntries(
-			List<ReservationEntry> entries) {
-
-		List<ReservationInformation> reservations = null;
-
-		reservations = new ArrayList<ReservationInformation>();
-
-		for (ReservationEntry entry : entries) {
-			ReservationInformation reservation = new ReservationInformation();
-
-			String experimentName = (service.getExperimentById(entry
-					.getExperiment())).getName();
-			reservation.setExperiment(experimentName);
-
-			List<String> telescopes = service.getAllRTOfReservation(entry
-					.getIdreservation());
-			reservation.setTelescopes(telescopes);
-			reservation.setUser(entry.getUser());
-			reservation.setStatus(entry.getStatus());
-
-			TimeSlot timeSlot = new TimeSlot();
-			timeSlot.setBegin(entry.getBegin());
-			timeSlot.setEnd(entry.getEnd());
-
-			reservation.setTimeSlot(timeSlot);
-			reservation.setReservationId(entry.getIdreservation());
-
-			reservations.add(reservation);
-		}
-
-		return reservations;
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 * @throws NoReservationsAvailableException
-	 */
-	public List<ReservationInformation> getAllReservationsActiveNow()
-			throws ExperimentDatabaseException,
-			NoReservationsAvailableException {
-
-		try {
-			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsAt(new Date());
-
-			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("active");
-			}
-
-			return this.processReservationEntries(reservationEntries);
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	/**
-	 * @return
-	 * @throws ExperimentDatabaseException
-	 * @throws NoReservationsAvailableException
-	 */
-	public List<ReservationInformation> getAllReservationsActiveNow(String type)
-			throws ExperimentDatabaseException,
-			NoReservationsAvailableException {
-
-		try {
-			List<ReservationEntry> reservationEntries = service
-					.getAllReservationsAtByType(type, new Date());
-
-			if (reservationEntries == null || reservationEntries.size() == 0) {
-				throw new NoReservationsAvailableException("active");
-			}
-
-			return this.processReservationEntries(reservationEntries);
-		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1040,6 +1062,7 @@ public class ExperimentDBAdapter {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1065,8 +1088,28 @@ public class ExperimentDBAdapter {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
+	}
+
+	/**
+	 * @return
+	 * @throws ExperimentDatabaseException
+	 */
+	public boolean isReservationActiveNow(int rid)
+			throws ExperimentDatabaseException {
+
+		boolean anyActive = false;
+		try {
+			anyActive = service.isReservationActiveNow(rid, new Date());
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+
+		return anyActive;
 	}
 
 	/**
@@ -1106,6 +1149,7 @@ public class ExperimentDBAdapter {
 					&& paramsInContext == parameters.size();
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1153,36 +1197,132 @@ public class ExperimentDBAdapter {
 			return reservationEntry.getIdreservation();
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	private List<ReservationInformation> processReservationEntries(
+			List<ReservationEntry> entries) {
+
+		List<ReservationInformation> reservations = null;
+
+		reservations = new ArrayList<ReservationInformation>();
+
+		for (ReservationEntry entry : entries) {
+			ReservationInformation reservation = new ReservationInformation();
+
+			String experimentName = (service.getExperimentById(entry
+					.getExperiment())).getName();
+			reservation.setExperiment(experimentName);
+
+			List<String> telescopes = service.getAllRTOfReservation(entry
+					.getIdreservation());
+			reservation.setTelescopes(telescopes);
+			reservation.setUser(entry.getUser());
+			reservation.setStatus(entry.getStatus());
+
+			TimeSlot timeSlot = new TimeSlot();
+			timeSlot.setBegin(entry.getBegin());
+			timeSlot.setEnd(entry.getEnd());
+
+			reservation.setTimeSlot(timeSlot);
+			reservation.setReservationId(entry.getIdreservation());
+
+			reservations.add(reservation);
+		}
+
+		return reservations;
+	}
+
+	public void removeExperimentOperation(String experiment, String opName)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+				service.removeExperimentOperation(experimentId, opName);
+				service.removeExperimentContexts(experimentId);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
+			}
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	public void removeExperimentParameter(String experiment, String paramName)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		try {
+
+			if (service.containsExperiment(experiment)) {
+
+				int experimentId = service.getExperimentId(experiment);
+
+				service.removeDependantOperations(experimentId, paramName);
+				service.removeExperimentParameter(experimentId, paramName);
+				service.removeExperimentContexts(experimentId);
+			} else {
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
+			}
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
 
 	/**
-	 * @param rid
+	 * @return
 	 * @throws ExperimentDatabaseException
 	 */
-	public void setContextReady(int rid) throws ExperimentDatabaseException {
+	public boolean reservationIsActiveNowForUser(int rid, String user)
+			throws ExperimentDatabaseException {
 
+		boolean anyActive = false;
 		try {
-
-			service.setReservationStatus(rid, "READY");
+			anyActive = service.isReservationActiveNowForUser(rid, user,
+					new Date());
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
+
+		return anyActive;
 	}
 
-	/**
-	 * @param rid
-	 * @throws ExperimentDatabaseException
-	 */
-	public void setContextInit(int rid) throws ExperimentDatabaseException {
+	public void saveResult(int reservationId, String tag, String user,
+			Object value) throws ExperimentDatabaseException {
 
 		try {
 
-			service.setReservationStatus(rid, "INIT");
+			int experimentId = service.getReservationById(reservationId)
+					.getExperiment();
+			int tagId = service.getExperimentParameter(experimentId, tag)
+					.getIdparameter();
+
+			ResultEntry entry = new ResultEntry();
+			entry.setDate(new Date());
+			entry.setValue(value);
+			entry.setUser(user);
+			entry.setTag(tagId);
+			entry.setContext(reservationId);
+			service.saveResult(entry);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1198,6 +1338,23 @@ public class ExperimentDBAdapter {
 			service.setReservationStatus(rid, "ERROR");
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @param rid
+	 * @throws ExperimentDatabaseException
+	 */
+	public void setContextInit(int rid) throws ExperimentDatabaseException {
+
+		try {
+
+			service.setReservationStatus(rid, "INIT");
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1213,35 +1370,24 @@ public class ExperimentDBAdapter {
 			service.setReservationStatus(rid, "OBSOLETE");
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
 
 	/**
-	 * @param experiment
-	 * @param description
+	 * @param rid
 	 * @throws ExperimentDatabaseException
-	 * @throws NoSuchExperimentException
 	 */
-	public void setExperimentDescription(String experiment, String description)
-			throws ExperimentDatabaseException, NoSuchExperimentException {
-
-		boolean alreadyContained = false;
+	public void setContextReady(int rid) throws ExperimentDatabaseException {
 
 		try {
-			if (service.containsExperiment(experiment)) {
 
-				alreadyContained = true;
-				service.setExperimentDescription(experiment, description);
-
-			}
+			service.setReservationStatus(rid, "READY");
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
-		}
-
-		if (!alreadyContained) {
-			throw new NoSuchExperimentException(experiment);
 		}
 	}
 
@@ -1266,8 +1412,42 @@ public class ExperimentDBAdapter {
 			service.createExperimentArgumentTable();
 			service.createExperimentContextTable();
 			service.createExperimentResultsTable();
+			log.info("Database ready");
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
+		}
+	}
+
+	/**
+	 * @param experiment
+	 * @param description
+	 * @throws ExperimentDatabaseException
+	 * @throws NoSuchExperimentException
+	 */
+	public void setExperimentDescription(String experiment, String description)
+			throws ExperimentDatabaseException, NoSuchExperimentException {
+
+		boolean alreadyContained = false;
+
+		try {
+			if (service.containsExperiment(experiment)) {
+
+				alreadyContained = true;
+				service.setExperimentDescription(experiment, description);
+
+			}
+
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+			throw new ExperimentDatabaseException();
+		}
+
+		if (!alreadyContained) {
+			NoSuchExperimentException e = new NoSuchExperimentException(
+					experiment);
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -1320,7 +1500,6 @@ public class ExperimentDBAdapter {
 										actualArgument);
 
 						if (parameterEntry == null && argOpEntry == null) {
-
 							throw new NoSuchParameterException(actualArgument);
 						}
 
@@ -1351,15 +1530,21 @@ public class ExperimentDBAdapter {
 					}
 
 				} else {
-					throw new ExperimentDatabaseException("The experiment '"
-							+ experiment
-							+ "' does not contain an operation named '"
-							+ operation + "'");
+					ExperimentDatabaseException e = new ExperimentDatabaseException(
+							"The experiment '" + experiment
+									+ "' does not contain an operation named '"
+									+ operation + "'");
+					log.error(e.getMessage());
+					throw e;
 				}
 			} else {
-				throw new NoSuchExperimentException(experiment);
+				NoSuchExperimentException e = new NoSuchExperimentException(
+						experiment);
+				log.error(e.getMessage());
+				throw e;
 			}
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 
@@ -1370,6 +1555,7 @@ public class ExperimentDBAdapter {
 	 */
 	public void setOperationFactory(ExperimentOperationFactory factory) {
 		this.operationFactory = factory;
+		log.info("Operation factory injected");
 	}
 
 	/**
@@ -1387,15 +1573,11 @@ public class ExperimentDBAdapter {
 			ExperimentNotInstantiatedException, NoSuchParameterException {
 
 		try {
-
-			/*
-			 * if (!service.containsExperiment(experiment)) { throw new
-			 * NoSuchExperimentException("The experiment '" + experiment +
-			 * "' does not exist"); }
-			 */
-
 			if (!service.isReservationContextInstantiated(rid)) {
-				throw new ExperimentNotInstantiatedException(rid);
+				ExperimentNotInstantiatedException e = new ExperimentNotInstantiatedException(
+						rid);
+				log.error(e.getMessage());
+				throw e;
 			}
 
 			ReservationEntry resEntry = service.getReservationById(rid);
@@ -1411,10 +1593,14 @@ public class ExperimentDBAdapter {
 						parameterEntry.getIdparameter(), rid, value);
 
 			} else {
-				throw new NoSuchParameterException(parameter);
+				NoSuchParameterException e = new NoSuchParameterException(
+						parameter);
+				log.error(e.getMessage());
+				throw e;
 			}
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ExperimentDatabaseException();
 		}
 	}
@@ -1424,96 +1610,6 @@ public class ExperimentDBAdapter {
 	 */
 	public void setParameterFactory(ExperimentParameterFactory factory) {
 		this.parameterFactory = factory;
-	}
-
-	public void saveResult(int reservationId, String tag, String user,
-			Object value) throws ExperimentDatabaseException {
-
-		try {
-
-			int experimentId = service.getReservationById(reservationId)
-					.getExperiment();
-			int tagId = service.getExperimentParameter(experimentId, tag)
-					.getIdparameter();
-
-			ResultEntry entry = new ResultEntry();
-			entry.setDate(new Date());
-			entry.setValue(value);
-			entry.setUser(user);
-			entry.setTag(tagId);
-			entry.setContext(reservationId);
-			service.saveResult(entry);
-
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	public List<ResultInformation> getExperimentResults(String experiment)
-			throws ExperimentDatabaseException {
-
-		try {
-
-			List<ResultInformation> results = new ArrayList<>();
-
-			List<Integer> contexts = service
-					.getAllExperimentContexts(experiment);
-
-			for (Integer context : contexts) {
-				List<ResultEntry> contextResults = service
-						.getContextResults(context);
-
-				for (ResultEntry res : contextResults) {
-					ResultInformation resInfo = new ResultInformation();
-					resInfo.setDate(res.getDate());
-					resInfo.setExperiment(experiment);
-					resInfo.setReservationId(context);
-					resInfo.setUser(res.getUser());
-					resInfo.setValue(res.getValue());
-
-					results.add(resInfo);
-				}
-			}
-
-			return results;
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
-	}
-
-	public List<ResultInformation> getContextResults(int context)
-			throws ExperimentDatabaseException, NoSuchReservationException {
-
-		try {
-
-			List<ResultInformation> results = new ArrayList<>();
-
-			List<ResultEntry> contextResults = service
-					.getContextResults(context);
-
-			ReservationEntry resEntry = service.getReservationById(context);
-
-			if (resEntry == null) {
-				throw new NoSuchReservationException(context);
-			}
-
-			int expId = resEntry.getExperiment();
-			String experiment = service.getExperimentById(expId).getName();
-
-			for (ResultEntry res : contextResults) {
-				ResultInformation resInfo = new ResultInformation();
-				resInfo.setDate(res.getDate());
-				resInfo.setExperiment(experiment);
-				resInfo.setReservationId(context);
-				resInfo.setUser(res.getUser());
-				resInfo.setValue(res.getValue());
-
-				results.add(resInfo);
-			}
-
-			return results;
-		} catch (PersistenceException e) {
-			throw new ExperimentDatabaseException();
-		}
+		log.info("Parameter factory injected");
 	}
 }

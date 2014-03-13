@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.gloria.gs.services.log.action.data.dbservices.ActionLogDBService;
 import eu.gloria.gs.services.log.action.data.dbservices.ActionLogEntry;
@@ -18,12 +20,14 @@ import eu.gloria.gs.services.log.action.data.dbservices.ActionLogAdapterExceptio
 public class ActionLogAdapter {
 
 	private ActionLogDBService service;
+	private Logger log = LoggerFactory.getLogger(ActionLogAdapter.class
+			.getSimpleName());
 
 	/**
 	 * 
 	 */
 	public ActionLogAdapter() {
-
+		log.debug("ActionLogAdapter created");
 	}
 
 	/**
@@ -31,7 +35,12 @@ public class ActionLogAdapter {
 	 */
 	public void init() {
 
-		service.create();
+		try {
+			service.create();
+			log.info("Database ready");
+		} catch (PersistenceException e) {
+			log.error(e.getMessage());
+		}
 	}
 
 	private void register(String user, Date when, String type, Integer rid,
@@ -48,6 +57,7 @@ public class ActionLogAdapter {
 			service.save(entry);
 
 		} catch (IOException | PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -133,6 +143,7 @@ public class ActionLogAdapter {
 						(String) entry.getAction(), Object.class, null));
 
 			} catch (IOException e) {
+				log.warn(e.getMessage());
 				actionInfo.setAction("?");
 			}
 
@@ -151,6 +162,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -165,6 +177,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -178,6 +191,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -192,6 +206,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -205,6 +220,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -219,6 +235,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -232,6 +249,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -246,6 +264,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -259,6 +278,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -273,6 +293,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -286,6 +307,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -300,6 +322,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -313,6 +336,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -327,6 +351,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -341,6 +366,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -354,6 +380,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -368,6 +395,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -381,6 +409,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -395,6 +424,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -408,6 +438,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -422,6 +453,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -436,6 +468,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -449,6 +482,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -463,6 +497,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -476,6 +511,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -490,6 +526,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -503,6 +540,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -517,6 +555,7 @@ public class ActionLogAdapter {
 			return this.getActionInformations(entries);
 
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -526,6 +565,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsRid(rid);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -536,6 +576,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsRidByDate(rid, from, to);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -546,6 +587,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsDate(from, to);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -556,6 +598,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsUser(user);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -566,6 +609,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsUserByDate(user, from, to);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -575,6 +619,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsRt(rt);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -585,6 +630,7 @@ public class ActionLogAdapter {
 		try {
 			return service.containsRtByDate(rt, from, to);
 		} catch (PersistenceException e) {
+			log.error(e.getMessage());
 			throw new ActionLogAdapterException(e.getMessage());
 		}
 	}
@@ -594,5 +640,6 @@ public class ActionLogAdapter {
 	 */
 	public void setActionLogDBService(ActionLogDBService service) {
 		this.service = service;
+		log.info("Database service injected");
 	}
 }

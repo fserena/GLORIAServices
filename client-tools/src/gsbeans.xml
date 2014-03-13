@@ -5,98 +5,98 @@
 
 	<bean id="ccdTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="CCDTeleoperationPort"></property>
+		<property name="portName" value="ccd-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="rtRepositoryClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="RTRepositoryPort"></property>
+		<property name="portName" value="rt-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.rt.RTRepositoryInterface"></property>
 	</bean>
 
 	<bean id="userRepositoryClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="UserRepositoryPort"></property>
+		<property name="portName" value="user-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.user.UserRepositoryInterface"></property>
 	</bean>
 
 	<bean id="actionLogClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="ActionLogPort"></property>
+		<property name="portName" value="action-log"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.log.action.ActionLogInterface"></property>
 	</bean>
 
 	<bean id="domeTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="DomeTeleoperationPort"></property>
+		<property name="portName" value="dome-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.dome.DomeTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="mountTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="MountTeleoperationPort"></property>
+		<property name="portName" value="mount-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.mount.MountTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="scamTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="SCamTeleoperationPort"></property>
+		<property name="portName" value="scam-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.scam.SCamTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="focuserTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="FocuserTeleoperationPort"></property>
+		<property name="portName" value="focuser-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.focuser.FocuserTeleoperationInterface"></property>
 	</bean>
 	
 	<bean id="weatherTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="WeatherTeleoperationPort"></property>
+		<property name="portName" value="weather-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.weather.WeatherTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="fwTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="FilterWheelTeleoperationPort"></property>
+		<property name="portName" value="fw-teleoperation"></property>
 		<property name="serviceClass"
 	value="eu.gloria.gs.services.teleoperation.fw.FilterWheelTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="genericTeleoperationClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="GenericTeleoperationPort"></property>
+		<property name="portName" value="generic-teleoperation"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface"></property>
 	</bean>
 
 	<bean id="experimentClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="ExperimentPort"></property>
+		<property name="portName" value="experiment"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.experiment.ExperimentInterface"></property>
 	</bean>
 
 	<bean id="imageRepositoryClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="ImageRepositoryPort"></property>
+		<property name="portName" value="image-repository"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.repository.image.ImageRepositoryInterface"></property>
 	</bean>
 	
 	<bean id="schedulerClientFactory" class="eu.gloria.gs.services.core.client.ClientFactory"
 		lazy-init="true" scope="singleton">
-		<property name="portName" value="SchedulerPort"></property>
+		<property name="portName" value="scheduler"></property>
 		<property name="serviceClass"
 			value="eu.gloria.gs.services.scheduler.SchedulerInterface"></property>
 	</bean>

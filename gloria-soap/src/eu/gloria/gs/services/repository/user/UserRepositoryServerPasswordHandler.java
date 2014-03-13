@@ -30,7 +30,6 @@ public class UserRepositoryServerPasswordHandler extends ServerPasswordHandler {
 				}
 			}
 		} catch (UserRepositoryAdapterException e) {
-			e.printStackTrace();
 		}
 	}
 

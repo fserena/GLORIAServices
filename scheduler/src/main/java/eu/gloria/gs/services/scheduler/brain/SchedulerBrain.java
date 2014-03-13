@@ -245,9 +245,6 @@ public class SchedulerBrain {
 			SchHandler schHandler = SchServerManager.getReference().getSch(
 					keyData);
 
-			/*log.info("Asking " + schInfo.getRt() + " about ADVERTISED plan "
-					+ schInfo.getId() + "...");*/
-			
 			PlanInfo planInfo = null;
 			try {
 				planInfo = schHandler.getOPInformationByUuid(uuid);
@@ -261,7 +258,7 @@ public class SchedulerBrain {
 
 					log.info("Previously ADVERTISED plan " + schInfo.getId()
 							+ " is now " + planState.name());
-					
+
 					if (planState.equals(PlanState.ERROR)) {
 						planState = PlanState.REJECTED;
 					}
@@ -271,17 +268,12 @@ public class SchedulerBrain {
 				}
 
 			} catch (EmptySchFilterResultException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn(e.getMessage());
 			}
 		} catch (SchedulerDatabaseException e) {
 			throw new SchedulerException();
-		} catch (SchServerNotAvailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GenericSchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SchServerNotAvailableException | GenericSchException e) {
+			log.warn(e.getMessage());
 		}
 	}
 
@@ -307,9 +299,6 @@ public class SchedulerBrain {
 			SchHandler schHandler = SchServerManager.getReference().getSch(
 					keyData);
 
-			/*log.info("Asking " + schInfo.getRt() + " about QUEUED plan "
-					+ schInfo.getId() + "...");*/
-
 			PlanInfo planInfo = null;
 			try {
 				planInfo = schHandler.getOPInformationByUuid(uuid);
@@ -323,7 +312,7 @@ public class SchedulerBrain {
 					if (planState.equals(PlanState.ERROR)) {
 						planState = PlanState.REJECTED;
 					}
-					
+
 					log.info("Previously QUEUED plan " + schInfo.getId()
 							+ " is now " + planState.name());
 
@@ -365,8 +354,7 @@ public class SchedulerBrain {
 												.getUuid(), target, schInfo
 												.getOpInfo().getExposure());
 							} catch (ImageRepositoryException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								log.warn(e.getMessage());
 							}
 
 							for (Format format : file.getFormats()) {
@@ -392,8 +380,7 @@ public class SchedulerBrain {
 														format.getUrl());
 									}
 								} catch (ImageRepositoryException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									log.warn(e.getMessage());
 								}
 							}
 
@@ -405,17 +392,12 @@ public class SchedulerBrain {
 				}
 
 			} catch (EmptySchFilterResultException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn(e.getMessage());
 			}
 		} catch (SchedulerDatabaseException e) {
 			throw new SchedulerException();
-		} catch (SchServerNotAvailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GenericSchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SchServerNotAvailableException | GenericSchException e) {
+			log.error(e.getMessage());
 		}
 	}
 

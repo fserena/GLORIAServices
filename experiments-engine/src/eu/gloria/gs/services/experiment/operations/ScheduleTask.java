@@ -18,8 +18,6 @@ public class ScheduleTask extends TimerTask {
 		try {
 			this.context.execute();
 		} catch (ExperimentOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

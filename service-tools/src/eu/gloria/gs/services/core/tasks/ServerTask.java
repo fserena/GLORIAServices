@@ -14,13 +14,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public abstract class ServerTask implements ServletContextListener {
 
-	protected ServerThread myThread = null;
-	protected static ExecutorService executor = Executors
-			.newFixedThreadPool(10);
+	protected static ExecutorService executor = Executors.newCachedThreadPool();
 
 	protected abstract ServerThread createServerThread(
 			ApplicationContext context);
-		
+
+	private static Logger log = LoggerFactory.getLogger(ServerTask.class
+			.getSimpleName());
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
@@ -29,8 +30,9 @@ public abstract class ServerTask implements ServletContextListener {
 
 		try {
 
-			myThread = this.createServerThread(cxt);
-
+			ServerThread myThread = this.createServerThread(cxt);
+			log.debug("Server thread created: "
+					+ myThread.getClass().getSimpleName());
 			executor.submit(myThread);
 		} catch (RejectedExecutionException e) {
 		}
@@ -39,8 +41,10 @@ public abstract class ServerTask implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		try {
-			myThread.end();
+			executor.shutdownNow();
+			log.debug("Server task thread pool shutdown");
 		} catch (Exception ex) {
+			log.error(ex.getMessage());
 		}
 	}
 }

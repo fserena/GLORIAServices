@@ -1,8 +1,6 @@
 package eu.gloria.gs.services.scheduler;
 
 import java.util.Date;
-import java.util.Map;
-
 import eu.gloria.gs.services.core.ErrorLogEntry;
 import eu.gloria.gs.services.core.InfoLogEntry;
 import eu.gloria.gs.services.core.LogEntry;
@@ -13,21 +11,20 @@ import eu.gloria.gs.services.core.tasks.ServerThread;
 import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.scheduler.brain.SchedulerBrain;
-import eu.gloria.gs.services.scheduler.data.SchedulerAdapter;
 import eu.gloria.gs.services.scheduler.data.SchedulerDatabaseException;
 
 public class SchedulerMonitorExecutor extends ServerThread {
 
-	private SchedulerAdapter adapter;
 	private LogStore logStore;
 	private String username;
 	private String password;
 	private SchedulerBrain brain;
-	private boolean thereArePending;
-	private Map<Integer, Integer> recoverRetries = null;
 
-	public void setAdapter(SchedulerAdapter adapter) {
-		this.adapter = adapter;
+	/**
+	 * @param name
+	 */
+	public SchedulerMonitorExecutor() {
+		super(SchedulerMonitorExecutor.class.getSimpleName());
 	}
 
 	public void setLogStore(LogStore logStore) {
@@ -52,26 +49,21 @@ public class SchedulerMonitorExecutor extends ServerThread {
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage());
 		}
-		
+
 		GSClientProvider.setCredentials(this.username, this.password);
 
 		try {
 			this.brain.refreshPlans();
 		} catch (SchedulerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (SchedulerDatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (RTRepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 

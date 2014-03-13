@@ -8,9 +8,6 @@ package eu.gloria.gs.services.core;
 import java.io.IOException;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.gloria.gs.services.log.action.LogAction;
 import eu.gloria.gs.services.utils.JSONConverter;
 
@@ -21,13 +18,9 @@ import eu.gloria.gs.services.utils.JSONConverter;
 public abstract class GSLogProducerService extends GSWebService {
 
 	private LogStore logStore;
-	protected Logger log = LoggerFactory.getLogger(GSLogProducerService.class.getSimpleName());
-
-	public void createLogger(Class<?> cl) {
-		log = LoggerFactory.getLogger(cl.getSimpleName());
-	}
 
 	public void setLogStore(LogStore logStore) {
+		log.debug("Log store set up");
 		this.logStore = logStore;
 
 	}

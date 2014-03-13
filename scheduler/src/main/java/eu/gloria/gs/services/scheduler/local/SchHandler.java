@@ -18,6 +18,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.gloria.rt.entity.db.File;
 import eu.gloria.rt.entity.db.UuidType;
 import eu.gloria.rt.entity.scheduler.PlanInfo;
@@ -37,9 +40,9 @@ public class SchHandler {
 
 	private GloriaRtiScheduler schProxy;
 	private GloriaRtiDb dbProxy;
-	// private static String port;
 	private static String schServiceName;
 	private static String dbServiceName;
+	private Logger log;
 
 	static {
 
@@ -51,17 +54,16 @@ public class SchHandler {
 			properties.load(in);
 			in.close();
 
-			// port = (String) properties.get("port");
 			schServiceName = (String) properties.get("sch_service_name");
 			dbServiceName = (String) properties.get("db_service_name");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
 	public SchHandler(String host, String port, String user, String password)
 			throws SchServerNotAvailableException {
+
+		log = LoggerFactory.getLogger(host);
 
 		String actionMessage = "scheduler/" + host + "?" + "->";
 
@@ -74,14 +76,11 @@ public class SchHandler {
 		schProxy = schConnection.getProxy();
 		dbProxy = dbConnection.getProxy();
 
-		if (schProxy == null) {
-			throw new SchServerNotAvailableException(actionMessage
-					+ "SERVER_NOT_AVAILABLE");
-		}
-
-		if (dbProxy == null) {
-			throw new SchServerNotAvailableException(actionMessage
-					+ "SERVER_NOT_AVAILABLE");
+		if (schProxy == null || dbProxy == null) {
+			SchServerNotAvailableException e = new SchServerNotAvailableException(
+					actionMessage + "SERVER_NOT_AVAILABLE");
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -97,11 +96,13 @@ public class SchHandler {
 			xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(
 					calendar);
 		} catch (DatatypeConfigurationException e) {
+			log.warn(e.getMessage());
 		}
 
 		try {
 			schProxy.planAdvertise(xgcal, xmlPlans);
 		} catch (RtiSchError e) {
+			log.error(e.getMessage());
 			throw new GenericSchException(e.getMessage());
 		}
 	}
@@ -110,6 +111,7 @@ public class SchHandler {
 		try {
 			return dbProxy.uuidCreate(UuidType.OP);
 		} catch (RtiDbError e) {
+			log.error(e.getMessage());
 			throw new GenericSchException(e.getMessage());
 		}
 	}
@@ -126,8 +128,12 @@ public class SchHandler {
 				return plansInfo.get(0);
 			}
 
-			throw new EmptySchFilterResultException(uuid);
+			EmptySchFilterResultException e = new EmptySchFilterResultException(
+					uuid);
+			log.error(e.getMessage());
+			throw e;
 		} catch (RtiSchError e) {
+			log.error(e.getMessage());
 			throw new GenericSchException(e.getMessage());
 		}
 	}
@@ -137,6 +143,7 @@ public class SchHandler {
 		try {
 			return dbProxy.opGet(uuid).getFiles();
 		} catch (RtiDbError e) {
+			log.error(e.getMessage());
 			throw new GenericSchException(e.getMessage());
 		}
 	}
@@ -158,6 +165,7 @@ public class SchHandler {
 
 			return plansInfo;
 		} catch (RtiSchError e) {
+			log.error(e.getMessage());
 			throw new GenericSchException(e.getMessage());
 		}
 	}
