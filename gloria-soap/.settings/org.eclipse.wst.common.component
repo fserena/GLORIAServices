@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="gloria-soap">
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <dependent-module archiveName="experiment-operation-image-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/experiments-image/experiments-image">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="experiments-engine-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/experiments-engine/experiments-engine">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="gloria-commons-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gloria-commons/gloria-commons">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="client-tools-0.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/client-tools/client-tools">
@@ -15,9 +19,6 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="actions-log-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/actions-log/actions-log">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="gloria-commons-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gloria-commons/gloria-commons">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="rt-repository-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rt-repository/rt-repository">
@@ -41,7 +42,7 @@
         <dependent-module archiveName="service-tools-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/service-tools/service-tools">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <property name="java-output-path" value="/gloria-soap/build/classes"/>
         <property name="context-root" value="gloria-soap"/>
+        <property name="java-output-path" value="/gloria-soap/target/classes"/>
     </wb-module>
 </project-modules>

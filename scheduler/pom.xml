@@ -12,9 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cxf.version>2.7.2</cxf.version>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<cxf.version>2.7.8</cxf.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -22,16 +20,6 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>RTISchProxy</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>RTIDBProxy</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -45,14 +33,12 @@
 			<version>${cxf.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Jetty is needed if you're are not using the CXFServlet -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http-jetty</artifactId>
 			<version>${cxf.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Spring framework -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-bindings-soap</artifactId>
@@ -71,8 +57,6 @@
 			<version>1.4</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- Mybatis Spring -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
@@ -89,11 +73,24 @@
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>gloria-commons</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>rtidb-proxy</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>rtisch-proxy</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<parent>
-		<groupId>eu.gloriaproject</groupId>
-		<artifactId>gloria</artifactId>
+		<groupId>eu.gloria</groupId>
+		<artifactId>gloria-lib</artifactId>
 		<version>1.0.0</version>
 	</parent>
 </project>

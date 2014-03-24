@@ -4,28 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>service-tools</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA Service Tools</name>
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<name>GLORIA Service Tools</name>	
 	<properties>
 		<cxf.version>2.7.8</cxf.version>
 	</properties>
@@ -85,4 +64,9 @@
 			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+	<parent>
+		<groupId>eu.gloria</groupId>
+		<artifactId>gloria-lib</artifactId>
+		<version>1.0.0</version>
+	</parent>
 </project>

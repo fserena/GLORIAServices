@@ -7,13 +7,12 @@ package eu.gloria.gs.services.experiment.operations;
 
 import java.util.List;
 
-import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.data.ReservationInformation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
+import eu.gloria.gs.services.log.action.ActionException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -40,7 +39,7 @@ public class LoadAllRTNames extends TeleOperation {
 			resInfo = this.getAdapter().getReservationInformation(rid);
 
 			telescopes = resInfo.getTelescopes();
-		} catch (ExperimentDatabaseException | NoSuchReservationException e) {
+		} catch (ActionException e) {
 			throw new ExperimentOperationException(e.getAction());
 		}
 

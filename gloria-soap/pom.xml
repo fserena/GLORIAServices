@@ -6,32 +6,6 @@
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA Services</name>
 	<packaging>war</packaging>
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-					<url>http://saturno.datsi.fi.upm.es:8080/manager/text</url>
-					<server>saturno</server>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
-	<properties>
-		<cxf.version>2.7.8</cxf.version>
-	</properties>
 
 	<dependencies>
 		<!-- Jetty is needed if you're are not using the CXFServlet -->
@@ -46,17 +20,17 @@
 			<artifactId>cxf-rt-ws-security</artifactId>
 			<version>2.7.8</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>3.2.1.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>eu.gloria.gs.services</groupId>
-			<artifactId>RTIProxy</artifactId>
-			<version>0.0.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -90,6 +64,12 @@
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>rt-repository</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>gloria-commons</artifactId>
+					<groupId>eu.gloria.gs.services</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
@@ -100,6 +80,12 @@
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>image-repository</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>gloria-commons</artifactId>
+					<groupId>eu.gloria.gs.services</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
@@ -115,11 +101,32 @@
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>service-tools</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>gloria-commons</artifactId>
+					<groupId>eu.gloria.gs.services</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.gloria.gs.services</groupId>
+			<artifactId>rti-proxy</artifactId>
+			<version>0.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.2</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<parent>
-		<groupId>eu.gloriaproject</groupId>
-		<artifactId>gloria</artifactId>
+		<groupId>eu.gloria</groupId>
+		<artifactId>gloria-app</artifactId>
 		<version>1.0.0</version>
 	</parent>
+	<properties>
+		<maven.tomcat.path>/gloria-soap</maven.tomcat.path>
+	</properties>
 </project>

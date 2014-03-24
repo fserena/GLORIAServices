@@ -5,15 +5,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.scheduler.brain.InvalidObservingPlanException;
 import eu.gloria.gs.services.scheduler.data.dbservices.SchedulerDBService;
 import eu.gloria.gs.services.scheduler.data.dbservices.ScheduleEntry;
+import eu.gloria.gs.services.utils.JSONConverter;
+import eu.gloria.gs.services.utils.LoggerEntity;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
  * 
  */
-public class SchedulerAdapter {
+public class SchedulerAdapter extends LoggerEntity {
 
 	private SchedulerDBService schedulerService;
 
@@ -21,7 +24,7 @@ public class SchedulerAdapter {
 	 * 
 	 */
 	public SchedulerAdapter() {
-
+		super(SchedulerAdapter.class.getSimpleName());
 	}
 
 	public void init() {
@@ -30,7 +33,7 @@ public class SchedulerAdapter {
 	}
 
 	public int prepareSchedule(String user, ObservingPlanInformation opInfo)
-			throws SchedulerDatabaseException, InvalidObservingPlanException {
+			throws ActionException, InvalidObservingPlanException {
 		ScheduleEntry entry = new ScheduleEntry();
 		entry.setStatus("PREPARED");
 		entry.setUser(user);
@@ -46,7 +49,7 @@ public class SchedulerAdapter {
 		try {
 			schedulerService.save(entry);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		int id = -1;
@@ -54,13 +57,13 @@ public class SchedulerAdapter {
 		try {
 			id = schedulerService.getLastUserScheduleId(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 		return id;
 	}
 
 	public void saveSchedule(String rt, String user, String uuid, Date date)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		ScheduleEntry entry = new ScheduleEntry();
 		entry.setStatus("ADVERTISED");
 		entry.setUser(user);
@@ -71,22 +74,22 @@ public class SchedulerAdapter {
 		try {
 			schedulerService.save(entry);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 	}
 
-	public void removeSchedule(int id) throws SchedulerDatabaseException {
+	public void removeSchedule(int id) throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		schedulerService.remove(id);
 	}
 
 	public ScheduleInformation getScheduleInformation(int id)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		ScheduleEntry entry = null;
@@ -94,7 +97,7 @@ public class SchedulerAdapter {
 		try {
 			entry = schedulerService.get(id);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		ScheduleInformation schInfo = this.buildScheduleInfo(entry);
@@ -103,17 +106,17 @@ public class SchedulerAdapter {
 	}
 
 	public ScheduleInformation getScheduleByRTUuid(String rt, String uuid)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 
 		ScheduleEntry entry = null;
 		try {
 			if (!schedulerService.containsRTLocalId(rt, uuid)) {
-				throw new SchedulerDatabaseException();
+				throw new ActionException();
 			}
 
 			entry = schedulerService.getByRTLocalId(rt, uuid);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		ScheduleInformation schInfo = this.buildScheduleInfo(entry);
@@ -121,14 +124,13 @@ public class SchedulerAdapter {
 		return schInfo;
 	}
 
-	public int getUserActiveSchedulesCount(String user)
-			throws SchedulerDatabaseException {
+	public int getUserActiveSchedulesCount(String user) throws ActionException {
 
 		int count = 0;
 		try {
 			count = schedulerService.getUserActiveSchedulesCount(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		return count;
@@ -136,7 +138,7 @@ public class SchedulerAdapter {
 
 	@SuppressWarnings("unchecked")
 	private ScheduleInformation buildScheduleInfo(ScheduleEntry entry)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		ScheduleInformation schInfo = new ScheduleInformation();
 		schInfo.setId(entry.getIdschedule());
 		schInfo.setLastDate(entry.getLast_date());
@@ -154,28 +156,28 @@ public class SchedulerAdapter {
 			schInfo.getOpInfo().setPriority(100);
 
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		try {
 			schInfo.setCandidates((List<String>) JSONConverter.fromJSON(
 					entry.getCandidates(), List.class, String.class));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		try {
 			schInfo.setResults((List<ImageResult>) JSONConverter.fromJSON(
 					entry.getResults(), List.class, ImageResult.class));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		return schInfo;
 	}
 
 	public List<ScheduleInformation> getAllSchedulesByUser(String user,
-			int limit) throws SchedulerDatabaseException {
+			int limit) throws ActionException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -183,7 +185,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getByUser(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		if (entries != null) {
@@ -197,8 +199,7 @@ public class SchedulerAdapter {
 	}
 
 	public List<ScheduleInformation> getInactiveSchedulesByUser(String user,
-			int limit) throws SchedulerDatabaseException,
-			ScheduleNotFoundException {
+			int limit) throws ActionException, ScheduleNotFoundException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -206,7 +207,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getUserInactiveSchedules(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		if (entries != null) {
@@ -220,7 +221,7 @@ public class SchedulerAdapter {
 	}
 
 	public List<ScheduleInformation> getActiveSchedulesByUser(String user,
-			int limit) throws SchedulerDatabaseException {
+			int limit) throws ActionException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -228,7 +229,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getUserActiveSchedules(user);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		if (entries != null) {
@@ -242,7 +243,7 @@ public class SchedulerAdapter {
 	}
 
 	public List<ScheduleInformation> getSchedulesByRT(String rt, int limit)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -250,7 +251,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getByRT(rt);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		if (entries != null) {
@@ -264,7 +265,7 @@ public class SchedulerAdapter {
 	}
 
 	public List<ScheduleInformation> getActiveSchedulesByRT(String rt, int limit)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -272,7 +273,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getActiveByRT(rt);
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		if (entries != null) {
@@ -285,80 +286,79 @@ public class SchedulerAdapter {
 		return schInfos;
 	}
 
-	public void setRT(int id, String rt) throws SchedulerDatabaseException {
+	public void setRT(int id, String rt) throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		schedulerService.setTelescope(id, rt);
 	}
 
 	public void setPlan(int id, ObservingPlanInformation plan)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		try {
 			schedulerService.setPlan(id, JSONConverter.toJSON(plan));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 	}
 
-	public void setUuid(int id, String uuid) throws SchedulerDatabaseException {
+	public void setUuid(int id, String uuid) throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		schedulerService.setUuid(id, uuid);
 	}
 
-	public void setState(int id, String status)
-			throws SchedulerDatabaseException {
+	public void setState(int id, String status) throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		schedulerService.setStatus(id, status);
 	}
 
 	public void setCandidates(int id, List<String> cands)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		try {
 			schedulerService.setCandidates(id, JSONConverter.toJSON(cands));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 	}
 
 	public void setResults(int id, List<ImageResult> res)
-			throws SchedulerDatabaseException {
+			throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		try {
 			schedulerService.setResults(id, JSONConverter.toJSON(res));
 		} catch (IOException e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 	}
 
-	public void setLastDate(int id, Date ld) throws SchedulerDatabaseException {
+	public void setLastDate(int id, Date ld) throws ActionException {
 		if (!schedulerService.contains(id)) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException();
 		}
 
 		schedulerService.setLastDate(id, ld);
 	}
 
 	public List<ScheduleInformation> getAllActiveSchedules()
-			throws SchedulerDatabaseException {
+			throws ActionException {
 
 		List<ScheduleInformation> schInfos = new ArrayList<ScheduleInformation>();
 		List<ScheduleEntry> entries = null;
@@ -366,7 +366,7 @@ public class SchedulerAdapter {
 		try {
 			entries = schedulerService.getAllActiveSchedules();
 		} catch (Exception e) {
-			throw new SchedulerDatabaseException();
+			throw new ActionException(e.getMessage());
 		}
 
 		if (entries != null) {

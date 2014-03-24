@@ -11,11 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.repository.image.data.ImageTargetData;
@@ -30,7 +29,6 @@ import eu.gloria.gs.services.scheduler.data.OPImageData;
 import eu.gloria.gs.services.scheduler.data.ObservingPlanInformation;
 import eu.gloria.gs.services.scheduler.data.ScheduleInformation;
 import eu.gloria.gs.services.scheduler.data.SchedulerAdapter;
-import eu.gloria.gs.services.scheduler.data.SchedulerDatabaseException;
 import eu.gloria.gs.services.scheduler.local.EmptySchFilterResultException;
 import eu.gloria.gs.services.scheduler.local.GenericSchException;
 import eu.gloria.gs.services.scheduler.local.SchHandler;
@@ -58,7 +56,7 @@ public class SchedulerBrain {
 			.getSimpleName());
 
 	public int prepare(ObservingPlanInformation op) throws SchedulerException,
-			SchedulerDatabaseException, MaxUserSchedulesException,
+			ActionException, MaxUserSchedulesException,
 			InvalidObservingPlanException {
 
 		String user = op.getUser();
@@ -83,7 +81,7 @@ public class SchedulerBrain {
 		try {
 			rts = this.rtRepository.getAllBatchRTs();
 		} catch (RTRepositoryException e) {
-			throw new SchedulerException();
+			throw new SchedulerException(e.getAction());
 		}
 
 		String rt = null;
@@ -161,8 +159,8 @@ public class SchedulerBrain {
 				this.adapter.setPlan(schInfo.getId(), schInfo.getOpInfo());
 				this.adapter.setLastDate(schInfo.getId(), new Date());
 				this.adapter.setState(schInfo.getId(), "ADVERTISED");
-			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException();
+			} catch (ActionException e) {
+				throw new SchedulerException(e.getAction());
 			} catch (SchServerNotAvailableException | GenericSchException e) {
 				log.error(candidate + " returned an error: " + e.getMessage());
 			} catch (Exception e) {
@@ -179,8 +177,8 @@ public class SchedulerBrain {
 				log.error(candidate + " rejected the plan " + schInfo.getId());
 				try {
 					this.adapter.setState(schInfo.getId(), "REJECTED");
-				} catch (SchedulerDatabaseException e) {
-					throw new SchedulerException();
+				} catch (ActionException e) {
+					throw new SchedulerException(e.getAction());
 				}
 			}
 		} else {
@@ -190,8 +188,8 @@ public class SchedulerBrain {
 
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
-			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException();
+			} catch (ActionException e) {
+				throw new SchedulerException(e.getAction());
 			}
 		}
 	}
@@ -209,16 +207,16 @@ public class SchedulerBrain {
 					+ " is impossible by now");
 			try {
 				this.adapter.setState(schInfo.getId(), "IMPOSSIBLE");
-			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException();
+			} catch (ActionException e) {
+				throw new SchedulerException(e.getAction());
 			}
 		} else {
 			log.info("Preparing to request the plan " + schInfo.getId()
 					+ " to another telescope...");
 			try {
 				this.adapter.setState(schInfo.getId(), "PREPARED");
-			} catch (SchedulerDatabaseException e) {
-				throw new SchedulerException();
+			} catch (ActionException e) {
+				throw new SchedulerException(e.getAction());
 			}
 		}
 	}
@@ -270,8 +268,8 @@ public class SchedulerBrain {
 			} catch (EmptySchFilterResultException e) {
 				log.warn(e.getMessage());
 			}
-		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException();
+		} catch (ActionException e) {
+			throw new SchedulerException(e.getAction());
 		} catch (SchServerNotAvailableException | GenericSchException e) {
 			log.warn(e.getMessage());
 		}
@@ -394,15 +392,15 @@ public class SchedulerBrain {
 			} catch (EmptySchFilterResultException e) {
 				log.warn(e.getMessage());
 			}
-		} catch (SchedulerDatabaseException e) {
-			throw new SchedulerException();
+		} catch (ActionException e) {
+			throw new SchedulerException(e.getAction());
 		} catch (SchServerNotAvailableException | GenericSchException e) {
 			log.error(e.getMessage());
 		}
 	}
 
 	public void refreshPlans() throws SchedulerException,
-			SchedulerDatabaseException, RTRepositoryException {
+			ActionException, RTRepositoryException {
 
 		List<ScheduleInformation> schedules = this.adapter
 				.getAllActiveSchedules();

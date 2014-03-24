@@ -8,17 +8,14 @@ package eu.gloria.gs.services.experiment.operations;
 import java.util.LinkedHashMap;
 
 import eu.gloria.gs.services.core.client.GSClientProvider;
-import eu.gloria.gs.services.experiment.base.data.ExperimentDatabaseException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
-import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.repository.image.ImageRepositoryException;
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.repository.image.data.ImageInformation;
 import eu.gloria.gs.services.repository.image.data.ImageTargetData;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
-import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -107,10 +104,9 @@ public class StartExposure extends TeleOperation {
 						this.getAdapter().getReservationInformation(rid)
 								.getUser());
 
-			} catch (NoSuchReservationException | ExperimentDatabaseException
-					| CCDTeleoperationException | ImageRepositoryException e) {
-				throw new ExperimentOperationException(e.getAction());
 			} catch (DeviceOperationFailedException e) {
+			} catch (ActionException e) {
+				throw new ExperimentOperationException(e.getAction());
 			}
 
 			this.getContext().getExperimentContext()

@@ -5,30 +5,15 @@
 	<artifactId>user-repository</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>GLORIA User Repository</name>
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<packaging>jar</packaging>
 
 	<dependencies>
-		<!-- Spring framework -->
-		<!-- Mybatis Spring -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
 			<version>1.1.1</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
@@ -39,19 +24,13 @@
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>gloria-commons</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>springsource-repo</id>
-			<name>SpringSource Repository</name>
-			<url>http://repo.springsource.org/release</url>
-		</repository>
-	</repositories>
 	<parent>
-		<groupId>eu.gloriaproject</groupId>
-		<artifactId>gloria</artifactId>
+		<groupId>eu.gloria</groupId>
+		<artifactId>gloria-lib</artifactId>
 		<version>1.0.0</version>
 	</parent>
 </project>

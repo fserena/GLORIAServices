@@ -2,12 +2,12 @@ package eu.gloria.gs.services.repository.user.data;
 
 import java.util.Date;
 
-import eu.gloria.gs.services.log.action.LogAction;
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserDBService;
 import eu.gloria.gs.services.repository.user.data.dbservices.UserEntry;
-import eu.gloria.gs.services.repository.user.data.dbservices.UserRepositoryAdapterException;
+import eu.gloria.gs.services.utils.LoggerEntity;
 
-public class UserRepositoryAdapter {
+public class UserRepositoryAdapter extends LoggerEntity {
 
 	private String ADMIN_ROLE = "ADM";
 	private String REGULAR_ROLE = "REG";
@@ -32,7 +32,7 @@ public class UserRepositoryAdapter {
 	private UserDBService userService;
 
 	public UserRepositoryAdapter() {
-
+		super(UserRepositoryAdapter.class.getSimpleName());
 	}
 
 	public void setImageRepositoryUsername(String user) {
@@ -104,7 +104,6 @@ public class UserRepositoryAdapter {
 	}
 
 	private void createUser(String name, String password, UserRole role) {
-
 		if (!userService.containsName(name)) {
 			UserEntry admin = new UserEntry();
 			admin.setName(name);
@@ -142,21 +141,14 @@ public class UserRepositoryAdapter {
 		this.createUser(SCHEDULER_NAME, SCHEDULER_PWD, UserRole.WEB_SERVICE);
 	}
 
-	public void create(String name, String alias)
-			throws UserRepositoryAdapterException {
-
-		LogAction action = new LogAction();
-		action.put("name", name);
-		action.put("alias", alias);
+	public void create(String name, String alias) throws ActionException {
 
 		if (name == null) {
-			action.put("cause", "user is null");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user is null");
 		}
 
 		if (alias == null) {
-			action.put("cause", "alias is null");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("alias is null");
 		}
 
 		boolean previouslyContained = false;
@@ -174,19 +166,14 @@ public class UserRepositoryAdapter {
 		}
 
 		if (previouslyContained) {
-			action.put("cause", "user already exists");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user already exists");
 		}
 	}
 
-	public void delete(String name) throws UserRepositoryAdapterException {
-
-		LogAction action = new LogAction();
-		action.put("name", name);
+	public void delete(String name) throws ActionException {
 
 		if (name == null) {
-			action.put("cause", "user is null");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user is null");
 		}
 
 		boolean previouslyContained = false;
@@ -198,16 +185,12 @@ public class UserRepositoryAdapter {
 		}
 
 		if (previouslyContained) {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 	}
 
-	public void activate(String name, String password)
-			throws UserRepositoryAdapterException {
+	public void activate(String name, String password) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyActivated = false;
 
@@ -223,21 +206,16 @@ public class UserRepositoryAdapter {
 		}
 
 		if (!previouslyContained) {
-			action.put("cause", "user does not exists");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 		if (previouslyActivated) {
-			action.put("cause", "user already activated");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user already activated");
 		}
 	}
 
-	public void deactivate(String name, String password)
-			throws UserRepositoryAdapterException {
+	public void deactivate(String name, String password) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyDeactivated = false;
 
@@ -253,18 +231,15 @@ public class UserRepositoryAdapter {
 		}
 
 		if (!previouslyContained) {
-			action.put("cause", "user does not exists");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 		if (previouslyDeactivated) {
-			action.put("cause", "user already deactivated");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user already deactivated");
 		}
 	}
 
-	public boolean isActivated(String name)
-			throws UserRepositoryAdapterException {
+	public boolean isActivated(String name) throws ActionException {
 
 		boolean previouslyActivated = false;
 
@@ -297,8 +272,7 @@ public class UserRepositoryAdapter {
 		return rolesArray;
 	}
 
-	public UserRole[] getRoles(String name)
-			throws UserRepositoryAdapterException {
+	public UserRole[] getRoles(String name) throws ActionException {
 
 		UserEntry entry = userService.get(name);
 
@@ -309,8 +283,7 @@ public class UserRepositoryAdapter {
 		return null;
 	}
 
-	public boolean isAdministrator(String name)
-			throws UserRepositoryAdapterException {
+	public boolean isAdministrator(String name) throws ActionException {
 
 		if (this.isActivated(name)) {
 			UserRole[] roles = this.getRoles(name);
@@ -324,68 +297,54 @@ public class UserRepositoryAdapter {
 		return false;
 	}
 
-	public boolean containsName(String name)
-			throws UserRepositoryAdapterException {
+	public boolean containsName(String name) throws ActionException {
 
 		return userService.containsName(name);
 	}
-	
-	public boolean containsAlias(String alias)
-			throws UserRepositoryAdapterException {
+
+	public boolean containsAlias(String alias) throws ActionException {
 
 		return userService.containsAlias(alias);
 	}
 
-	public boolean contains(String name, String alias)
-			throws UserRepositoryAdapterException {
+	public boolean contains(String name, String alias) throws ActionException {
 
 		return userService.containsAlias(alias)
 				|| userService.containsName(name);
 	}
 
-	public Date getCreationDate(String name)
-			throws UserRepositoryAdapterException {
+	public Date getCreationDate(String name) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		UserEntry entry = userService.get(name);
 
 		if (entry != null) {
 			return entry.getDate();
 		} else {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 	}
 
-	public String getPassword(String name)
-			throws UserRepositoryAdapterException {
+	public String getPassword(String name) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		UserEntry entry = userService.get(name);
 
 		if (entry != null) {
 			String password = entry.getPassword();
 
 			if (password == null) {
-				action.put("cause", "user not activated");
-				throw new UserRepositoryAdapterException(action);
+				throw new ActionException("user not activated");
 			} else
 				return password;
 		} else {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 	}
 
 	public void setPassword(String name, String password)
-			throws UserRepositoryAdapterException {
+			throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		boolean previouslyContained = false;
 		boolean previouslyActivated = true;
 
@@ -401,37 +360,29 @@ public class UserRepositoryAdapter {
 		}
 
 		if (!previouslyContained) {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 		if (!previouslyActivated) {
-			action.put("cause", "user not activated");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user not activated");
 		}
 	}
 
-	public String getOcupation(String name)
-			throws UserRepositoryAdapterException {
+	public String getOcupation(String name) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		UserEntry entry = userService.get(name);
 
 		if (entry != null) {
 			return entry.getOcupation();
 		} else {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 	}
 
 	public void setOcupation(String name, String ocupation)
-			throws UserRepositoryAdapterException {
+			throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		boolean previouslyContained = false;
 
 		previouslyContained = userService.containsName(name);
@@ -441,32 +392,25 @@ public class UserRepositoryAdapter {
 		}
 
 		if (!previouslyContained) {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 	}
 
-	public String getLanguage(String name)
-			throws UserRepositoryAdapterException {
+	public String getLanguage(String name) throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		UserEntry entry = userService.get(name);
 
 		if (entry != null) {
 			return entry.getLanguage();
 		} else {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 
 	}
 
 	public void setLanguage(String name, String language)
-			throws UserRepositoryAdapterException {
+			throws ActionException {
 
-		LogAction action = new LogAction();
-		action.put("name", name);
 		boolean previouslyContained = false;
 
 		previouslyContained = userService.containsName(name);
@@ -476,13 +420,12 @@ public class UserRepositoryAdapter {
 		}
 
 		if (!previouslyContained) {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 	}
 
 	public UserInformation getUserInformation(String name)
-			throws UserRepositoryAdapterException {
+			throws ActionException {
 
 		UserInformation userInfo = new UserInformation();
 
@@ -505,9 +448,7 @@ public class UserRepositoryAdapter {
 	}
 
 	public UserInformation getUserCredentials(String name)
-			throws UserRepositoryAdapterException {
-
-		LogAction action = new LogAction();
+			throws ActionException {
 
 		UserInformation userInfo = new UserInformation();
 
@@ -516,8 +457,7 @@ public class UserRepositoryAdapter {
 			String password = userService.getPassword(name);
 
 			if (password == null) {
-				action.put("cause", "user not activated");
-				throw new UserRepositoryAdapterException(action);
+				throw new ActionException("user not activated");
 			} else {
 				userInfo.setPassword(password);
 				String rolesStr = userService.getRoles(name);
@@ -527,8 +467,7 @@ public class UserRepositoryAdapter {
 				return userInfo;
 			}
 		} else {
-			action.put("cause", "user does not exist");
-			throw new UserRepositoryAdapterException(action);
+			throw new ActionException("user does not exist");
 		}
 	}
 }
