@@ -87,10 +87,10 @@ public class LogStoreExecutor extends ServerThread {
 
 			try {
 				this.registerAction(entry);
-				logStore.removeEntry(entry);
-
 			} catch (ActionLogException e) {
+				
 			}
+			logStore.removeEntry(entry);
 		}
 	}
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.log.action.ActionException;
 
 public class ExperimentContextManager {
 
@@ -22,7 +22,7 @@ public class ExperimentContextManager {
 	}
 
 	public ExperimentContext getContext(String username, int rid)
-			throws InvalidUserContextException, ActionException,
+			throws InvalidUserContextException, ExperimentException,
 			NoSuchReservationException {
 		ExperimentContext context = null;
 

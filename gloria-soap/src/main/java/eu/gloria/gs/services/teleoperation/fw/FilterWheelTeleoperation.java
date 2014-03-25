@@ -2,6 +2,7 @@ package eu.gloria.gs.services.teleoperation.fw;
 
 import java.util.List;
 
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
@@ -23,7 +24,7 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 			@SuppressWarnings("unchecked")
 			List<String> filters = (List<String>) this.invokeGetOperation(GetFiltersOperation.class, rt, filterWheel);
 			return filters;
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new FilterWheelTeleoperationException(e.getAction());
 		}
 	}
@@ -34,7 +35,7 @@ public class FilterWheelTeleoperation extends AbstractTeleoperation implements
 			FilterWheelTeleoperationException {
 		try {
 			this.invokeSetOperation(SelectFilterOperation.class, rt, filterWheel, filter);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new FilterWheelTeleoperationException(e.getAction());
 		}		
 	}

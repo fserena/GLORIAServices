@@ -1,6 +1,8 @@
 package eu.gloria.gs.services.experiment.base.models;
 
 import java.util.Map;
+
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.models.DuplicateExperimentException;
@@ -28,14 +30,14 @@ public class ExperimentModelManager {
 	}
 
 	public CustomExperimentModel getModel(String experiment)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 		CustomExperimentModel model = null;
 
 		if (adapter.containsExperiment(experiment)) {
 			try {
 				model = factory.loadCustomExperiment(experiment);
 			} catch (InvalidExperimentModelException e) {
-				throw new ActionException(e.getMessage());
+				throw new ExperimentException(e.getMessage());
 			}
 		}
 
@@ -43,18 +45,16 @@ public class ExperimentModelManager {
 	}
 
 	public void createModel(String experiment, String author, String type)
-			throws DuplicateExperimentException, ActionException {
+			throws DuplicateExperimentException, ExperimentException {
 
 		if (!adapter.containsExperiment(experiment)) {
-
-			factory.createCustomExperiment(experiment, author, type);
-
 			try {
-				factory.loadCustomExperiment(experiment); // Verification load
+				factory.createCustomExperiment(experiment, author, type);
+				factory.loadCustomExperiment(experiment);
 			} catch (InvalidExperimentModelException e) {
 				throw new DuplicateExperimentException(e.getMessage());
-			} catch (NoSuchExperimentException e) {
-				throw new ActionException(e.getMessage());
+			} catch (ActionException e) {
+				throw new ExperimentException(e.getMessage());
 			}
 
 		} else {
@@ -63,17 +63,17 @@ public class ExperimentModelManager {
 	}
 
 	public void deleteModel(String experiment)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 		adapter.deleteExperiment(experiment);
 	}
 
 	public void deleteParameter(String experiment, String parameter)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 		adapter.removeExperimentParameter(experiment, parameter);
 	}
 
 	public void deleteOperation(String experiment, String operation)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 		adapter.removeExperimentOperation(experiment, operation);
 	}
 

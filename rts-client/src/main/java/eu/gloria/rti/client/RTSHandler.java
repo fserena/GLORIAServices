@@ -1,11 +1,8 @@
 package eu.gloria.rti.client;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
@@ -20,7 +17,6 @@ import eu.gloria.gs.services.teleoperation.ccd.ImageTransferFailedException;
 import eu.gloria.gs.services.teleoperation.focuser.NotAbsoluteFocuserException;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.TrackingRate;
-import eu.gloria.gs.services.utils.LoggerEntity;
 import eu.gloria.rt.entity.device.ActivityContinueStateCamera;
 import eu.gloria.rt.entity.device.ActivityStateDomeOpening;
 import eu.gloria.rt.entity.device.ActivityStateMount;
@@ -46,7 +42,7 @@ import eu.gloria.rti.client.devices.TempSensor;
 import eu.gloria.rti.client.devices.WindSensor;
 import eu.gloria.rti.factory.ProxyFactory;
 
-public class RTSHandler extends LoggerEntity implements ServerHandler {
+public class RTSHandler implements ServerHandler {
 
 	private GloriaRti rtsPort;
 	private static String serviceName;
@@ -56,24 +52,28 @@ public class RTSHandler extends LoggerEntity implements ServerHandler {
 
 	static {
 
-		Properties properties = new Properties();
-		try {
-			InputStream in = Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream("rtsclient.properties");
+		//Properties properties = new Properties();
+		//try {
+			//InputStream in = Thread.currentThread().getContextClassLoader()
+			//		.getResourceAsStream("rtsclient.properties");
 
-			properties.load(in);
-			in.close();
+			//properties.load(in);
+			//in.close();
 
-			serviceName = (String) properties.get("service_name");
+			serviceName = "RTI";//(String) properties.get("service_name");
 
-		} catch (IOException e) {
-		}
+		//} catch (IOException e) {
+	//	}
+	}
+	
+	public RTSHandler() {
+		
 	}
 
 	public RTSHandler(String host, String port, String user, String password)
 			throws TeleoperationException {
 
-		super(host);
+		//super(host);
 
 		this.host = host;
 		this.port = port;
@@ -152,9 +152,7 @@ public class RTSHandler extends LoggerEntity implements ServerHandler {
 		}
 
 		try {
-
 			return rtsPort.camGetAutoExposureTime(null, camera);
-
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get auto exposure", e.getMessage());

@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.experiment.reservation;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentType;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
@@ -10,7 +11,6 @@ import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationAr
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
-import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.Action;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class ExperimentBooker {
 
 	public List<TimeSlot> getAvailableTimeSlots(String experiment,
 			List<String> telescopes, boolean adminMode)
-			throws ExperimentReservationArgumentException, ActionException {
+			throws ExperimentReservationArgumentException, ExperimentException {
 
 		testAndThrowIfNull(experiment, "experiment name cannot be null");
 		testAndThrowIfNull(telescopes, "telescope list name cannot be null");
@@ -112,7 +112,7 @@ public class ExperimentBooker {
 			List<String> telescopes, TimeSlot timeSlot, boolean adminMode)
 			throws NoReservationsAvailableException,
 			ExperimentReservationArgumentException,
-			MaxReservationTimeException, ActionException {
+			MaxReservationTimeException, ExperimentException {
 
 		testAndThrowIfNull(experiment, "experiment name cannot be null");
 		testAndThrowIfNull(telescopes, "telescope list name cannot be null");
@@ -143,12 +143,8 @@ public class ExperimentBooker {
 
 		List<ReservationInformation> pendingReservations = null;
 
-		try {
-			pendingReservations = adapter.getUserPendingReservations(
-					ExperimentType.ONLINE, username);
-		} catch (ActionException e) {
-			throw e;
-		}
+		pendingReservations = adapter.getUserPendingReservations(
+				ExperimentType.ONLINE, username);
 
 		long msReserved = 0;
 		long msReservation = timeSlot.getEnd().getTime()
@@ -171,29 +167,25 @@ public class ExperimentBooker {
 			limitMs = limitMs * 4;
 		}
 
-		try {
-			if (msReserved + msReservation <= limitMs) {
+		if (msReserved + msReservation <= limitMs) {
 
-				if (!adapter.anyRTReservationBetween(telescopes, timeSlot)) {
-					adapter.makeReservation(experiment, telescopes, username,
-							timeSlot);
-				} else {
-					throw new NoReservationsAvailableException(
-							"one or more telescopes are not available");
-				}
+			if (!adapter.anyRTReservationBetween(telescopes, timeSlot)) {
+				adapter.makeReservation(experiment, telescopes, username,
+						timeSlot);
 			} else {
-				MaxReservationTimeException ex = new MaxReservationTimeException(
-						msReserved, MILLISECONDS_PER_30MIN, username);
-
-				throw ex;
+				throw new NoReservationsAvailableException(
+						"one or more telescopes are not available");
 			}
-		} catch (ActionException e) {
-			throw e;
+		} else {
+			MaxReservationTimeException ex = new MaxReservationTimeException(
+					msReserved, MILLISECONDS_PER_30MIN, username);
+
+			throw ex;
 		}
 	}
 
 	public void applyFor(String experiment, String username)
-			throws ActionException, NoReservationsAvailableException,
+			throws ExperimentException, NoReservationsAvailableException,
 			NoSuchExperimentException {
 
 		if (adapter.containsExperiment(experiment)) {
@@ -207,7 +199,6 @@ public class ExperimentBooker {
 							ExperimentType.OFFLINE, username);
 
 				} catch (NoReservationsAvailableException e) {
-
 				}
 
 				if (reservations != null) {
@@ -244,7 +235,7 @@ public class ExperimentBooker {
 	}
 
 	public void cancelReservation(String username, int reservationId)
-			throws NoSuchReservationException, ActionException,
+			throws NoSuchReservationException, ExperimentException,
 			InvalidUserContextException {
 
 		boolean allowCancel = true;
@@ -261,30 +252,21 @@ public class ExperimentBooker {
 					break;
 				}
 			}
-		} catch (ActionException e) {
-			throw e;
+		} catch (NoReservationsAvailableException e) {
 		}
 
 		ReservationInformation reservation;
-		try {
-			reservation = adapter.getReservationInformation(reservationId);
+		reservation = adapter.getReservationInformation(reservationId);
 
-			if (!reservation.getUser().equals(username)) {
-				Action action = new Action();
-				action.put("user", username);
-				action.put("cause", "invalid user");
-				throw new InvalidUserContextException(action);
-			}
-		} catch (ActionException e) {
-			throw e;
+		if (!reservation.getUser().equals(username)) {
+			Action action = new Action();
+			action.put("user", username);
+			action.put("cause", "invalid user");
+			throw new InvalidUserContextException(action);
 		}
 
 		if (allowCancel) {
-			try {
-				adapter.deleteReservation(reservationId);
-			} catch (ActionException e) {
-				throw e;
-			}
+			adapter.deleteReservation(reservationId);
 		} else {
 			Action action = new Action();
 			action.put("user", username);

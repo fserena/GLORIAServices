@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.ScriptSlot;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentDBService;
 import eu.gloria.gs.services.experiment.script.NoScriptsAvailableException;
@@ -14,7 +15,6 @@ import eu.gloria.gs.services.experiment.script.NoSuchScriptException;
 import eu.gloria.gs.services.experiment.script.OverlapRTScriptException;
 import eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptDBService;
 import eu.gloria.gs.services.experiment.script.data.dbservices.RTScriptEntry;
-import eu.gloria.gs.services.log.action.ActionException;
 
 /**
  * @author Fernando Serena (fserena@ciclope.info)
@@ -33,25 +33,25 @@ public class RTScriptDBAdapter {
 	}
 
 	public void setExperimentDBService(ExperimentDBService service)
-			throws ActionException {
+			throws ExperimentException {
 		this.experimentService = service;
 	}
 
 	public void setRTScriptDBService(RTScriptDBService service)
-			throws ActionException {
+			throws ExperimentException {
 		this.service = service;
 
 		try {
 			service.createRTScriptTable();
 			service.createRTScriptRidTable();
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
 	public synchronized int addRTScript(String user, String experiment,
 			String rt, String operation, ScriptSlot scriptSlot, String init,
-			String result, boolean notify) throws ActionException,
+			String result, boolean notify) throws ExperimentException,
 			OverlapRTScriptException {
 
 		try {
@@ -99,20 +99,20 @@ public class RTScriptDBAdapter {
 			return service.getScriptId(rt, scriptSlot.getBegin());
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void removeRTScript(int sid) throws ActionException {
+	public void removeRTScript(int sid) throws ExperimentException {
 		try {
 			service.removeScript(sid);
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
 	public List<Integer> getAllRTScripts(String rt)
-			throws ActionException {
+			throws ExperimentException {
 		try {
 			List<Integer> scripts = service.getAllRTScripts(rt);
 			if (scripts == null) {
@@ -121,7 +121,7 @@ public class RTScriptDBAdapter {
 
 			return scripts;
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
@@ -148,7 +148,7 @@ public class RTScriptDBAdapter {
 	}
 
 	public RTScriptInformation getRTScriptInformation(int sid)
-			throws ActionException, NoSuchScriptException {
+			throws ExperimentException, NoSuchScriptException {
 
 		RTScriptInformation rtScript = null;
 
@@ -159,7 +159,7 @@ public class RTScriptDBAdapter {
 				rtScript = this.processRTScriptEntry(scriptEntry);
 			}
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 
 		if (rtScript == null)
@@ -170,11 +170,11 @@ public class RTScriptDBAdapter {
 
 	/**
 	 * @return
-	 * @throws ActionException
+	 * @throws ExperimentException
 	 * @throws NoScriptsAvailableException
 	 */
 	public List<RTScriptInformation> getAllScriptsActiveNow()
-			throws ActionException, NoScriptsAvailableException {
+			throws ExperimentException, NoScriptsAvailableException {
 
 		try {
 			List<RTScriptEntry> scriptEntries = service
@@ -186,18 +186,18 @@ public class RTScriptDBAdapter {
 
 			return this.processRTScriptEntries(scriptEntries);
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void prepareAllDailyNotActive() throws ActionException,
+	public void prepareAllDailyNotActive() throws ExperimentException,
 			NoScriptsAvailableException {
 
 		try {
 			service.prepareAllDailyNotActive();
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
@@ -257,95 +257,95 @@ public class RTScriptDBAdapter {
 		return scripts;
 	}
 
-	public void setScriptScheduled(int sid) throws ActionException {
+	public void setScriptScheduled(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "S");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptReady(int sid) throws ActionException {
+	public void setScriptReady(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "R");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptDone(int sid) throws ActionException {
+	public void setScriptDone(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "D");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptNotifying(int sid) throws ActionException {
+	public void setScriptNotifying(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "N");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptPrepared(int sid) throws ActionException {
+	public void setScriptPrepared(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "P");
 			service.setReservation(sid, null);
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptTriggered(int sid) throws ActionException {
+	public void setScriptTriggered(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "T");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
 	public void setScriptWaitingInvoke(int sid)
-			throws ActionException {
+			throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "I");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptWaitingEnd(int sid) throws ActionException {
+	public void setScriptWaitingEnd(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "W");
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	public void setScriptError(int sid) throws ActionException {
+	public void setScriptError(int sid) throws ExperimentException {
 		try {
 			service.setScriptStatus(sid, "E");
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
 	public void setReservation(int sid, int rid)
-			throws ActionException {
+			throws ExperimentException {
 		try {
 			service.setReservation(sid, rid);
 			service.saveRTScriptRid(sid, rid);
 
 		} catch (PersistenceException e) {
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 

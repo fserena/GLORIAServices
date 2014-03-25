@@ -1,13 +1,20 @@
 package eu.gloria.gs.services.experiment.base.models;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
+import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.data.OperationInformation;
 import eu.gloria.gs.services.experiment.base.data.ParameterInformation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
+import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationFactory;
+import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
+import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
+import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
-import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 
 public class CustomExperimentModel extends ExperimentModel {
 
@@ -32,7 +39,9 @@ public class CustomExperimentModel extends ExperimentModel {
 	}
 
 	public void buildOperation(OperationInformation operationInfo)
-			throws ActionException {
+			throws ExperimentException, OperationTypeNotAvailableException,
+			ExperimentOperationException, NoSuchExperimentException,
+			NoSuchParameterException, NoSuchOperationException {
 
 		ExperimentOperation operation = null;
 
@@ -48,7 +57,8 @@ public class CustomExperimentModel extends ExperimentModel {
 	}
 
 	public void buildParameter(ParameterInformation parameterInfo)
-			throws ActionException {
+			throws ExperimentException, ParameterTypeNotAvailableException,
+			ExperimentParameterException, NoSuchExperimentException {
 
 		ExperimentParameter parameter = null;
 

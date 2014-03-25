@@ -66,34 +66,34 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 	}
 
 	protected void invokeSetOperation(Class<?> cl, String rt, String device,
-			Object... args) throws TeleoperationException {
+			Object... args) throws ActionException {
 		try {
-			this.invokeOperation(cl, rt, device);
+			this.invokeOperation(cl, rt, device, args);
 		} catch (DeviceOperationFailedException e) {
 			this.processDeviceFailure(rt, e);
 			throw e;
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			this.processInternalError(rt, e);
 			throw e;
 		}
 	}
 
 	protected Object invokeGetOperation(Class<?> cl, String rt, String device,
-			Object... args) throws TeleoperationException {
+			Object... args) throws ActionException {
 		try {
-			Object value = this.invokeOperation(cl, rt, device).get(0);
+			Object value = this.invokeOperation(cl, rt, device, args).get(0);
 			return value;
 		} catch (DeviceOperationFailedException e) {
 			this.processDeviceFailure(rt, e);
 			throw e;
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			this.processInternalError(rt, e);
 			throw e;
 		}
 	}
 
 	protected ArrayList<Object> invokeOperation(Class<?> cl, String rt,
-			Object... args) throws TeleoperationException {
+			Object... args) throws ActionException {
 
 		OperationArgs opArgs = new OperationArgs();
 		opArgs.getArguments().add(rt);
@@ -114,7 +114,7 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 			Constructor<?> constructor = cl.getConstructor(OperationArgs.class);
 			operation = (DeviceOperation) constructor.newInstance(opArgs);
 		} catch (Exception e) {
-			throw new CCDTeleoperationException("bad request");
+			throw new ActionException("bad request");
 		}
 
 		try {

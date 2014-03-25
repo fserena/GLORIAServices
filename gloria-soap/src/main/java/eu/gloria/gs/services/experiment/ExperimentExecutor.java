@@ -180,7 +180,6 @@ public class ExperimentExecutor extends ServerThread {
 						}
 					}
 				} catch (Exception e) {
-
 					errorState = true;
 					action.put("grave", e.getClass().getSimpleName());
 				}

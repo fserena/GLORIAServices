@@ -4,6 +4,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
@@ -32,7 +33,7 @@ public class ExperimentContextFactory extends LoggerEntity implements
 	}
 
 	public ExperimentContext createExperimentContext(String username, int rid)
-			throws InvalidUserContextException, ActionException,
+			throws InvalidUserContextException, ExperimentException,
 			NoSuchReservationException {
 
 		ExperimentContext context = null;
@@ -52,31 +53,27 @@ public class ExperimentContextFactory extends LoggerEntity implements
 		try {
 			experimentInfo = this.adapter.getExperimentInformation(resInfo
 					.getExperiment());
-
-			context = new ExperimentContext();
-			context.setExperimentName(resInfo.getExperiment());
-			context.setReservation(rid);
-
-			for (ParameterInformation paramInfo : experimentInfo
-					.getParameters()) {
-				ParameterContext parameterContext = null;
-
-				parameterContext = this.createParameterContext(paramInfo,
-						context);
-				context.addParameter(paramInfo.getName(), parameterContext);
-			}
-
-			for (OperationInformation opInfo : experimentInfo.getOperations()) {
-				OperationContext operationContext = null;
-
-				operationContext = this.createOperationContext(opInfo, context);
-				context.addOperation(opInfo.getName(), operationContext);
-
-			}
 		} catch (NoSuchExperimentException e) {
-			ActionException ex = new ActionException();
-			ex.getAction().put("experiment not found", e.getAction());
-			throw ex;
+			throw new ExperimentException(e.getMessage());
+		}
+
+		context = new ExperimentContext();
+		context.setExperimentName(resInfo.getExperiment());
+		context.setReservation(rid);
+
+		for (ParameterInformation paramInfo : experimentInfo.getParameters()) {
+			ParameterContext parameterContext = null;
+
+			parameterContext = this.createParameterContext(paramInfo, context);
+			context.addParameter(paramInfo.getName(), parameterContext);
+		}
+
+		for (OperationInformation opInfo : experimentInfo.getOperations()) {
+			OperationContext operationContext = null;
+
+			operationContext = this.createOperationContext(opInfo, context);
+			context.addOperation(opInfo.getName(), operationContext);
+
 		}
 
 		log.info("context created for reservation id " + rid + ", user "

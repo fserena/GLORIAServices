@@ -38,6 +38,7 @@ public abstract class GSLogProducerService extends GSWebService {
 
 	protected void logException(Action action, ActionException e) {
 		action.child("exception", e.getAction());
+		e.setAction(action);
 		this.logError(getClientUsername(), action);
 	}
 
@@ -52,7 +53,7 @@ public abstract class GSLogProducerService extends GSWebService {
 	}
 
 	protected void logError(Action action) {
-		this.logUserAction(LogType.ERROR, this.getClientPassword(), action);
+		this.logUserAction(LogType.ERROR, this.getClientUsername(), action);
 	}
 
 	protected void logError(String username, Action action) {
@@ -68,7 +69,7 @@ public abstract class GSLogProducerService extends GSWebService {
 	}
 
 	protected void logWarning(Action action) {
-		this.logUserAction(LogType.WARNING, this.getClientPassword(), action);
+		this.logUserAction(LogType.WARNING, this.getClientUsername(), action);
 	}
 
 	protected void logWarning(String username, Action action) {
@@ -84,7 +85,7 @@ public abstract class GSLogProducerService extends GSWebService {
 	}
 
 	protected void logInfo(Action action) {
-		this.logUserAction(LogType.INFO, this.getClientPassword(), action);
+		this.logUserAction(LogType.INFO, this.getClientUsername(), action);
 	}
 
 	protected void logInfo(String username, Action action) {

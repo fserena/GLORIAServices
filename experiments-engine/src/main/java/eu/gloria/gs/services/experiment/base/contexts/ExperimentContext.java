@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
@@ -12,7 +13,6 @@ import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException
 import eu.gloria.gs.services.experiment.base.operations.OperationContext;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterContext;
-import eu.gloria.gs.services.experiment.base.parameters.UndefinedExperimentParameterException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 
 public class ExperimentContext extends Context {
@@ -172,8 +172,8 @@ public class ExperimentContext extends Context {
 	}
 
 	public void setParameterValue(String parameterName, Object value)
-			throws ExperimentParameterException, ExperimentNotInstantiatedException,
-			NoSuchParameterException {
+			throws ExperimentParameterException,
+			ExperimentNotInstantiatedException, NoSuchParameterException {
 
 		String[] parameterNodes = parameterName.split("\\.");
 
@@ -206,9 +206,8 @@ public class ExperimentContext extends Context {
 	}
 
 	public void executeOperation(String name)
-			throws ExperimentOperationException, NoSuchOperationException,
-			UndefinedExperimentParameterException,
-			ExperimentParameterException, ExperimentNotInstantiatedException {
+			throws ExperimentOperationException, ExperimentException,
+			NoSuchOperationException, ExperimentNotInstantiatedException {
 
 		OperationContext operationContext = this.getOperation(name);
 

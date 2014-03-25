@@ -31,9 +31,11 @@ import eu.gloria.gs.services.experiment.base.models.InvalidUserContextException;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperation;
 import eu.gloria.gs.services.experiment.base.operations.ExperimentOperationException;
 import eu.gloria.gs.services.experiment.base.operations.NoSuchOperationException;
+import eu.gloria.gs.services.experiment.base.operations.OperationTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameter;
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterException;
+import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentNotInstantiatedException;
 import eu.gloria.gs.services.experiment.base.reservation.ExperimentReservationArgumentException;
 import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeException;
@@ -48,6 +50,7 @@ import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.Action;
 import eu.gloria.gs.services.log.action.Param;
 import eu.gloria.gs.services.log.action.ServiceOperation;
+import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.RTRepositoryInterface;
 import eu.gloria.gs.services.repository.user.InvalidUserException;
 import eu.gloria.gs.services.repository.user.UserRepositoryException;
@@ -100,23 +103,6 @@ public class Experiment extends GSLogProducerService implements
 		this.rtRepository = rtRepository;
 	}
 
-	private void buildWarningLog(Action action, ActionException e,
-			String origin, String... reasons) {
-		Action warning = new Action();
-		action.put("warning", warning);
-		if (e != null) {
-			warning.put("details", e.getAction());
-		}
-		warning.put("origin", origin);
-		warning.put("reasons", reasons);
-	}
-
-	private void treatUserRepositoryException(Action action, ActionException e) {
-		buildWarningLog(action, e, "user repository");
-		this.logWarning(getClientUsername(), action);
-		action.remove("warning");
-	}
-
 	private boolean isAdminMode(Action action) {
 		boolean adminMode = false;
 
@@ -128,7 +114,7 @@ public class Experiment extends GSLogProducerService implements
 				adminMode = true;
 			}
 		} catch (UserRepositoryException e) {
-			treatUserRepositoryException(action, e);
+			this.logWarning(action);
 		}
 
 		return adminMode;
@@ -149,7 +135,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -166,12 +152,9 @@ public class Experiment extends GSLogProducerService implements
 		try {
 			expInfo = experimentAdapter.getExperimentInformation(experiment);
 			return expInfo;
-		} catch (NoSuchExperimentException e) {
-			this.logException(action, e);
-			throw e;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -192,7 +175,7 @@ public class Experiment extends GSLogProducerService implements
 			return paramInfo;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -209,7 +192,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
@@ -234,7 +217,7 @@ public class Experiment extends GSLogProducerService implements
 			return experiments;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
@@ -251,7 +234,7 @@ public class Experiment extends GSLogProducerService implements
 
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -269,12 +252,12 @@ public class Experiment extends GSLogProducerService implements
 			return this.getPendingReservations(type, adminMode);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
 	private List<ReservationInformation> getPendingReservations(
-			ExperimentType type, boolean adminMode) throws ActionException,
+			ExperimentType type, boolean adminMode) throws ExperimentException,
 			NoReservationsAvailableException {
 
 		List<ReservationInformation> resInfo = null;
@@ -289,7 +272,7 @@ public class Experiment extends GSLogProducerService implements
 	}
 
 	private boolean anyReservationActiveNow(ExperimentType type,
-			boolean adminMode) throws ActionException {
+			boolean adminMode) throws ExperimentException {
 		boolean anyActiveNow;
 		if (adminMode) {
 			anyActiveNow = experimentAdapter.anyReservationActiveNow(type);
@@ -317,7 +300,7 @@ public class Experiment extends GSLogProducerService implements
 			return this.anyReservationActiveNow(type, adminMode);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -337,13 +320,13 @@ public class Experiment extends GSLogProducerService implements
 			return this.getCurrentReservations(type, adminMode);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
 
 	private List<ReservationInformation> getCurrentReservations(
-			ExperimentType type, boolean adminMode) throws ActionException,
+			ExperimentType type, boolean adminMode) throws ExperimentException,
 			NoReservationsAvailableException {
 		List<ReservationInformation> reservations;
 
@@ -373,7 +356,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		} finally {
 			GSClientProvider.clearCredentials();
 		}
@@ -402,7 +385,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		} finally {
 			GSClientProvider.clearCredentials();
 		}
@@ -435,7 +418,7 @@ public class Experiment extends GSLogProducerService implements
 			return timeSlots;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		} finally {
 			GSClientProvider.clearCredentials();
 		}
@@ -457,15 +440,9 @@ public class Experiment extends GSLogProducerService implements
 			experimentBooker.cancelReservation(this.getClientUsername(),
 					reservationId);
 			this.logInfo(action);
-		} catch (InvalidUserContextException e) {
-			this.logException(action, e);
-			throw new InvalidUserContextException(action);
-		} catch (NoSuchReservationException e) {
-			this.logException(action, e);
-			throw new NoSuchReservationException(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		} finally {
 			GSClientProvider.clearCredentials();
 		}
@@ -492,12 +469,9 @@ public class Experiment extends GSLogProducerService implements
 				this.logError(action);
 				throw new InvalidUserContextException(action);
 			}
-		} catch (NoSuchReservationException e) {
-			this.logError(action);
-			throw new NoSuchReservationException(action);
 		} catch (ActionException e) {
-			this.logError(action);
-			throw new ExperimentException(action);
+			this.logException(action, e);
+			throw e;
 		}
 	}
 
@@ -508,7 +482,7 @@ public class Experiment extends GSLogProducerService implements
 			@Param(name = "name") String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
 			ExperimentNotInstantiatedException, NoSuchReservationException,
-			InvalidUserContextException {
+			InvalidUserContextException, ExperimentException {
 
 		Action action = new Action(Experiment.class,
 				"executeExperimentOperation", reservationId, operation);
@@ -520,18 +494,9 @@ public class Experiment extends GSLogProducerService implements
 
 			context.executeOperation(operation);
 			this.logInfo(action);
-		} catch (ExperimentParameterException e) {
-			this.logException(action, e);
-			throw new ExperimentOperationException(action);
-		} catch (InvalidUserContextException e) {
-			this.logException(action, e);
-			throw new InvalidUserContextException(action);
-		} catch (ExperimentOperationException | NoSuchOperationException e) {
-			this.logException(action, e);
-			throw e;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentOperationException(action);
+			throw e;
 		}
 	}
 
@@ -562,31 +527,20 @@ public class Experiment extends GSLogProducerService implements
 				this.logError(action);
 				throw new NoSuchReservationException(action);
 			}
-		} catch (ActionException e) {
-			this.logException(action, e);
-			throw new ExperimentException(action);
-		}
 
-		try {
 			if (!experimentAdapter.isReservationContextReady(reservationId)) {
 				action.put("reason", "context not ready");
 				this.logError(action);
 				throw new ExperimentNotInstantiatedException(action);
 			}
-		} catch (ActionException e) {
-			this.logException(action, e);
-			throw new ExperimentException(action);
-		}
 
-		ExperimentRuntimeInformation context;
-		try {
-			context = experimentAdapter
+			ExperimentRuntimeInformation context = experimentAdapter
 					.getExperimentRuntimeContext(reservationId);
 
 			return context;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -612,7 +566,7 @@ public class Experiment extends GSLogProducerService implements
 			}
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 		CustomExperimentModel model;
@@ -620,9 +574,14 @@ public class Experiment extends GSLogProducerService implements
 			model = modelManager.getModel(experiment);
 			model.buildOperation(operation);
 			contextManager.deleteExperimentContexts(experiment);
-		} catch (ActionException e) {
+		} catch (NoSuchOperationException | NoSuchParameterException
+				| ExperimentOperationException
+				| OperationTypeNotAvailableException e) {
 			this.logException(action, e);
 			throw new ExperimentException(action);
+		} catch (ActionException e) {
+			this.logException(action, e);
+			throw e;
 		}
 
 		this.logInfo(action);
@@ -649,7 +608,7 @@ public class Experiment extends GSLogProducerService implements
 			}
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 		CustomExperimentModel model;
@@ -668,9 +627,13 @@ public class Experiment extends GSLogProducerService implements
 				throw new NoSuchParameterException(action);
 			}
 			model.buildParameter(parameter);
-		} catch (ActionException e) {
+		} catch (ExperimentParameterException
+				| ParameterTypeNotAvailableException e) {
 			this.logException(action, e);
 			throw new ExperimentException(action);
+		} catch (ActionException e) {
+			this.logException(action, e);
+			throw e;
 		}
 
 		this.logInfo(action);
@@ -681,7 +644,7 @@ public class Experiment extends GSLogProducerService implements
 	public void setExperimentParameterValue(
 			@Param(name = "rid") int reservationId,
 			@Param(name = "parameter") String parameter, ObjectResponse input)
-			throws ExperimentParameterException,
+			throws ExperimentParameterException, ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException,
 			InvalidUserContextException, NoSuchParameterException {
 
@@ -729,15 +692,9 @@ public class Experiment extends GSLogProducerService implements
 
 			this.logInfo(reservationId, getClientUsername(), action);
 
-		} catch (InvalidUserContextException e) {
-			this.logException(action, e);
-			throw new InvalidUserContextException(action);
-		} catch (NoSuchParameterException e) {
-			this.logException(action, e);
-			throw new NoSuchParameterException(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentParameterException(action);
+			throw e;
 		}
 	}
 
@@ -810,15 +767,12 @@ public class Experiment extends GSLogProducerService implements
 
 			return response;
 
-		} catch (InvalidUserContextException e) {
-			this.logException(action, e);
-			throw new InvalidUserContextException(action);
-		} catch (NoSuchParameterException e) {
-			this.logException(action, e);
-			throw new NoSuchParameterException(action);
-		} catch (ActionException e) {
+		} catch (ExperimentParameterException e) {
 			this.logException(action, e);
 			throw new ExperimentException(action);
+		} catch (ActionException e) {
+			this.logException(action, e);
+			throw e;
 		}
 	}
 
@@ -855,7 +809,7 @@ public class Experiment extends GSLogProducerService implements
 
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -864,7 +818,7 @@ public class Experiment extends GSLogProducerService implements
 	public ObjectResponse getExperimentParameterValue(
 			@Param(name = "rid") int reservationId,
 			@Param(name = "parameter") String parameter)
-			throws ExperimentParameterException,
+			throws ExperimentParameterException, ExperimentException,
 			ExperimentNotInstantiatedException, NoSuchReservationException,
 			InvalidUserContextException, NoSuchParameterException {
 
@@ -917,15 +871,9 @@ public class Experiment extends GSLogProducerService implements
 
 			return response;
 
-		} catch (NoSuchParameterException e) {
-			this.logException(action, e);
-			throw new NoSuchParameterException(action);
-		} catch (InvalidUserContextException e) {
-			this.logException(action, e);
-			throw new InvalidUserContextException(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentParameterException(action);
+			throw e;
 		}
 	}
 
@@ -947,21 +895,14 @@ public class Experiment extends GSLogProducerService implements
 				this.logError(action);
 				throw new NoSuchExperimentException(action);
 			}
-		} catch (ActionException e) {
-			this.logException(action, e);
-			throw new ExperimentException(action);
-		}
 
-		try {
 			modelManager.deleteModel(experiment);
 			contextManager.deleteExperimentContexts(experiment);
-			this.logInfo(getClientUsername(), action);
+			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
-
-		this.logInfo(action);
 	}
 
 	@Override
@@ -991,7 +932,7 @@ public class Experiment extends GSLogProducerService implements
 			return reservationInfo;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
@@ -999,7 +940,6 @@ public class Experiment extends GSLogProducerService implements
 	@Override
 	@ServiceOperation(name = "get all parameters")
 	public Set<String> getAllExperimentParameters() throws ExperimentException {
-
 		Map<String, ExperimentParameter> parameters = modelManager
 				.getAllExperimentParameters();
 
@@ -1045,7 +985,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1065,7 +1005,7 @@ public class Experiment extends GSLogProducerService implements
 			return results;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1084,7 +1024,7 @@ public class Experiment extends GSLogProducerService implements
 			return results;
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1107,18 +1047,13 @@ public class Experiment extends GSLogProducerService implements
 				this.logError(action);
 				throw new NoSuchExperimentException(action);
 			}
-		} catch (ActionException e) {
-			this.logException(action, e);
-			throw new ExperimentException(action);
-		}
 
-		try {
 			modelManager.deleteParameter(experiment, parameter);
 			contextManager.deleteExperimentContexts(experiment);
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1142,18 +1077,13 @@ public class Experiment extends GSLogProducerService implements
 				this.logError(action);
 				throw new NoSuchExperimentException(action);
 			}
-		} catch (ActionException e) {
-			this.logException(action, e);
-			throw new ExperimentException(action);
-		}
 
-		try {
 			modelManager.deleteOperation(experiment, operation);
 			contextManager.deleteExperimentContexts(experiment);
-			this.logInfo(getClientUsername(), action);
+			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1171,7 +1101,7 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
@@ -1215,9 +1145,12 @@ public class Experiment extends GSLogProducerService implements
 			this.logInfo(action);
 
 			return sid;
-		} catch (ActionException e) {
+		} catch (RTRepositoryException e) {
 			this.logException(action, e);
 			throw new ExperimentException(action);
+		} catch (ActionException e) {
+			this.logException(action, e);
+			throw e;
 		} finally {
 			GSClientProvider.clearCredentials();
 		}
@@ -1235,7 +1168,7 @@ public class Experiment extends GSLogProducerService implements
 			return scriptAdapter.getRTScriptInformation(sid);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1249,7 +1182,7 @@ public class Experiment extends GSLogProducerService implements
 			return scriptAdapter.getAllRTScripts(rt);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 
@@ -1275,7 +1208,7 @@ public class Experiment extends GSLogProducerService implements
 			scriptAdapter.removeRTScript(sid);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 
 	}
@@ -1304,10 +1237,10 @@ public class Experiment extends GSLogProducerService implements
 
 		} catch (NoSuchExperimentException e) {
 			this.logException(action, e);
-			throw new NoSuchScriptException(action);
+			throw new ExperimentException(action);
 		} catch (ActionException e) {
 			this.logException(action, e);
-			throw new ExperimentException(action);
+			throw e;
 		}
 	}
 }

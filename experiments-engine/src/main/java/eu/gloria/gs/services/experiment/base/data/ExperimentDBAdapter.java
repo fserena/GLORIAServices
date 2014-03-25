@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ArgumentEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ContextEntry;
 import eu.gloria.gs.services.experiment.base.data.dbservices.ExperimentDBService;
@@ -47,18 +48,11 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		super(ExperimentDBAdapter.class.getSimpleName());
 	}
 
-	/**
-	 * @param experiment
-	 * @param operationInfo
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
 	public void addExperimentOperation(String experiment,
-			OperationInformation operationInfo) throws ActionException,
+			OperationInformation operationInfo) throws ExperimentException,
 			NoSuchExperimentException {
 
 		try {
-
 			if (service.containsExperiment(experiment)) {
 
 				int experimentId = service.getExperimentId(experiment);
@@ -74,18 +68,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param parameterInfo
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
 	public void addExperimentParameter(String experiment,
-			ParameterInformation parameterInfo) throws ActionException,
+			ParameterInformation parameterInfo) throws ExperimentException,
 			NoSuchExperimentException {
 
 		try {
@@ -109,19 +97,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException | IOException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param parameter
-	 * @param rid
-	 * @throws NoSuchExperimentException
-	 * @throws ActionException
-	 */
 	public void addParameterContext(String experiment, String parameter, int rid)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 
 		try {
 
@@ -146,23 +127,19 @@ public class ExperimentDBAdapter extends LoggerEntity {
 					ex.getAction().put("rid", rid);
 
 					log.warn(ex.getAction().toString());
-					throw ex;
+					throw new ExperimentException(ex.getAction());
 				}
 			} else {
 				throw new NoSuchExperimentException(experiment);
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws ActionException
-	 */
 	public boolean anyReservationActiveNow(ExperimentType type)
-			throws ActionException {
+			throws ExperimentException {
 
 		boolean anyActive = false;
 		try {
@@ -174,20 +151,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return anyActive;
 	}
 
-	/**
-	 * @param telescopes
-	 * @param timeSlot
-	 * @return
-	 * @throws ActionException
-	 */
 	public boolean anyRTReservationBetween(List<String> telescopes,
-			TimeSlot timeSlot) throws ActionException {
+			TimeSlot timeSlot) throws ExperimentException {
 
 		boolean available = true;
 
@@ -202,19 +173,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 				}
 			}
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return !available;
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 * @throws ActionException
-	 */
 	public boolean anyUserReservationActiveNow(ExperimentType type,
-			String username) throws ActionException {
+			String username) throws ExperimentException {
 
 		boolean anyActive = false;
 		try {
@@ -226,16 +192,13 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return anyActive;
 	}
 
-	/**
-	 * @throws ActionException
-	 */
-	public void clearAllObsoleteContexts() throws ActionException {
+	public void clearAllObsoleteContexts() throws ExperimentException {
 
 		try {
 
@@ -249,15 +212,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
-	/**
-	 * @throws ActionException
-	 */
-	public void clearAllObsoleteReservations() throws ActionException {
+	public void clearAllObsoleteReservations() throws ExperimentException {
 
 		try {
 
@@ -269,36 +229,25 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @return
-	 * @throws ActionException
-	 */
-	public boolean containsExperiment(String experiment) throws ActionException {
+	public boolean containsExperiment(String experiment) throws ExperimentException {
 
 		boolean alreadyContained = false;
 
 		try {
 			alreadyContained = service.containsExperiment(experiment);
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return alreadyContained;
 	}
-
-	/**
-	 * @param experiment
-	 * @param author
-	 * @throws ActionException
-	 * @throws DuplicateExperimentException
-	 */
+	
 	public void createExperiment(String experiment, String author, String type)
-			throws ActionException, DuplicateExperimentException {
+			throws ExperimentException, DuplicateExperimentException {
 
 		boolean alreadyContained = true;
 
@@ -315,7 +264,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		if (alreadyContained) {
@@ -323,13 +272,8 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @throws NoSuchExperimentException
-	 * @throws ActionException
-	 */
 	public void deleteExperiment(String experiment)
-			throws NoSuchExperimentException, ActionException {
+			throws NoSuchExperimentException, ExperimentException {
 
 		try {
 			if (service.containsExperiment(experiment)) {
@@ -341,42 +285,34 @@ public class ExperimentDBAdapter extends LoggerEntity {
 				throw e;
 			}
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
-	/**
-	 * @param rid
-	 * @throws ActionException
-	 */
-	public void deleteExperimentContext(int rid) throws ActionException {
+	public void deleteExperimentContext(int rid) throws ExperimentException {
 
 		try {
 
 			service.removeReservationContext(rid);
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
 
-	/**
-	 * @param rid
-	 * @throws ActionException
-	 */
-	public void deleteReservation(int rid) throws ActionException {
+	public void deleteReservation(int rid) throws ExperimentException {
 
 		try {
 
 			service.removeReservation(rid);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	public void emptyExperiment(String experiment) throws ActionException,
+	public void emptyExperiment(String experiment) throws ExperimentException,
 			NoSuchExperimentException {
 
 		try {
@@ -394,16 +330,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 		} catch (PersistenceException e) {
 			log.error(e.getMessage());
-			throw new ActionException();
+			throw new ExperimentException();
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws ActionException
-	 */
 	public List<String> getAllExperiments(ExperimentType type)
-			throws ActionException {
+			throws ExperimentException {
 
 		List<String> experiments = null;
 
@@ -411,20 +343,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			experiments = service.getAllTypeExperiments(type.name());
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return experiments;
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 * @throws ActionException
-	 * @throws NoReservationsAvailableException
-	 */
 	public List<ReservationInformation> getAllPendingReservations(
-			ExperimentType type) throws ActionException,
+			ExperimentType type) throws ExperimentException,
 			NoReservationsAvailableException {
 
 		try {
@@ -444,17 +370,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws ActionException
-	 * @throws NoReservationsAvailableException
-	 */
 	public List<ReservationInformation> getAllReservationsActiveNow(
-			ExperimentType type) throws ActionException,
+			ExperimentType type) throws ExperimentException,
 			NoReservationsAvailableException {
 
 		try {
@@ -472,18 +393,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 			return this.processReservationEntries(reservationEntries);
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @return
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
 	public ExperimentInformation getBasicExperimentInformation(String experiment)
-			throws ActionException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		try {
 
@@ -499,14 +414,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 				return expInfo;
 			}
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		throw new NoSuchExperimentException(experiment);
 	}
 
 	public List<ResultInformation> getContextResults(int context)
-			throws ActionException, NoSuchReservationException {
+			throws ExperimentException, NoSuchReservationException {
 
 		try {
 
@@ -538,18 +453,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 			return results;
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @return
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
 	public ExperimentInformation getExperimentInformation(String experiment)
-			throws ActionException, NoSuchExperimentException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		try {
 
@@ -688,14 +597,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 				| ParameterTypeNotAvailableException
 				| ExperimentParameterException
 				| OperationTypeNotAvailableException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		throw new NoSuchExperimentException(experiment);
 	}
 
 	public List<ResultInformation> getExperimentResults(String experiment)
-			throws ActionException {
+			throws ExperimentException {
 
 		try {
 
@@ -722,18 +631,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 			return results;
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param rid
-	 * @return
-	 * @throws ActionException
-	 * @throws ExperimentNotInstantiatedException
-	 */
 	public ExperimentRuntimeInformation getExperimentRuntimeContext(int rid)
-			throws ActionException, ExperimentNotInstantiatedException {
+			throws ExperimentException, ExperimentNotInstantiatedException {
 
 		try {
 
@@ -756,36 +659,23 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return runtimeContext;
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @return
-	 * @throws ActionException
-	 */
-	public String getExperimentType(String experiment) throws ActionException {
+	public String getExperimentType(String experiment)
+			throws ExperimentException {
 
 		try {
 			ExperimentEntry expEntry = service.getExperiment(experiment);
 			return expEntry.getType();
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param parameter
-	 * @param rid
-	 * @return
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 * @throws ExperimentNotInstantiatedException
-	 */
 	public Object getParameterContextValue(String parameter, int rid)
-			throws ActionException, NoSuchParameterException,
+			throws ExperimentException, NoSuchParameterException,
 			ExperimentNotInstantiatedException {
 
 		try {
@@ -807,22 +697,16 @@ public class ExperimentDBAdapter extends LoggerEntity {
 						parameterEntry.getIdparameter(), rid);
 
 			} else {
-				throw new ActionException("parameter problem");
+				throw new ExperimentException("parameter problem");
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param rid
-	 * @return
-	 * @throws ActionException
-	 * @throws NoSuchReservationException
-	 */
 	public ReservationInformation getReservationInformation(int rid)
-			throws ActionException, NoSuchReservationException {
+			throws ExperimentException, NoSuchReservationException {
 
 		ReservationInformation reservation = null;
 
@@ -855,7 +739,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		if (reservation == null) {
@@ -865,14 +749,8 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		return reservation;
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 * @throws ActionException
-	 * @throws NoReservationsAvailableException
-	 */
 	public List<ReservationInformation> getUserPendingReservations(
-			String username) throws ActionException,
+			String username) throws ExperimentException,
 			NoReservationsAvailableException {
 
 		try {
@@ -886,18 +764,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 * @throws ActionException
-	 * @throws NoReservationsAvailableException
-	 */
 	public List<ReservationInformation> getUserPendingReservations(
-			ExperimentType type, String username) throws ActionException,
+			ExperimentType type, String username) throws ExperimentException,
 			NoReservationsAvailableException {
 
 		try {
@@ -912,18 +784,13 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 * @throws ActionException
-	 * @throws NoReservationsAvailableException
-	 */
 	public List<ReservationInformation> getUserReservationsActiveNow(
-			ExperimentType type, String username) throws ActionException {
+			ExperimentType type, String username) throws ExperimentException,
+			NoReservationsAvailableException {
 
 		try {
 			List<ReservationEntry> reservationEntries;
@@ -943,39 +810,25 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return this.processReservationEntries(reservationEntries);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws ActionException
-	 */
-	public boolean isReservationActiveNow(int rid) throws ActionException {
+	public boolean isReservationActiveNow(int rid) throws ExperimentException {
 
 		boolean anyActive = false;
 		try {
 			anyActive = service.isReservationActiveNow(rid, new Date());
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return anyActive;
 	}
 
-	/**
-	 * @param rid
-	 * @return
-	 * @throws ActionException
-	 */
-	/**
-	 * @param rid
-	 * @return
-	 * @throws ActionException
-	 * @throws NoSuchReservationException
-	 */
-	public boolean isReservationContextReady(int rid) throws ActionException {
+	public boolean isReservationContextReady(int rid)
+			throws ExperimentException, NoSuchReservationException {
 
 		try {
 
@@ -1000,26 +853,19 @@ public class ExperimentDBAdapter extends LoggerEntity {
 					&& paramsInContext == parameters.size();
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param telescopes
-	 * @param username
-	 * @param timeSlot
-	 * @throws ActionException
-	 */
 	public synchronized int makeReservation(String experiment,
 			List<String> telescopes, String username, TimeSlot timeSlot)
-			throws ActionException {
+			throws ExperimentException {
 
 		try {
 			int experimentId = service.getExperimentId(experiment);
 
 			if (this.anyRTReservationBetween(telescopes, timeSlot)) {
-				throw new ActionException("already reserved");
+				throw new ExperimentException("already reserved");
 			}
 
 			ReservationEntry reservationEntry = new ReservationEntry();
@@ -1047,7 +893,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			return reservationEntry.getIdreservation();
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1085,7 +931,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	}
 
 	public void removeExperimentOperation(String experiment, String opName)
-			throws ActionException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		try {
 
@@ -1099,12 +945,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
 	public void removeExperimentParameter(String experiment, String paramName)
-			throws ActionException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		try {
 
@@ -1120,7 +966,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1129,7 +975,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	 * @throws ActionException
 	 */
 	public boolean reservationIsActiveNowForUser(int rid, String user)
-			throws ActionException {
+			throws ExperimentException {
 
 		boolean anyActive = false;
 		try {
@@ -1137,14 +983,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 					new Date());
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		return anyActive;
 	}
 
 	public void saveResult(int reservationId, String tag, String user,
-			Object value) throws ActionException {
+			Object value) throws ExperimentException {
 
 		try {
 
@@ -1162,7 +1008,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			service.saveResult(entry);
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1170,14 +1016,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	 * @param rid
 	 * @throws ActionException
 	 */
-	public void setContextError(int rid) throws ActionException {
+	public void setContextError(int rid) throws ExperimentException {
 
 		try {
 
 			service.setReservationStatus(rid, "ERROR");
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1185,14 +1031,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	 * @param rid
 	 * @throws ActionException
 	 */
-	public void setContextInit(int rid) throws ActionException {
+	public void setContextInit(int rid) throws ExperimentException {
 
 		try {
 
 			service.setReservationStatus(rid, "INIT");
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1200,14 +1046,14 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	 * @param rid
 	 * @throws ActionException
 	 */
-	public void setContextObsolete(int rid) throws ActionException {
+	public void setContextObsolete(int rid) throws ExperimentException {
 
 		try {
 
 			service.setReservationStatus(rid, "OBSOLETE");
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1215,12 +1061,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 	 * @param rid
 	 * @throws ActionException
 	 */
-	public void setContextReady(int rid) throws ActionException {
+	public void setContextReady(int rid) throws ExperimentException {
 		try {
 			service.setReservationStatus(rid, "READY");
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
@@ -1247,18 +1093,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			service.createExperimentResultsTable();
 			log.info("Database ready");
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param description
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
 	public void setExperimentDescription(String experiment, String description)
-			throws ActionException {
+			throws ExperimentException, NoSuchExperimentException {
 
 		boolean alreadyContained = false;
 
@@ -1271,7 +1111,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 		if (!alreadyContained) {
@@ -1279,23 +1119,10 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		}
 	}
 
-	/**
-	 * @param experiment
-	 * @param operation
-	 * @param arguments
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 */
-	/**
-	 * @param experiment
-	 * @param operation
-	 * @param arguments
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 * @throws NoSuchParameterException
-	 */
 	public void setOperationArguments(String experiment, String operation,
-			String[] arguments) throws ActionException {
+			String[] arguments) throws ExperimentException,
+			NoSuchParameterException, NoSuchOperationException,
+			NoSuchExperimentException {
 
 		try {
 
@@ -1363,7 +1190,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 				throw new NoSuchExperimentException(experiment);
 			}
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 
 	}
@@ -1376,18 +1203,9 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		log.info("Operation factory injected");
 	}
 
-	/**
-	 * @param experiment
-	 * @param parameter
-	 * @param rid
-	 * @param value
-	 * @throws ActionException
-	 * @throws NoSuchExperimentException
-	 * @throws ExperimentNotInstantiatedException
-	 * @throws NoSuchParameterException
-	 */
 	public void setParameterContextValue(String parameter, int rid, Object value)
-			throws ActionException {
+			throws ExperimentException, NoSuchParameterException,
+			ExperimentNotInstantiatedException {
 
 		try {
 			if (!service.isReservationContextInstantiated(rid)) {
@@ -1409,7 +1227,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 			}
 
 		} catch (PersistenceException e) {
-			throw new ActionException(e.getMessage());
+			throw new ExperimentException(e.getMessage());
 		}
 	}
 

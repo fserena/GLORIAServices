@@ -53,7 +53,7 @@ public class UserServerPasswordHandler extends ServerPasswordHandler {
 			}
 		} catch (UserRepositoryException e) {
 		} finally {
-			GSClientProvider.clearCredentials();
+			//GSClientProvider.clearCredentials();
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import eu.gloria.gs.services.experiment.ExperimentException;
 import eu.gloria.gs.services.experiment.base.data.ExperimentDBAdapter;
 import eu.gloria.gs.services.experiment.base.data.ExperimentInformation;
 import eu.gloria.gs.services.experiment.base.data.NoSuchExperimentException;
@@ -21,7 +22,6 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterFactory;
 import eu.gloria.gs.services.experiment.base.parameters.NoSuchParameterException;
 import eu.gloria.gs.services.experiment.base.parameters.ParameterTypeNotAvailableException;
-import eu.gloria.gs.services.log.action.ActionException;
 
 public class ExperimentModelFactory {
 
@@ -45,16 +45,12 @@ public class ExperimentModelFactory {
 	}
 
 	public CustomExperimentModel loadCustomExperiment(String experiment)
-			throws NoSuchExperimentException, InvalidExperimentModelException {
+			throws NoSuchExperimentException, InvalidExperimentModelException,
+			ExperimentException {
 		CustomExperimentModel model = null;
 
 		ExperimentInformation expInfo = null;
-
-		try {
-			expInfo = adapter.getExperimentInformation(experiment);
-		} catch (ActionException e) {
-			throw new NoSuchExperimentException(experiment);
-		}
+		expInfo = adapter.getExperimentInformation(experiment);
 
 		model = new CustomExperimentModel();
 		model.setAdapter(this.adapter);
@@ -176,7 +172,7 @@ public class ExperimentModelFactory {
 
 	public void createCustomExperiment(String experiment, String author,
 			String type) throws DuplicateExperimentException,
-			ActionException {
+			ExperimentException {
 		if (adapter.containsExperiment(experiment)) {
 			throw new DuplicateExperimentException(experiment);
 		}

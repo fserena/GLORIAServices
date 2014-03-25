@@ -24,10 +24,13 @@ public class Action extends LinkedHashMap<String, Object> implements
 	}
 
 	public Action(Class<?> cl, String method, Object... args) {
-		try {
-			this.setOperation(cl.getMethod(method), args);
-		} catch (NoSuchMethodException e) {
-		} catch (SecurityException e) {
+		
+		Method[] methods = cl.getDeclaredMethods();
+		for (Method m : methods) {
+			if (m.getName().equals(method)) {
+				this.setOperation(m, args);
+				break;
+			}
 		}
 	}
 

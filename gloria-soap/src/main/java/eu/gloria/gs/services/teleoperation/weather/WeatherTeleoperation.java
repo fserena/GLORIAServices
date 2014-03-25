@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.teleoperation.weather;
 
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
@@ -26,7 +27,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(GetPressureOperation.class,
 					rt, barometer);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
@@ -38,7 +39,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Boolean) this.invokeGetOperation(
 					IsPressureOnAlarmOperation.class, rt, barometer);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
@@ -50,7 +51,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetTemperatureOperation.class, rt, tempSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
@@ -62,7 +63,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Boolean) this.invokeGetOperation(
 					IsTemperatureOnAlarmOperation.class, rt, tempSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}
 	}
@@ -74,7 +75,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetWindSpeedOperation.class, rt, windSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}		
 	}
@@ -86,7 +87,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Boolean) this.invokeGetOperation(
 					IsWindOnAlarmOperation.class, rt, windSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}		
 	}
@@ -98,7 +99,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetRelativeHumidityOperation.class, rt, rhSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}		
 	}
@@ -110,7 +111,7 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Boolean) this.invokeGetOperation(
 					IsRHOnAlarmOperation.class, rt, rhSensor);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
 		}		
 	}

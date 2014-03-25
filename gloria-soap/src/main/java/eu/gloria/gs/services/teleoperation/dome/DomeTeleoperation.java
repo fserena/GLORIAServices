@@ -1,5 +1,6 @@
 package eu.gloria.gs.services.teleoperation.dome;
 
+import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
@@ -7,6 +8,7 @@ import eu.gloria.gs.services.teleoperation.dome.operations.CloseOperation;
 import eu.gloria.gs.services.teleoperation.dome.operations.GetAzimuthOperation;
 import eu.gloria.gs.services.teleoperation.dome.operations.GetStateOperation;
 import eu.gloria.gs.services.teleoperation.dome.operations.IsTrackingEnabledOperation;
+import eu.gloria.gs.services.teleoperation.dome.operations.OpenOperation;
 import eu.gloria.gs.services.teleoperation.dome.operations.ParkOperation;
 import eu.gloria.gs.services.teleoperation.dome.operations.SetTrackingOperation;
 
@@ -22,7 +24,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 		try {
 			this.invokeSetOperation(CloseOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -33,7 +35,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(GetAzimuthOperation.class,
 					rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -44,7 +46,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (DomeOpeningState) this.invokeGetOperation(
 					GetStateOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -55,7 +57,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Boolean) this.invokeGetOperation(
 					IsTrackingEnabledOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -64,8 +66,8 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 	public void open(String rt, String dome)
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 		try {
-			this.invokeSetOperation(CloseOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+			this.invokeSetOperation(OpenOperation.class, rt, dome);
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -75,7 +77,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 		try {
 			this.invokeSetOperation(ParkOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}
@@ -85,7 +87,7 @@ public class DomeTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, DomeTeleoperationException {
 		try {
 			this.invokeSetOperation(SetTrackingOperation.class, rt, dome);
-		} catch (TeleoperationException e) {
+		} catch (ActionException e) {
 			throw new DomeTeleoperationException(e.getAction());
 		}
 	}

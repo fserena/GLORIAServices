@@ -72,18 +72,22 @@ public interface ExperimentInterface {
 	public void setExperimentDescription(String experiment, String description)
 			throws ExperimentException, NoSuchExperimentException;
 
-	public List<String> getAllExperiments(ExperimentType type) throws ExperimentException;
+	public List<String> getAllExperiments(ExperimentType type)
+			throws ExperimentException;
 
 	public boolean containsExperiment(String experiment)
 			throws ExperimentException;
 
-	public List<ReservationInformation> getMyPendingReservations(ExperimentType type)
-			throws ExperimentException, NoReservationsAvailableException;
+	public List<ReservationInformation> getMyPendingReservations(
+			ExperimentType type) throws ExperimentException,
+			NoReservationsAvailableException;
 
-	public boolean anyReservationActiveNow(ExperimentType type) throws ExperimentException;
+	public boolean anyReservationActiveNow(ExperimentType type)
+			throws ExperimentException;
 
-	public List<ReservationInformation> getMyCurrentReservations(ExperimentType type)
-			throws ExperimentException, NoReservationsAvailableException;
+	public List<ReservationInformation> getMyCurrentReservations(
+			ExperimentType type) throws ExperimentException,
+			NoReservationsAvailableException;
 
 	public void reserveExperiment(String experiment, List<String> telescopes,
 			TimeSlot timeSlot) throws ExperimentException,
@@ -108,20 +112,20 @@ public interface ExperimentInterface {
 
 	public void executeExperimentOperation(int reservationId, String operation)
 			throws ExperimentOperationException, NoSuchOperationException,
-			ExperimentNotInstantiatedException, ExperimentException,
-			NoSuchReservationException, NoSuchExperimentException,
-			InvalidUserContextException;
+			ExperimentNotInstantiatedException, NoSuchReservationException,
+			InvalidUserContextException, ExperimentException;
 
 	public void setExperimentParameterValue(int reservationId,
 			String parameter, ObjectResponse value)
-			throws ExperimentNotInstantiatedException,
-			NoSuchReservationException, ExperimentParameterException,
+			throws ExperimentParameterException, ExperimentException,
+			ExperimentNotInstantiatedException, NoSuchReservationException,
 			InvalidUserContextException, NoSuchParameterException;
 
 	public ObjectResponse getExperimentParameterValue(int reservationId,
-			String parameter) throws ExperimentNotInstantiatedException,
-			NoSuchReservationException, ExperimentParameterException,
-			InvalidUserContextException, NoSuchParameterException;
+			String parameter) throws ExperimentParameterException,
+			ExperimentException, ExperimentNotInstantiatedException,
+			NoSuchReservationException, InvalidUserContextException,
+			NoSuchParameterException;
 
 	public List<ResultInformation> getContextResults(int reservationId)
 			throws ExperimentException, ExperimentNotInstantiatedException,
