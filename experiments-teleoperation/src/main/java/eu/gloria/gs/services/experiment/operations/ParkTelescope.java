@@ -43,18 +43,18 @@ public class ParkTelescope extends TeleOperation {
 					this.getPassword());
 
 			List<String> mounts;
-			List<String> domes;
+			//List<String> domes;
 
 			try {
 				mounts = this.getRTRepository().getRTDeviceNames(rtName,
 						DeviceType.MOUNT);
-				domes = this.getRTRepository().getRTDeviceNames(rtName,
-						DeviceType.DOME);
+				//domes = this.getRTRepository().getRTDeviceNames(rtName,
+				//		DeviceType.DOME);
 			} catch (RTRepositoryException e) {
 				throw new ExperimentOperationException(e.getAction());
 			}
 
-			if (domes != null && domes.size() > 0) {
+			/*if (domes != null && domes.size() > 0) {
 				String domeName = domes.get(0);
 				try {
 					this.getDomeTeleoperation().close(rtName, domeName);
@@ -62,7 +62,7 @@ public class ParkTelescope extends TeleOperation {
 					throw new ExperimentOperationException(e.getAction());
 				} catch (DeviceOperationFailedException e) {
 				}
-			}
+			}*/
 
 			if (mounts != null && mounts.size() > 0) {
 

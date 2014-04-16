@@ -25,9 +25,8 @@ public class ActionException extends Exception {
 	private String json;
 
 	private void putExceptionName() {
-		this.action.put("exception",
-				this.getClass().getSimpleName().replace("Exception", "")
-						.toLowerCase());
+		this.action.put("name",
+				this.getClass().getSimpleName().replace("Exception", ""));
 	}
 	
 	public ActionException() {
@@ -37,11 +36,18 @@ public class ActionException extends Exception {
 
 	public ActionException(String message) {
 		this.action = new Action();
-		this.action.put("cause", message);
+		this.action.put("message", message);
+		this.putExceptionName();
 	}
 
 	public ActionException(Action action) {
 		this.action = new Action();
+		this.action.putAll(action);
+		if (action.containsKey("exception")) {
+			this.action.put("inner", action.get("exception"));
+			this.action.remove("exception");
+		}
+		
 		this.putExceptionName();
 	}
 

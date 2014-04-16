@@ -12,10 +12,8 @@ public class DomeTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 
-	public DomeTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public DomeTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public DomeTeleoperationException() {

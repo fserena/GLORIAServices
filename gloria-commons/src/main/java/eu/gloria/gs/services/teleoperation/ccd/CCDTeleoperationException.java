@@ -17,11 +17,9 @@ public class CCDTeleoperationException extends RTSTeleoperationException {
 		super();
 	}
 	
-	public CCDTeleoperationException(String cause)
+	public CCDTeleoperationException(String message)
 	{
-		super(new Action());
-		
-		this.getAction().put("cause", cause);
+		super(message);
 	}
 	
 	

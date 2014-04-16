@@ -321,7 +321,13 @@ public interface ExperimentDBService {
 	 * @param end
 	 * @return
 	 */
-	public ReservationEntry getReservation(@Param(value = "user_") String user,
+	public List<ReservationEntry> getReservation(
+			@Param(value = "user_") String user,
+			@Param(value = "experiment_") int experiment,
+			@Param(value = "begin_") Date begin, @Param(value = "end_") Date end);
+
+	public List<Integer> getReservationIds(
+			@Param(value = "user_") String user,
 			@Param(value = "experiment_") int experiment,
 			@Param(value = "begin_") Date begin, @Param(value = "end_") Date end);
 

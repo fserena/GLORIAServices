@@ -16,8 +16,8 @@ public class ExperimentException extends ActionException {
 		super();
 	}
 
-	public ExperimentException(String cause) {
-		super(cause);
+	public ExperimentException(String message) {
+		super(message);
 	}
 
 	private static final long serialVersionUID = 5848333110207976076L;

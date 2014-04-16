@@ -51,7 +51,6 @@ public class OpenDome extends TeleOperation {
 
 			this.getDomeTeleoperation().open(rtName, domeName);
 		} catch (DeviceOperationFailedException e) {
-
 		} catch (DomeTeleoperationException e) {
 			throw new ExperimentOperationException(e.getAction());
 		}

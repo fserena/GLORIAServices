@@ -14,11 +14,7 @@ public class NoSuchExperimentException extends ActionException {
 		super();
 
 		Action action = this.getAction();
-		action.put("name", experiment);
-	}
-
-	public NoSuchExperimentException(Action action) {
-		super(action);
+		action.put("experiment", experiment);
 	}
 
 	public NoSuchExperimentException() {

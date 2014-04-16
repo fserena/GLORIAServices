@@ -356,7 +356,7 @@ public class RTSHandler implements ServerHandler {
 			}
 		}
 
-		throw new IncorrectDeviceTypeException(type.name());
+		throw new IncorrectDeviceTypeException(name, type.name());
 	}
 
 	public double getDomeAzimuth(String dome) throws TeleoperationException {
@@ -533,6 +533,11 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 
+			DeviceMount mountDevice = (DeviceMount) rtsPort.devGetDevice(null,
+					mount, false);
+
+			ActivityStateMount state = mountDevice.getActivityState();
+			
 			boolean parked = rtsPort.mntIsParked(null, mount);
 			boolean slewing = rtsPort.mntIsSlewing(null, mount);
 			boolean tracking = rtsPort.mntGetTracking(null, mount);
@@ -543,11 +548,9 @@ public class RTSHandler implements ServerHandler {
 				return ActivityStateMount.TRACKING;
 			if (slewing)
 				return ActivityStateMount.MOVING;
-
-			DeviceMount mountDevice = (DeviceMount) rtsPort.devGetDevice(null,
-					mount, false);
-
-			return mountDevice.getActivityState();
+			
+			return state;
+			
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get state", e.getMessage());

@@ -48,8 +48,8 @@ public class Action extends LinkedHashMap<String, Object> implements
 
 	@SuppressWarnings("unchecked")
 	public void setOperation(Method method, Object... args) {
-		if (!this.containsKey("operation")) {
-			this.put("operation", new LinkedHashMap<String, Object>());
+		if (!this.containsKey("action")) {
+			this.put("action", new LinkedHashMap<String, Object>());
 		}
 
 		String name = method.getName();
@@ -59,7 +59,7 @@ public class Action extends LinkedHashMap<String, Object> implements
 			name = operation.name();
 		}
 
-		((LinkedHashMap<String, Object>) this.get("operation")).put("name",
+		((LinkedHashMap<String, Object>) this.get("action")).put("name",
 				name);
 
 		Annotation[][] annotations = method.getParameterAnnotations();
@@ -70,7 +70,7 @@ public class Action extends LinkedHashMap<String, Object> implements
 					&& annotation[0].annotationType().equals(Param.class)) {
 				
 				String param = ((Param) annotation[0]).name();
-				((LinkedHashMap<String, Object>) this.get("operation")).put(
+				((LinkedHashMap<String, Object>) this.get("action")).put(
 						param, args[i]);
 			}
 
@@ -80,18 +80,18 @@ public class Action extends LinkedHashMap<String, Object> implements
 
 	@SuppressWarnings("unchecked")
 	public void setOperation(String operation) {
-		if (!this.containsKey("operation")) {
-			this.put("operation", new LinkedHashMap<String, Object>());
+		if (!this.containsKey("action")) {
+			this.put("action", new LinkedHashMap<String, Object>());
 		}
 
-		((LinkedHashMap<String, Object>) this.get("operation")).put("name",
+		((LinkedHashMap<String, Object>) this.get("action")).put("name",
 				operation);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void setArgument(String name, Object value) {
-		if (this.containsKey("operation")) {
-			((LinkedHashMap<String, Object>) this.get("operation")).put("name",
+		if (this.containsKey("action")) {
+			((LinkedHashMap<String, Object>) this.get("action")).put("name",
 					value);
 		}
 	}

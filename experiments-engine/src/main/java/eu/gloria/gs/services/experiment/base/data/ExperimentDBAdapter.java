@@ -233,7 +233,8 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		}
 	}
 
-	public boolean containsExperiment(String experiment) throws ExperimentException {
+	public boolean containsExperiment(String experiment)
+			throws ExperimentException {
 
 		boolean alreadyContained = false;
 
@@ -245,7 +246,7 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 		return alreadyContained;
 	}
-	
+
 	public void createExperiment(String experiment, String author, String type)
 			throws ExperimentException, DuplicateExperimentException {
 
@@ -663,12 +664,12 @@ public class ExperimentDBAdapter extends LoggerEntity {
 		}
 	}
 
-	public String getExperimentType(String experiment)
+	public ExperimentType getExperimentType(String experiment)
 			throws ExperimentException {
 
 		try {
 			ExperimentEntry expEntry = service.getExperiment(experiment);
-			return expEntry.getType();
+			return ExperimentType.valueOf(expEntry.getType());
 		} catch (PersistenceException e) {
 			throw new ExperimentException(e.getMessage());
 		}
@@ -878,15 +879,17 @@ public class ExperimentDBAdapter extends LoggerEntity {
 
 			service.saveReservation(reservationEntry);
 
-			reservationEntry = service.getReservation(username, experimentId,
-					timeSlot.getBegin(), timeSlot.getEnd());
+			List<Integer> reservations = service.getReservationIds(username,
+					experimentId, timeSlot.getBegin(), timeSlot.getEnd());
 
 			if (telescopes != null) {
-
-				for (String rt : telescopes) {
-
-					service.saveRTReservation(
-							reservationEntry.getIdreservation(), rt);
+				for (Integer id : reservations) {
+					List<String> storedRTs = service.getAllRTOfReservation(id);
+					if (storedRTs == null || storedRTs.size() == 0) {
+						for (String rt : telescopes) {
+							service.saveRTReservation(id, rt);
+						}
+					}
 				}
 			}
 

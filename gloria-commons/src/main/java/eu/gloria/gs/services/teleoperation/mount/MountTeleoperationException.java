@@ -12,10 +12,8 @@ public class MountTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 
-	public MountTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public MountTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public MountTeleoperationException() {

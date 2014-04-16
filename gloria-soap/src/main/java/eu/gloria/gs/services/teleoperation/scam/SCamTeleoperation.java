@@ -3,7 +3,6 @@ package eu.gloria.gs.services.teleoperation.scam;
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
-import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.scam.operations.GetBrightnessOperation;
 import eu.gloria.gs.services.teleoperation.scam.operations.GetContrastOperation;
 import eu.gloria.gs.services.teleoperation.scam.operations.GetExposureTimeOperation;
@@ -28,6 +27,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetBrightnessOperation.class,
 					rt, scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -39,6 +40,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetContrastOperation.class,
 					rt, scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -50,6 +53,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetExposureTimeOperation.class, rt, scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -61,6 +66,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetGainOperation.class, rt,
 					scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -72,6 +79,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (String) this.invokeGetOperation(GetImageURLOperation.class,
 					rt, scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -83,6 +92,8 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (SCamState) this.invokeGetOperation(GetStateOperation.class,
 					rt, scam);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -92,7 +103,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 	public void setBrightness(String rt, String scam, long value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
 		try {
-			this.invokeSetOperation(SetBrightnessOperation.class, rt, scam, value);
+			this.invokeSetOperation(SetBrightnessOperation.class, rt, scam,
+					value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -103,16 +117,21 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, SCamTeleoperationException {
 		try {
 			this.invokeSetOperation(SetContrastOperation.class, rt, scam, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
 	public void setExposureTime(String rt, String scam, double value)
 			throws DeviceOperationFailedException, SCamTeleoperationException {
 		try {
-			this.invokeSetOperation(SetExposureTimeOperation.class, rt, scam, value);
+			this.invokeSetOperation(SetExposureTimeOperation.class, rt, scam,
+					value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
 		}
@@ -123,8 +142,10 @@ public class SCamTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, SCamTeleoperationException {
 		try {
 			this.invokeSetOperation(SetGainOperation.class, rt, scam, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new SCamTeleoperationException(e.getAction());
-		}		
+		}
 	}
 }

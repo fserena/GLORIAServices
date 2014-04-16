@@ -12,6 +12,7 @@ import eu.gloria.gs.services.experiment.base.reservation.MaxReservationTimeExcep
 import eu.gloria.gs.services.experiment.base.reservation.NoReservationsAvailableException;
 import eu.gloria.gs.services.experiment.base.reservation.NoSuchReservationException;
 import eu.gloria.gs.services.log.action.Action;
+import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,11 +61,6 @@ public class ExperimentBooker {
 		int integerFactor = currentMinutes / MINUTES_FRAME;
 
 		calendar.set(Calendar.MINUTE, integerFactor * MINUTES_FRAME);
-		/*
-		 * if (calendar.get(Calendar.MINUTE) < MINUTES_FRAME) {
-		 * calendar.set(Calendar.MINUTE, 0); } else {
-		 * calendar.set(Calendar.MINUTE, MINUTES_FRAME); }
-		 */
 
 		Date fromDate = calendar.getTime();
 		calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)
@@ -86,7 +82,12 @@ public class ExperimentBooker {
 			timeSlot.setEnd(endTimeSlotDate);
 
 			if (!adminMode) {
-				available = rtBooker.available(telescopes, timeSlot);
+				try {
+					available = rtBooker.available(telescopes, timeSlot);
+				} catch (RTRepositoryException e) {
+					throw new ExperimentReservationArgumentException(
+							e.getAction());
+				}
 			}
 
 			if (available) {
@@ -135,16 +136,22 @@ public class ExperimentBooker {
 							+ " days");
 		}
 
-		if (!adminMode) {
-			if (!rtBooker.available(telescopes, timeSlot))
+		try {
+			if (!rtBooker.available(telescopes, timeSlot) && !adminMode)
 				throw new ExperimentReservationArgumentException(
 						"one or more telescopes are not available");
+		} catch (ExperimentReservationArgumentException e) {
+		} catch (RTRepositoryException e) {
+			throw new ExperimentReservationArgumentException(e.getAction());
 		}
 
 		List<ReservationInformation> pendingReservations = null;
 
-		pendingReservations = adapter.getUserPendingReservations(
-				ExperimentType.ONLINE, username);
+		try {
+			pendingReservations = adapter.getUserPendingReservations(
+					ExperimentType.ONLINE, username);
+		} catch (NoReservationsAvailableException e) {
+		}
 
 		long msReserved = 0;
 		long msReservation = timeSlot.getEnd().getTime()
@@ -189,9 +196,9 @@ public class ExperimentBooker {
 			NoSuchExperimentException {
 
 		if (adapter.containsExperiment(experiment)) {
-			String type = adapter.getExperimentType(experiment);
+			ExperimentType type = adapter.getExperimentType(experiment);
 
-			if (type.equals("OFFLINE")) {
+			if (type.equals(ExperimentType.OFFLINE)) {
 
 				List<ReservationInformation> reservations = null;
 				try {
@@ -259,10 +266,7 @@ public class ExperimentBooker {
 		reservation = adapter.getReservationInformation(reservationId);
 
 		if (!reservation.getUser().equals(username)) {
-			Action action = new Action();
-			action.put("user", username);
-			action.put("cause", "invalid user");
-			throw new InvalidUserContextException(action);
+			throw new InvalidUserContextException(username, reservationId);
 		}
 
 		if (allowCancel) {

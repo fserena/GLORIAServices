@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.ibatis.exceptions.PersistenceException;
 
 import eu.gloria.gs.services.log.action.ActionException;
+import eu.gloria.gs.services.repository.rt.RTRepositoryException;
 import eu.gloria.gs.services.repository.rt.data.dbservices.DeviceDBService;
 import eu.gloria.gs.services.repository.rt.data.dbservices.DeviceEntry;
 import eu.gloria.gs.services.repository.rt.data.dbservices.ObservatoryDBService;
@@ -729,12 +730,22 @@ public class RTRepositoryAdapter extends LoggerEntity {
 		RTAvailability availability = new RTAvailability();
 
 		try {
-			entry = rtService.getAvailability(rt);
 
-			availability.setEndingTime(entry.getEnding_avl());
-			availability.setStartingTime(entry.getStarting_avl());
+			if (this.containsRT(rt)) {
 
-			return availability;
+				entry = rtService.getAvailability(rt);
+
+				availability.setEndingTime(entry.getEnding_avl());
+				availability.setStartingTime(entry.getStarting_avl());
+
+				return availability;
+			} else {
+				RTRepositoryException e = new RTRepositoryException(
+						"rt unknown");
+				e.getAction().put("rt", rt);
+				throw e;
+			}
+
 		} catch (NullPointerException e) {
 			throw new ActionException("no availability defined");
 		} catch (PersistenceException e) {

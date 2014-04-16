@@ -11,9 +11,8 @@ public class NoSuchReservationException extends ActionException {
 	private static final long serialVersionUID = 1L;
 
 	public NoSuchReservationException(int rid) {
-		super(new Action());
-		Action action = this.getAction();
-		action.put("rid", rid);
+		super();
+		this.getAction().put("rid", rid);
 	}
 
 	public NoSuchReservationException(Action action) {
@@ -22,6 +21,10 @@ public class NoSuchReservationException extends ActionException {
 
 	public NoSuchReservationException() {
 		super();
+	}
+
+	public NoSuchReservationException(String message) {
+		super(message);
 	}
 
 }

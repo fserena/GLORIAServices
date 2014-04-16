@@ -47,7 +47,7 @@ public class SetCCDBining extends TeleOperation {
 
 			try {
 				this.getCCDTeleoperation().setBiningX(rtName, camName, binX);
-				this.getCCDTeleoperation().setBinningY(rtName, camName, binY);
+				this.getCCDTeleoperation().setBiningY(rtName, camName, binY);
 			} catch (CCDTeleoperationException e) {
 				throw new ExperimentOperationException(e.getAction());
 			} catch (DeviceOperationFailedException e) {

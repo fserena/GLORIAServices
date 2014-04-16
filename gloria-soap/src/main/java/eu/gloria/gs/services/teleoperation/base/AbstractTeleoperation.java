@@ -2,11 +2,12 @@ package eu.gloria.gs.services.teleoperation.base;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import eu.gloria.gs.services.core.GSLogProducerService;
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.Action;
-import eu.gloria.gs.services.teleoperation.ccd.CCDTeleoperationException;
 
 public abstract class AbstractTeleoperation extends GSLogProducerService
 		implements Teleoperation {
@@ -33,12 +34,10 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 	}
 
 	protected void processDeviceFailure(String rt, ActionException e) {
-		e.getAction().put("reason", "device failure");
 		this.processError(rt, e);
 	}
 
 	protected void processInternalError(String rt, ActionException e) {
-		e.getAction().put("reason", "internal error");
 		this.processError(rt, e);
 	}
 
@@ -46,13 +45,20 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 		this.logError(rt, this.getClientUsername(), e.getAction());
 	}
 
+	private void fillService(Action action, String rt, String operation,
+			ArrayList<Object> args) {
+		Map<String, Object> service = new LinkedHashMap<String, Object>();  
+		service.put("rt", rt);
+		service.put("name", operation);
+		service.put("args", args);
+		action.put("action", service);
+	}
+
 	private void processSuccess(String rt, String operation,
 			ArrayList<Object> args, ArrayList<Object> result) {
 
 		Action action = new Action();
-		action.put("rt", rt);
-		action.put("name", operation);
-		action.put("args", args);
+		this.fillService(action, rt, operation, args);
 
 		if (result != null) {
 			action.put("result", result);
@@ -93,13 +99,14 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 	}
 
 	protected ArrayList<Object> invokeOperation(Class<?> cl, String rt,
-			Object... args) throws ActionException {
+			String device, Object... args) throws ActionException {
 
 		OperationArgs opArgs = new OperationArgs();
 		opArgs.getArguments().add(rt);
+		opArgs.getArguments().add(device);
 
 		if (args != null) {
-			for (Object arg : args) {
+			for (Object arg : (Object[]) args) {
 				opArgs.getArguments().add(arg);
 			}
 		}
@@ -114,7 +121,9 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 			Constructor<?> constructor = cl.getConstructor(OperationArgs.class);
 			operation = (DeviceOperation) constructor.newInstance(opArgs);
 		} catch (Exception e) {
-			throw new ActionException("bad request");
+			Action action = new Action();
+			this.fillService(action, rt, opName, opArgs.getArguments());
+			throw new ActionException(action);
 		}
 
 		try {
@@ -124,9 +133,10 @@ public abstract class AbstractTeleoperation extends GSLogProducerService
 
 			return returns.getReturns();
 		} catch (TeleoperationException e) {
-			e.getAction().put("rt", rt);
-			e.getAction().put("name", opName);
-			e.getAction().put("args", opArgs.getArguments());
+			Action action = new Action();
+			this.fillService(action, rt, opName, opArgs.getArguments());
+			action.child("exception", e.getAction());
+			e.setAction(action);
 			throw e;
 		}
 	}

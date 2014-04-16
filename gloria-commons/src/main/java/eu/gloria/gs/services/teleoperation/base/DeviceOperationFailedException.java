@@ -11,13 +11,12 @@ public class DeviceOperationFailedException extends TeleoperationException {
 
 	public DeviceOperationFailedException(String name, String type,
 			String operation, String message) {
-		super(new Action());
+		super(message);
 		Action action = this.getAction();
 
 		action.put("operation", operation);
-		action.put("name", name);
+		action.put("device", name);
 		action.put("type", type);
-		action.put("message", message);
 	}
 
 	public DeviceOperationFailedException() {

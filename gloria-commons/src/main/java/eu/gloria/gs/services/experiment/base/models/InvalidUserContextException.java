@@ -10,20 +10,15 @@ public class InvalidUserContextException extends ActionException {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public InvalidUserContextException(Action action) {
-		super(action);
-	}
-	
-	public InvalidUserContextException() {
-		super();
-	}
-	
 	public InvalidUserContextException(String user, int rid) {
-		super(new Action());
-		
+		super("invalid user");
+
 		Action action = this.getAction();
 		action.put("user", user);
 		action.put("rid", rid);
 	}
-	
+
+	public InvalidUserContextException() {
+		super();
+	}
 }

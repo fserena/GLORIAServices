@@ -43,6 +43,7 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 		Action action = new Action();
 		action.put("name", operationName);
 		action.put("rt", rt);
+		action.put("seconds", seconds);
 
 		try {
 			RTSHandler rtHandler = (RTSHandler) this.getServerResolver()

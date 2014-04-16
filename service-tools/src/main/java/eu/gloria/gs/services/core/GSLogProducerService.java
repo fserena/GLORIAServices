@@ -37,9 +37,11 @@ public abstract class GSLogProducerService extends GSWebService {
 	}
 
 	protected void logException(Action action, ActionException e) {
-		action.child("exception", e.getAction());
-		e.setAction(action);
+		e.getAction().remove("service");
+		action.join(e.getAction());
 		this.logError(getClientUsername(), action);
+		e.setAction(new Action());
+		e.getAction().join(action);		
 	}
 
 	protected void logException(Action action, Exception e) {
@@ -102,10 +104,17 @@ public abstract class GSLogProducerService extends GSWebService {
 
 	private void logEntry(LogEntry entry) {
 		logStore.addEntry(entry);
-
 		try {
-			log.info(JSONConverter.toJSON(entry.getAction()));
+			String message = JSONConverter.toJSON(entry.getAction());
+			if (entry.getType().equals(LogType.INFO)) {
+				log.info(message);
+			} else if (entry.getType().equals(LogType.ERROR)) {
+				log.error(message);
+			} else {
+				log.warn(message);
+			}
 		} catch (IOException e) {
+			log.error(e.getMessage());
 		}
 	}
 

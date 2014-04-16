@@ -18,9 +18,9 @@ public class ExperimentParameterException extends ActionException {
 		super();
 	}
 
-	public ExperimentParameterException(String name, String cause) {
-		super(cause);
-		this.getAction().put("name", name);
+	public ExperimentParameterException(String name, String message) {
+		super(message);
+		this.getAction().put("parameter", name);
 	}
 
 }

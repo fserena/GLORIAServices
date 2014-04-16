@@ -1,10 +1,8 @@
 package eu.gloria.gs.services.teleoperation.mount;
 
-
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
-import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.mount.operations.GetDECOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.GetRAOperation;
 import eu.gloria.gs.services.teleoperation.mount.operations.GetStateOperation;
@@ -25,15 +23,18 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 	public MountTeleoperation() {
 		super(MountTeleoperation.class.getSimpleName());
 	}
-	
+
 	@Override
 	public MountState getState(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			return (MountState) this.invokeGetOperation(GetStateOperation.class, rt, mount);
+			return (MountState) this.invokeGetOperation(
+					GetStateOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
@@ -41,9 +42,11 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(MoveNorthOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}			
+		}
 	}
 
 	@Override
@@ -51,9 +54,11 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(MoveSouthOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}	
+		}
 	}
 
 	@Override
@@ -61,9 +66,11 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(MoveEastOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}	
+		}
 	}
 
 	@Override
@@ -71,9 +78,11 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(MoveWestOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}	
+		}
 	}
 
 	@Override
@@ -81,29 +90,37 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(SetSlewRateOperation.class, rt, mount, rate);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}			
+		}
 	}
 
 	@Override
 	public void slewToObject(String rt, String mount, String object)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			this.invokeSetOperation(SlewToObjectOperation.class, rt, mount, object);
+			this.invokeSetOperation(SlewToObjectOperation.class, rt, mount,
+					object);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
-	
+
 	@Override
 	public void slewToCoordinates(String rt, String mount, double ra, double dec)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			this.invokeSetOperation(SlewToCoordinatesOperation.class, rt, mount, ra, dec);
+			this.invokeSetOperation(SlewToCoordinatesOperation.class, rt,
+					mount, ra, dec);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
@@ -111,19 +128,24 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(ParkOperation.class, rt, mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
 	public void setTrackingRate(String rt, String mount, TrackingRate rate)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			this.invokeSetOperation(SetTrackingRateOperation.class, rt, mount, rate);
+			this.invokeSetOperation(SetTrackingRateOperation.class, rt, mount,
+					rate);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
@@ -131,16 +153,21 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
 			this.invokeSetOperation(SetTrackingOperation.class, rt, mount, mode);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 
 	@Override
 	public double getRA(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			return (Double) this.invokeGetOperation(GetRAOperation.class, rt, mount);
+			return (Double) this.invokeGetOperation(GetRAOperation.class, rt,
+					mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
 		}
@@ -150,9 +177,12 @@ public class MountTeleoperation extends AbstractTeleoperation implements
 	public double getDEC(String rt, String mount)
 			throws DeviceOperationFailedException, MountTeleoperationException {
 		try {
-			return (Double) this.invokeGetOperation(GetDECOperation.class, rt, mount);
+			return (Double) this.invokeGetOperation(GetDECOperation.class, rt,
+					mount);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new MountTeleoperationException(e.getAction());
-		}		
+		}
 	}
 }

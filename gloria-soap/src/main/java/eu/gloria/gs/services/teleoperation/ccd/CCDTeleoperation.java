@@ -1,12 +1,10 @@
 package eu.gloria.gs.services.teleoperation.ccd;
 
 import eu.gloria.gs.services.log.action.ActionException;
-import eu.gloria.gs.services.repository.image.ImageRepositoryException;
 import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.repository.image.data.ImageTargetData;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
-import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningXOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningYOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBrightnessOperation;
@@ -42,6 +40,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetBiningXOperation.class,
 					rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -53,6 +53,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetBiningYOperation.class,
 					rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -64,6 +66,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetBrightnessOperation.class,
 					rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -75,6 +79,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetContrastOperation.class,
 					rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -86,6 +92,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetExposureTimeOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -97,6 +105,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetGainOperation.class, rt,
 					ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -108,6 +118,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Long) this.invokeGetOperation(GetGammaOperation.class, rt,
 					ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -139,6 +151,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (CCDState) this.invokeGetOperation(GetStateOperation.class,
 					rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -147,19 +161,22 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 	@Override
 	public void setBiningX(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
-
 		try {
 			this.invokeSetOperation(SetBiningXOperation.class, rt, ccd, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
 	}
 
 	@Override
-	public void setBinningY(String rt, String ccd, long value)
+	public void setBiningY(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(SetBiningYOperation.class, rt, ccd, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -171,6 +188,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.invokeSetOperation(SetBrightnessOperation.class, rt, ccd,
 					value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -181,6 +200,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(SetContrastOperation.class, rt, ccd, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -192,6 +213,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			this.invokeSetOperation(SetExposureTimeOperation.class, rt, ccd,
 					value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -202,6 +225,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(SetGainOperation.class, rt, ccd, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -212,6 +237,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(SetGammaOperation.class, rt, ccd, value);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -227,6 +254,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (String) this.invokeGetOperation(
 					StartContinueModeOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -251,6 +280,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 					target, exposure);
 
 			return id;
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}
@@ -261,6 +292,8 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(StopContinueModeOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
 		} catch (ActionException e) {
 			throw new CCDTeleoperationException(e.getAction());
 		}

@@ -21,12 +21,6 @@ import eu.gloria.gs.services.teleoperation.ccd.ImageNotAvailableException;
  */
 public class LoadContinuousImage extends TeleOperation {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.gloria.gs.services.experiment.operations.ServiceOperation#execute()
-	 */
 	@Override
 	public void execute() throws ExperimentOperationException {
 		try {
@@ -72,6 +66,7 @@ public class LoadContinuousImage extends TeleOperation {
 					ExperimentOperationException ex = new ExperimentOperationException(
 							e.getAction());
 					ex.getAction().put("retries", retries);
+					ex.getAction().child("exception", e.getAction());
 					throw ex;
 				}
 
@@ -82,7 +77,6 @@ public class LoadContinuousImage extends TeleOperation {
 				ExperimentOperationException ex = new ExperimentOperationException(
 						this.getContext().getName(), "url not available");
 				ex.getAction().put("retries", retries);
-
 				throw ex;
 			}
 

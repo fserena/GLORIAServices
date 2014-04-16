@@ -9,16 +9,17 @@ public class IncorrectDeviceTypeException extends TeleoperationException {
 	 */
 	private static final long serialVersionUID = -3378992569190922738L;
 
-	public IncorrectDeviceTypeException(String type) {
-		super(new Action());
+	public IncorrectDeviceTypeException(String name, String type) {
+		super();
 
 		Action action = this.getAction();
 
-		action.put("type", type);		
+		action.put("device", name);
+		action.put("type", type);
 	}
-	
+
 	public IncorrectDeviceTypeException() {
 		super();
 	}
-	
+
 }

@@ -39,7 +39,7 @@ public class WSClientFactory extends ClientFactory {
 			tls.setDisableCNCheck(true);
 			tls.setUseHttpsURLConnectionDefaultHostnameVerifier(false);
 			conduit.setTlsClientParameters(tls);
-
+			
 			Endpoint cxfEndpoint = proxy.getEndpoint();
 			WSClientInterceptor interceptor = new WSClientInterceptor();
 			cxfEndpoint.getOutInterceptors().add(interceptor);

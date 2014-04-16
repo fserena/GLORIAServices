@@ -43,37 +43,33 @@ public class RTBooker {
 	}
 
 	public boolean available(List<String> telescopes, TimeSlot timeSlot)
-			throws ExperimentReservationArgumentException {
+			throws ExperimentReservationArgumentException, RTRepositoryException {
 
 		if (timeSlot != null) {
 
 			if (timeSlot.getBegin().getTime() >= timeSlot.getEnd().getTime()) {
-				throw new ExperimentReservationArgumentException("incorrect time slot");
+				throw new ExperimentReservationArgumentException(
+						"incorrect time slot");
 			}
 
 		} else
 			throw new ExperimentReservationArgumentException("null time slot");
 
 		if (telescopes == null || telescopes.size() == 0) {
-			throw new ExperimentReservationArgumentException("no telescopes specified");
+			throw new ExperimentReservationArgumentException(
+					"no telescopes specified");
 		}
 
 		boolean available = true;
 
 		for (String rt : telescopes) {
+			RTAvailability availability = this.getRTAvailability(rt);
 
-			try {
-				RTAvailability availability = this.getRTAvailability(rt);
+			available = available
+					&& this.timeSlotFitsIn(timeSlot, availability);
 
-				available = available
-						&& this.timeSlotFitsIn(timeSlot, availability);
-
-				if (!available)
-					break;
-
-			} catch (RTRepositoryException e) {
-				throw new ExperimentReservationArgumentException(e.getMessage());
-			}
+			if (!available)
+				break;
 		}
 
 		return available;
@@ -84,14 +80,14 @@ public class RTBooker {
 
 		Date startingTime = availability.getStartingTime();
 		Date endingTime = availability.getEndingTime();
-		
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(timeSlot.getBegin());
 		int beginYear = calendar.get(Calendar.YEAR);
-		
+
 		calendar.setTime(timeSlot.getEnd());
 		int endYear = calendar.get(Calendar.YEAR);
-		
+
 		calendar.setTime(startingTime);
 		calendar.set(Calendar.DAY_OF_YEAR, 1);
 		calendar.set(Calendar.YEAR, beginYear);
@@ -129,9 +125,9 @@ public class RTBooker {
 		int beginDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 		beginYear = calendar.get(Calendar.YEAR);
 		calendar.setTime(timeSlot.getEnd());
-		int endDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);		
+		int endDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 		endYear = calendar.get(Calendar.YEAR);
-		
+
 		calendar.setTime(startingTime);
 		calendar.set(Calendar.YEAR, beginYear);
 		if (beginHour < endingHour) {

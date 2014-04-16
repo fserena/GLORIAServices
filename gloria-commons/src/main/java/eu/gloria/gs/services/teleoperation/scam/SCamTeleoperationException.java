@@ -12,10 +12,8 @@ public class SCamTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 
-	public SCamTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public SCamTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public SCamTeleoperationException() {

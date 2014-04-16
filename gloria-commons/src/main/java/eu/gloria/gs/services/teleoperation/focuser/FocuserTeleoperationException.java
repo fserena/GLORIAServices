@@ -12,10 +12,8 @@ public class FocuserTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 
-	public FocuserTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public FocuserTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public FocuserTeleoperationException() {

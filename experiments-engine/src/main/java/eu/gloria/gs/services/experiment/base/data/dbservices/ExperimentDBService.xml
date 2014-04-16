@@ -622,6 +622,16 @@
 		experiment=#{experiment_} AND begin=#{begin_} AND
 		end=#{end_}
 	</select>
+	
+	<select id="getReservationIds"
+		resultType="int">
+		SELECT idreservation FROM
+		`reservation`
+		WHERE
+		user=#{user_} AND
+		experiment=#{experiment_} AND begin=#{begin_} AND
+		end=#{end_}
+	</select>
 
 	<select id="getReservationById"
 		resultType="eu.gloria.gs.services.experiment.base.data.dbservices.ReservationEntry">

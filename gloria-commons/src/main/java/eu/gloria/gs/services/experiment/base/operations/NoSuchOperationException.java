@@ -11,10 +11,10 @@ public class NoSuchOperationException extends ActionException {
 	private static final long serialVersionUID = -2236163623108047653L;
 
 	public NoSuchOperationException(String name) {
-		super();
+		super("operation not known");
 
 		Action action = this.getAction();
-		action.put("name", name);
+		action.put("operation", name);
 	}
 
 	public NoSuchOperationException() {

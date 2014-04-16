@@ -41,7 +41,7 @@ public interface CCDTeleoperationInterface {
 	public long getBiningX(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 	
-	public void setBinningY(String rt, String ccd, long value)
+	public void setBiningY(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public long getBiningY(String rt, String ccd)

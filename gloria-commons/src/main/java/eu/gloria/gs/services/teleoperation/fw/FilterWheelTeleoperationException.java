@@ -12,10 +12,8 @@ public class FilterWheelTeleoperationException extends RTSTeleoperationException
 		super(action);
 	}
 
-	public FilterWheelTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public FilterWheelTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public FilterWheelTeleoperationException() {

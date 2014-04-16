@@ -12,10 +12,8 @@ public class WeatherTeleoperationException extends RTSTeleoperationException {
 		super(action);
 	}
 
-	public WeatherTeleoperationException(String cause) {
-		super(new Action());
-
-		this.getAction().put("cause", cause);
+	public WeatherTeleoperationException(String message) {
+		super(message);
 	}
 	
 	public WeatherTeleoperationException() {

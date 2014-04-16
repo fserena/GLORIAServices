@@ -49,7 +49,7 @@ public class GSClientProvider {
 		credentials.setPassword(password);
 		ThreadCredentialsStore.storeCredentials(credentials);
 	}
-	
+
 	public static void clearCredentials() {
 		ThreadCredentialsStore.clear();
 	}
@@ -90,7 +90,7 @@ public class GSClientProvider {
 
 		return (ImageRepositoryInterface) factory.create();
 	}
-	
+
 	public static SchedulerInterface getSchedulerClient() {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(SCHEDULER_BEAN_NAME);
@@ -115,7 +115,7 @@ public class GSClientProvider {
 				.getBean(DOMETELEOPERATION_BEAN_NAME);
 		return (DomeTeleoperationInterface) factory.create();
 	}
-	
+
 	public static WeatherTeleoperationInterface getWeatherTeleoperationClient() {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(WEATHERTELEOPERATION_BEAN_NAME);
@@ -133,7 +133,7 @@ public class GSClientProvider {
 				.getBean(SCAMTELEOPERATION_BEAN_NAME);
 		return (SCamTeleoperationInterface) factory.create();
 	}
-	
+
 	public static FilterWheelTeleoperationInterface getFilterWheelTeleoperationClient() {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(FWTELEOPERATION_BEAN_NAME);
@@ -151,7 +151,7 @@ public class GSClientProvider {
 				.getBean(FOCUSERTELEOPERATION_BEAN_NAME);
 		return (FocuserTeleoperationInterface) factory.create();
 	}
-	
+
 	public static GenericTeleoperationInterface getGenericTeleoperationClient() {
 		ClientFactory factory = (ClientFactory) context
 				.getBean(GENERICTELEOPERATION_BEAN_NAME);

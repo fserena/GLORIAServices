@@ -55,6 +55,13 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 	public void setCCDTeleoperation(CCDTeleoperationInterface ccd) {
 		this.ccd = ccd;
 	}
+	
+	
+	@Override
+	public void end() {
+		GSClientProvider.clearCredentials();
+		super.end();
+	}
 
 	@Override
 	protected void doWork() {
@@ -88,9 +95,11 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 			}
 
 		} catch (ActionException e) {
-			preAction.put("cause", "internal error");
-			this.logError(preAction);
-			preAction.remove("cause");
+			preAction.child("exception", e.getAction());
+			preAction.put("message", "internal error");
+			this.log(LogType.ERROR, preAction);
+			preAction.remove("message");
+			preAction.remove("exception");
 		}
 
 		thereArePending = false;
@@ -110,12 +119,14 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 			if (currentDate.getTime() - creationDate.getTime() > (exposure * 1000.0)) {
 
-				action.put("exposure", "should end");
+				action.put("operation", "get urls");
+
 				try {
 					url = ccd.getImageURL(imageInfo.getRt(),
 							imageInfo.getCcd(), imageInfo.getLocalid(),
 							ImageExtensionFormat.JPG);
 
+					action.put("jpg", true);
 					adapter.setJpgByRT(imageInfo.getRt(),
 							imageInfo.getLocalid(), url);
 
@@ -123,16 +134,14 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 							imageInfo.getCcd(), imageInfo.getLocalid(),
 							ImageExtensionFormat.FITS);
 
+					action.put("fits", true);
 					adapter.setFitsByRT(imageInfo.getRt(),
 							imageInfo.getLocalid(), url);
 
-					this.logInfo(action);
+					this.log(LogType.INFO, action);
 
 				} catch (ImageNotAvailableException e) {
-					// Ignore the image this time, it will be treated by the
-					// next
-					// iteration of the executor
-
+					action.put("exposure", "should end");
 					int gid = imageInfo.getId();
 
 					if (recoverRetries.containsKey(gid)) {
@@ -140,16 +149,17 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 
 						action.put("retries", recoverRetries.get(gid));
 
-						if (recoverRetries.get(gid) == 20) {
+						if (recoverRetries.get(gid) == 30) {
 							try {
 								action.put("operation", "remove");
 								adapter.removeImage(imageInfo.getId());
 
-								this.logWarning(action);
+								this.log(LogType.ERROR, action);
 
 							} catch (ActionException e1) {
-								action.put("cause", "service error");
-								this.logError(action);
+								action.put("message", "service error");
+								action.child("exception", e1.getAction());
+								this.log(LogType.ERROR, action);
 							}
 
 							recoverRetries.remove(gid);
@@ -170,24 +180,26 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 					try {
 						adapter.removeImage(imageInfo.getId());
 
-						this.logError(action);
+						this.log(LogType.ERROR, action);
 
 					} catch (ActionException e1) {
-						action.put("cause", "internal error");
-						this.logError(action);
+						action.child("exception", e1.getAction());
+						action.put("message", "internal error");
+						this.log(LogType.ERROR, action);
 					}
 
 				} catch (Exception e) {
-					action.put("cause", "internal error");
+					action.put("message", "internal error");
 					action.put("operation", "remove");
 
 					try {
 						adapter.removeImage(imageInfo.getId());
 
-						this.logError(action);
+						this.log(LogType.ERROR, action);
 					} catch (ActionException e1) {
-						action.put("cause", "internal error");
-						this.logError(action);
+						action.child("exception", e1.getAction());
+						action.put("message", "internal error");
+						this.log(LogType.ERROR, action);
 					}
 				}
 			}
@@ -202,21 +214,10 @@ public class ImageURLRetrieveExecutor extends ServerThread {
 		this.logStore.addEntry(entry);
 	}
 
-	private void logError(Action action) {
-
-		LogEntry entry = new LogEntry(LogType.ERROR);
+	@Override
+	protected void log(LogType type, Action action) {
+		LogEntry entry = new LogEntry(type);
 		this.processLogEntry(entry, action);
-	}
-
-	private void logInfo(Action action) {
-
-		LogEntry entry = new LogEntry(LogType.INFO);
-		this.processLogEntry(entry, action);
-	}
-
-	private void logWarning(Action action) {
-
-		LogEntry entry = new LogEntry(LogType.WARNING);
-		this.processLogEntry(entry, action);
+		super.log(type, action);
 	}
 }

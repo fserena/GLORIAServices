@@ -18,11 +18,10 @@ public class ExperimentOperationException extends ActionException {
 		super();
 	}
 
-	public ExperimentOperationException(String name, String cause) {
-		super(new Action());
+	public ExperimentOperationException(String name, String message) {
+		super(message);
 
-		this.getAction().put("name", name);
-		this.getAction().put("cause", cause);
+		this.getAction().put("operation", name);
 	}
 
 }

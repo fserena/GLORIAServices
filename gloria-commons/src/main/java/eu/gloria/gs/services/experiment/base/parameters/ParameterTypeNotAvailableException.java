@@ -15,7 +15,7 @@ public class ParameterTypeNotAvailableException extends ActionException {
 	}
 	
 	public ParameterTypeNotAvailableException(String experiment, String name, String type) {
-		super(new Action());
+		super("type not available");
 		
 		Action action = this.getAction();
 		action.put("experiment", experiment);
@@ -24,7 +24,7 @@ public class ParameterTypeNotAvailableException extends ActionException {
 	}
 	
 	public ParameterTypeNotAvailableException(String name) {
-		super(new Action());
+		super("type not available");
 		
 		Action action = this.getAction();
 		action.put("name", name);
