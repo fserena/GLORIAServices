@@ -51,30 +51,15 @@ public class RTSHandler implements ServerHandler {
 	private String port;
 
 	static {
-
-		//Properties properties = new Properties();
-		//try {
-			//InputStream in = Thread.currentThread().getContextClassLoader()
-			//		.getResourceAsStream("rtsclient.properties");
-
-			//properties.load(in);
-			//in.close();
-
-			serviceName = "RTI";//(String) properties.get("service_name");
-
-		//} catch (IOException e) {
-	//	}
+		serviceName = "RTI";
 	}
-	
+
 	public RTSHandler() {
-		
+
 	}
 
 	public RTSHandler(String host, String port, String user, String password)
 			throws TeleoperationException {
-
-		//super(host);
-
 		this.host = host;
 		this.port = port;
 
@@ -537,7 +522,7 @@ public class RTSHandler implements ServerHandler {
 					mount, false);
 
 			ActivityStateMount state = mountDevice.getActivityState();
-			
+
 			boolean parked = rtsPort.mntIsParked(null, mount);
 			boolean slewing = rtsPort.mntIsSlewing(null, mount);
 			boolean tracking = rtsPort.mntGetTracking(null, mount);
@@ -548,9 +533,9 @@ public class RTSHandler implements ServerHandler {
 				return ActivityStateMount.TRACKING;
 			if (slewing)
 				return ActivityStateMount.MOVING;
-			
+
 			return state;
-			
+
 		} catch (RtiError e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get state", e.getMessage());

@@ -33,7 +33,7 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException,
 			FocuserTeleoperationException {
 		try {
-			this.invokeSetOperation(MoveAbsoluteOperation.class, rt, focuser);
+			this.invokeSetOperation(MoveAbsoluteOperation.class, rt, focuser, position);
 		} catch (DeviceOperationFailedException e) {
 			throw e;
 		} catch (ActionException e) {
@@ -46,7 +46,7 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException,
 			FocuserTeleoperationException {
 		try {
-			this.invokeSetOperation(MoveRelativeOperation.class, rt, focuser);
+			this.invokeSetOperation(MoveRelativeOperation.class, rt, focuser, steps);
 		} catch (DeviceOperationFailedException e) {
 			throw e;
 		} catch (ActionException e) {
