@@ -28,7 +28,7 @@ public class ExperimentExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
-
+	
 	/**
 	 * @param name
 	 */
@@ -59,13 +59,12 @@ public class ExperimentExecutor extends ServerThread {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	@Override
 	public void end() {
-		GSClientProvider.clearCredentials();
+		// GSClientProvider.clearCredentials();
 		super.end();
 	}
-
 
 	@Override
 	protected void doWork() {
@@ -160,25 +159,23 @@ public class ExperimentExecutor extends ServerThread {
 
 					} else {
 
-						ExperimentRuntimeInformation runtimeInfo = adapter
-								.getExperimentRuntimeContext(reservation
-										.getReservationId());
+						try {
+							ExperimentRuntimeInformation runtimeInfo = adapter
+									.getExperimentRuntimeContext(reservation
+											.getReservationId());
 
-						if (runtimeInfo.getRemainingTime() <= 1) {
-							ExperimentContext context = manager.getContext(
-									reservation.getUser(),
-									reservation.getReservationId());
-							try {
+							if (runtimeInfo.getRemainingTime() <= 1) {
+								ExperimentContext context = manager.getContext(
+										reservation.getUser(), reservationId);
 								context.end();
 
 								action.put("end", "done");
 
-							} catch (ExperimentOperationException e) {
-
-								errorState = true;
-								action.put("end", "failed");
-								action.child("exception", e.getAction());
 							}
+						} catch (ExperimentOperationException e) {
+							errorState = true;
+							action.put("end", "failed");
+							action.child("exception", e.getAction());
 						}
 					}
 				} catch (Exception e) {
@@ -188,10 +185,9 @@ public class ExperimentExecutor extends ServerThread {
 
 				try {
 					if (errorState) {
-						adapter.setContextError(reservation.getReservationId());
+						adapter.setContextError(reservationId);
 
-						adapter.deleteExperimentContext(reservation
-								.getReservationId());
+						adapter.deleteExperimentContext(reservationId);
 
 						this.log(LogType.ERROR, username, reservationId, action);
 					} else {
@@ -229,7 +225,7 @@ public class ExperimentExecutor extends ServerThread {
 			entry.setRid(rid);
 
 		entry.setAction(action);
-		this.logStore.addEntry(entry);		
+		this.logStore.addEntry(entry);
 	}
 
 	private void log(LogType type, String username, Integer rid, Action action) {

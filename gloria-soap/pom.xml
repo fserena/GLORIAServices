@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>gloria-soap</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA Services</name>
+	<name>GLORIA SOAP API</name>
 	<packaging>war</packaging>
 
 	<dependencies>
@@ -129,4 +129,5 @@
 	<properties>
 		<maven.tomcat.path>/gloria-soap</maven.tomcat.path>
 	</properties>
+	<url>users.gloria-project.eu</url>
 </project>

@@ -68,7 +68,7 @@ public class LogStoreExecutor extends ServerThread {
 	
 	@Override
 	public void end() {
-		GSClientProvider.clearCredentials();
+//		GSClientProvider.clearCredentials();
 		super.end();
 	}
 	
