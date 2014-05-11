@@ -486,6 +486,9 @@ public class Experiment extends GSLogProducerService implements
 		Action action = new Action(Experiment.class,
 				"executeExperimentOperation", reservationId, operation);
 
+		boolean adminMode = this.isAdminMode(action);
+		action.put("admin mode", adminMode);
+		
 		ExperimentContext context;
 		try {
 			context = contextManager.getContext(this.getClientUsername(),
