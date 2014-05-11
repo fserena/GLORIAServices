@@ -3,6 +3,7 @@ package eu.gloria.gs.services.teleoperation.ccd;
 import javax.jws.WebService;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.Range;
 
 @WebService(name = "CCDTeleoperationInterface", targetNamespace = "http://ccd.teleoperation.services.gs.gloria.eu/")
 public interface CCDTeleoperationInterface {
@@ -15,6 +16,15 @@ public interface CCDTeleoperationInterface {
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public double getExposureTime(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException;
+
+	public boolean gainIsModifiable(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException;
+
+	public boolean gammaIsModifiable(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException;
+
+	public Range getExposureRange(String rt, String ccd, String object)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public void setBrightness(String rt, String ccd, long value)
@@ -40,13 +50,13 @@ public interface CCDTeleoperationInterface {
 
 	public long getBiningX(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
-	
+
 	public void setBiningY(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
 	public long getBiningY(String rt, String ccd)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
-	
+
 	public void setGamma(String rt, String ccd, long value)
 			throws DeviceOperationFailedException, CCDTeleoperationException;
 
