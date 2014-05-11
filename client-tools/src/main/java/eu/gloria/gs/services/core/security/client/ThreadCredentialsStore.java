@@ -15,6 +15,7 @@ public class ThreadCredentialsStore {
 	public static void clear() {
 		try {
 			threadCredentialsStore.remove();
+//			threadCredentialsStore.set(null);
 		} catch (Exception e) {
 		}
 	}
