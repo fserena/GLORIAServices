@@ -53,7 +53,7 @@
 				<ref bean="object"></ref>
 				<ref bean="object"></ref>
 				<ref bean="object"></ref>
-				<ref bean="object"></ref>			
+				<ref bean="object"></ref>
 			</list>
 		</property>
 		<property name="behaviour">
@@ -232,6 +232,52 @@
 						<value>arg0</value>
 						<value>arg1</value>
 						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetCCDCapabilities" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetCCDCapabilities">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="GetExposureRange" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetExposureRange">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+						<value>arg3</value>
 					</list>
 				</entry>
 			</map>
@@ -912,6 +958,28 @@
 			<map>
 				<entry
 					key="eu.gloria.gs.services.experiment.operations.FocusRelativeMove">
+					<list>
+						<value>arg0</value>
+						<value>arg1</value>
+						<value>arg2</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="GetFocuserRange" parent="tele-operation">
+		<property name="parameterTypes">
+			<list>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+				<ref bean="object"></ref>
+			</list>
+		</property>
+		<property name="behaviour">
+			<map>
+				<entry
+					key="eu.gloria.gs.services.experiment.operations.GetFocuserRange">
 					<list>
 						<value>arg0</value>
 						<value>arg1</value>

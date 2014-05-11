@@ -51,6 +51,7 @@ public class CloseDome extends TeleOperation {
 
 			this.getDomeTeleoperation().close(rtName, domeName);
 		} catch (DeviceOperationFailedException e) {
+			throw new ExperimentOperationException(e.getAction());
 		} catch (DomeTeleoperationException e) {
 			throw new ExperimentOperationException(e.getAction());
 		}
