@@ -3,6 +3,7 @@ package eu.gloria.gs.services.core.tasks;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -21,6 +22,7 @@ public abstract class ServerTask extends LoggerEntity implements
 
 	protected static ExecutorService executor = Executors.newCachedThreadPool();
 	private static boolean destroyed = false;
+	private static Object sync = new Object();
 	private ServerThread thread = null;
 
 	protected abstract ServerThread createServerThread(
@@ -48,19 +50,18 @@ public abstract class ServerTask extends LoggerEntity implements
 			this.thread.end();
 
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
-		}
+			if (thread.isAlive()) {
+				thread.join(5000);
+			}
 
-		try {
-			synchronized (executor) {
+			synchronized (sync) {
 				if (!destroyed) {
+					destroyed = true;
 					executor.shutdown();
 					log.info("Server task thread pool shutdown");
-					destroyed = true;
+
 				}
-			}			
+			}
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}

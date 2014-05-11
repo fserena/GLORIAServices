@@ -31,8 +31,12 @@ public abstract class ServerThread extends Thread {
 				log.error(e.getMessage());
 			}
 		}
-		
-		GSClientProvider.clearCredentials();
+
+		try {
+			GSClientProvider.clearCredentials();
+			log.info("Thread local cleaned");
+		} catch (Exception e) {
+		}
 	}
 
 	public void end() {
