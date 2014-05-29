@@ -85,9 +85,9 @@ public class RTRepositoryAdapter extends LoggerEntity {
 			rtService.setEndingAvailability(rt, new Date());
 		}
 
-		if (previouslyContained) {
-			throw new ActionException("rt already exists");
-		}
+//		if (previouslyContained) {
+//			throw new ActionException("rt already exists");
+//		}
 	}
 
 	public void registerBatchRT(String rt, String owner, String url,
@@ -146,8 +146,9 @@ public class RTRepositoryAdapter extends LoggerEntity {
 
 			try {
 				rtdevService.save(rtDevEntry);
+				
 
-			} catch (PersistenceException e) {
+			} catch (Exception e) {
 				if (e.getMessage().contains("Duplicate"))
 					duplicated = true;
 				else {
@@ -159,8 +160,8 @@ public class RTRepositoryAdapter extends LoggerEntity {
 		if (!deviceFound)
 			throw new ActionException("device model does not exist");
 
-		if (duplicated)
-			throw new ActionException("already included");
+		//if (duplicated)
+		//	throw new ActionException("already included");
 	}
 
 	public void removeDevice(String rt, String device) throws ActionException {

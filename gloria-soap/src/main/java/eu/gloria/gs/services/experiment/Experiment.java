@@ -414,6 +414,9 @@ public class Experiment extends GSLogProducerService implements
 				e.getAction().put("slots", 0);
 				throw e;
 			}
+			
+			action.put("slots", timeSlots.size());
+			this.logInfo(action);
 
 			return timeSlots;
 		} catch (ActionException e) {

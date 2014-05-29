@@ -27,6 +27,8 @@ import eu.gloria.rt.entity.device.DeviceCamera;
 import eu.gloria.rt.entity.device.DeviceDome;
 import eu.gloria.rt.entity.device.DeviceMount;
 import eu.gloria.rt.entity.device.DeviceType;
+import eu.gloria.rt.entity.device.ExecutorInfo;
+import eu.gloria.rt.entity.device.ExecutorState;
 import eu.gloria.rt.entity.device.ImageFormat;
 import eu.gloria.rt.entity.device.TrackingRateType;
 import eu.gloria.rti.GloriaRti;
@@ -47,7 +49,7 @@ public class RTSHandler implements ServerHandler {
 
 	private GloriaRti rtsPort;
 	private static String serviceName;
-	private static boolean teleoperationStarted = false;
+	private boolean teleoperationStarted = false;
 	private String host;
 	private String port;
 
@@ -373,7 +375,12 @@ public class RTSHandler implements ServerHandler {
 			DeviceDome domeDevice = (DeviceDome) rtsPort.devGetDevice(null,
 					dome, false);
 
-			return domeDevice.getActivityStateOpening();
+			ActivityStateDomeOpening state = domeDevice.getActivityStateOpening();
+			if (state == null) {
+				state = ActivityStateDomeOpening.NOT_DEFINED;
+			}
+			
+			return state;
 		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "get state", e.getMessage());
@@ -624,7 +631,11 @@ public class RTSHandler implements ServerHandler {
 
 			boolean parked = rtsPort.mntIsParked(null, mount);
 			boolean slewing = rtsPort.mntIsSlewing(null, mount);
-			boolean tracking = rtsPort.mntGetTracking(null, mount);
+			boolean tracking = false;
+			try {
+				tracking = rtsPort.mntGetTracking(null, mount);
+			} catch (RtiError e) {				
+			}
 
 			if (parked)
 				return ActivityStateMount.PARKED;
@@ -636,6 +647,9 @@ public class RTSHandler implements ServerHandler {
 			return state;
 
 		} catch (Exception e) {
+			if (e.getMessage().contains("not supported")) {
+				return ActivityStateMount.NOT_DEFINED;
+			}
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get state", e.getMessage());
 		}
@@ -752,6 +766,29 @@ public class RTSHandler implements ServerHandler {
 			throw new ServerNotAvailableException(host, port, null);
 		}
 	}
+	
+	public boolean isOnWeatherAlarm() throws ServerNotAvailableException {
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			List<Device> devices = rtsPort.devGetDevices(null, false);
+			
+			for (Device device : devices) {
+				AlarmState state = device.getAlarmState();
+				
+				if (AlarmState.WEATHER.equals(state)) {
+					return true;
+				}
+			}
+			
+			return false;
+
+		} catch (Exception e) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+	}
 
 	public boolean isPressureSensorInAlarm(String barometer)
 			throws TeleoperationException {
@@ -771,7 +808,7 @@ public class RTSHandler implements ServerHandler {
 					DeviceType.BAROMETER.name(), "get pressure alarm",
 					e.getMessage());
 		}
-		
+
 		return false;
 	}
 
@@ -792,7 +829,7 @@ public class RTSHandler implements ServerHandler {
 			throw new DeviceOperationFailedException(rhSensor,
 					DeviceType.RH_SENSOR.name(), "get rh alarm", e.getMessage());
 		}
-		
+
 		return false;
 	}
 
@@ -903,20 +940,41 @@ public class RTSHandler implements ServerHandler {
 
 	public void notifyTeleoperation(long seconds)
 			throws GenericTeleoperationException {
+
+		ExecutorInfo executor;
 		try {
-			rtsPort.execStopOp(null);
-			teleoperationStarted = false;
+			executor = rtsPort.execGetInfo(null);
 		} catch (Exception e) {
-			throw new GenericTeleoperationException("start", "stop previous", e);
+			throw new GenericTeleoperationException("start",
+					"get executor state", e);
 		}
 
-		try {
-			rtsPort.execStartOp(null, null, "GLORIA", seconds);
-			teleoperationStarted = true;
-		} catch (Exception e) {
-			GenericTeleoperationException ex = new GenericTeleoperationException(
-					"start", e);
-			ex.getAction().put("while", "after stop");
+		ExecutorState state = executor.getState();
+		
+		if (state.equals(ExecutorState.IDLE) || state.equals(ExecutorState.RUNNING)) {
+			//if (teleoperationStarted) {
+				try {
+					rtsPort.execStopOp(null);
+					teleoperationStarted = false;
+				} catch (Exception e) {
+					throw new GenericTeleoperationException("start",
+							"stop previous", e);
+				}
+		//	}
+
+			try {
+				rtsPort.execStartOp(null, null, "GLORIA", seconds);
+				teleoperationStarted = true;
+			} catch (Exception e) {
+				GenericTeleoperationException ex = new GenericTeleoperationException(
+						"start", e);
+				ex.getAction().put("while", "after stop");
+
+				throw ex;
+			}
+		} else {
+			GenericTeleoperationException ex = new GenericTeleoperationException();
+			ex.getAction().put("state", state.name());
 
 			throw ex;
 		}
@@ -1319,11 +1377,13 @@ public class RTSHandler implements ServerHandler {
 	}
 
 	public void stopTeleoperation() throws GenericTeleoperationException {
-		try {
-			rtsPort.execStopOp(null);
-			teleoperationStarted = false;
-		} catch (Exception e) {
-			throw new GenericTeleoperationException("stop", e);
+		if (teleoperationStarted) {
+			try {
+				rtsPort.execStopOp(null);
+				teleoperationStarted = false;
+			} catch (Exception e) {
+				throw new GenericTeleoperationException("stop", e);
+			}
 		}
 	}
 }

@@ -1,7 +1,9 @@
 package eu.gloria.gs.services.experiment;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.gloria.gs.services.core.LogEntry;
 import eu.gloria.gs.services.core.LogStore;
@@ -18,6 +20,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.Action;
 import eu.gloria.gs.services.log.action.LogType;
+import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationException;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 
 public class ExperimentExecutor extends ServerThread {
@@ -28,7 +31,8 @@ public class ExperimentExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
-	
+	private static Map<Integer, Date> errorContexts = new HashMap<Integer, Date>();
+
 	/**
 	 * @param name
 	 */
@@ -89,6 +93,14 @@ public class ExperimentExecutor extends ServerThread {
 			for (ReservationInformation reservation : reservations) {
 
 				int reservationId = reservation.getReservationId();
+				
+				if (errorContexts.containsKey(reservationId)) {
+					Date lastUpdate = errorContexts.get(reservationId);
+					if (new Date().getTime() - lastUpdate.getTime() < 10000) {
+						continue;
+					}
+					errorContexts.remove(reservationId);
+				}
 
 				Action action = new Action();
 				action.put("sender", "experiment daemon");
@@ -178,6 +190,10 @@ public class ExperimentExecutor extends ServerThread {
 							action.child("exception", e.getAction());
 						}
 					}
+				} catch (GenericTeleoperationException e) {
+					if (!e.getAction().containsKey("state")) {
+						errorState = true;
+					}
 				} catch (Exception e) {
 					errorState = true;
 					action.put("grave", e.getClass().getSimpleName());
@@ -186,6 +202,7 @@ public class ExperimentExecutor extends ServerThread {
 				try {
 					if (errorState) {
 						adapter.setContextError(reservationId);
+						errorContexts.put(reservationId, new Date());
 
 						adapter.deleteExperimentContext(reservationId);
 

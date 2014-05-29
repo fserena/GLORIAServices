@@ -38,4 +38,6 @@ public interface WeatherTeleoperationInterface {
 	public boolean isTemperatureOnAlarm(String rt, String tempSensor)
 			throws DeviceOperationFailedException,
 			WeatherTeleoperationException;
+
+	public boolean isOnWeatherAlarm(String rt) throws WeatherTeleoperationException;
 }
