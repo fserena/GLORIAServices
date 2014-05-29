@@ -80,5 +80,4 @@ public class GenericTeleoperation extends AbstractTeleoperation implements
 			throw new GenericTeleoperationException(action);
 		}
 	}
-
 }

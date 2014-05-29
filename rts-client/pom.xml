@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>rts-client</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA RTS Client</name>
+	<name>RTS Client</name>
 	<dependencies>
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>eu.gloria.gs.services</groupId>
 			<artifactId>rti-proxy</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

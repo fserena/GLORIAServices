@@ -1,7 +1,9 @@
 package eu.gloria.gs.services.experiment;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.gloria.gs.services.core.LogEntry;
 import eu.gloria.gs.services.core.LogStore;
@@ -18,6 +20,7 @@ import eu.gloria.gs.services.experiment.base.parameters.ExperimentParameterExcep
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.log.action.Action;
 import eu.gloria.gs.services.log.action.LogType;
+import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationException;
 import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationInterface;
 
 public class ExperimentExecutor extends ServerThread {
@@ -28,6 +31,7 @@ public class ExperimentExecutor extends ServerThread {
 	private String username;
 	private String password;
 	private GenericTeleoperationInterface genericTeleoperation;
+	private static Map<Integer, Date> errorContexts = new HashMap<Integer, Date>();
 
 	/**
 	 * @param name
@@ -59,13 +63,12 @@ public class ExperimentExecutor extends ServerThread {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	@Override
 	public void end() {
-		GSClientProvider.clearCredentials();
+		// GSClientProvider.clearCredentials();
 		super.end();
 	}
-
 
 	@Override
 	protected void doWork() {
@@ -90,6 +93,14 @@ public class ExperimentExecutor extends ServerThread {
 			for (ReservationInformation reservation : reservations) {
 
 				int reservationId = reservation.getReservationId();
+				
+				if (errorContexts.containsKey(reservationId)) {
+					Date lastUpdate = errorContexts.get(reservationId);
+					if (new Date().getTime() - lastUpdate.getTime() < 10000) {
+						continue;
+					}
+					errorContexts.remove(reservationId);
+				}
 
 				Action action = new Action();
 				action.put("sender", "experiment daemon");
@@ -160,26 +171,28 @@ public class ExperimentExecutor extends ServerThread {
 
 					} else {
 
-						ExperimentRuntimeInformation runtimeInfo = adapter
-								.getExperimentRuntimeContext(reservation
-										.getReservationId());
+						try {
+							ExperimentRuntimeInformation runtimeInfo = adapter
+									.getExperimentRuntimeContext(reservation
+											.getReservationId());
 
-						if (runtimeInfo.getRemainingTime() <= 1) {
-							ExperimentContext context = manager.getContext(
-									reservation.getUser(),
-									reservation.getReservationId());
-							try {
+							if (runtimeInfo.getRemainingTime() <= 1) {
+								ExperimentContext context = manager.getContext(
+										reservation.getUser(), reservationId);
 								context.end();
 
 								action.put("end", "done");
 
-							} catch (ExperimentOperationException e) {
-
-								errorState = true;
-								action.put("end", "failed");
-								action.child("exception", e.getAction());
 							}
+						} catch (ExperimentOperationException e) {
+							errorState = true;
+							action.put("end", "failed");
+							action.child("exception", e.getAction());
 						}
+					}
+				} catch (GenericTeleoperationException e) {
+					if (!e.getAction().containsKey("state")) {
+						errorState = true;
 					}
 				} catch (Exception e) {
 					errorState = true;
@@ -188,10 +201,10 @@ public class ExperimentExecutor extends ServerThread {
 
 				try {
 					if (errorState) {
-						adapter.setContextError(reservation.getReservationId());
+						adapter.setContextError(reservationId);
+						errorContexts.put(reservationId, new Date());
 
-						adapter.deleteExperimentContext(reservation
-								.getReservationId());
+						adapter.deleteExperimentContext(reservationId);
 
 						this.log(LogType.ERROR, username, reservationId, action);
 					} else {
@@ -229,7 +242,7 @@ public class ExperimentExecutor extends ServerThread {
 			entry.setRid(rid);
 
 		entry.setAction(action);
-		this.logStore.addEntry(entry);		
+		this.logStore.addEntry(entry);
 	}
 
 	private void log(LogType type, String username, Integer rid, Action action) {

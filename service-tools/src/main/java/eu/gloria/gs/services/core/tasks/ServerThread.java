@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.gloria.gs.services.core.client.GSClientProvider;
 import eu.gloria.gs.services.log.action.Action;
 import eu.gloria.gs.services.log.action.LogType;
 import eu.gloria.gs.services.utils.JSONConverter;
@@ -31,11 +32,16 @@ public abstract class ServerThread extends Thread {
 			}
 		}
 
+		try {
+			GSClientProvider.clearCredentials();
+			log.info("Thread local cleaned");
+		} catch (Exception e) {
+		}
 	}
 
 	public void end() {
 		this.finish = true;
-		log.info("Trying to end " + log.getName() + "...");
+		log.info("Shutting down...");
 	}
 
 	protected void log(LogType type, Action action) {

@@ -32,7 +32,7 @@ public class RTSManager {
 		String requestedPort = keyData.getPort();
 
 		synchronized (rtsTable) {
-			if (!rtsTable.containsKey(requestedUrl)) {
+			if (!rtsTable.containsKey(requestedUrl + requestedPort)) {
 				try {
 					RTSHandler rts = null;
 
@@ -41,13 +41,13 @@ public class RTSManager {
 					rts = new RTSHandler(requestedUrl, requestedPort, keyData
 							.getCredentials().getUser(), keyData
 							.getCredentials().getPassword());
-					rtsTable.put(requestedUrl, rts);
+					rtsTable.put(requestedUrl + requestedPort, rts);
 				} catch (Exception e) {
 					throw e;
 				}
 			}
 
-			return rtsTable.get(requestedUrl);
+			return rtsTable.get(requestedUrl + requestedPort);
 		}
 	}
 

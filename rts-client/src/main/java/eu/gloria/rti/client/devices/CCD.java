@@ -1,6 +1,7 @@
 package eu.gloria.rti.client.devices;
 
 import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
+import eu.gloria.gs.services.teleoperation.base.Range;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDState;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
@@ -46,6 +47,16 @@ public class CCD extends DeviceHandler implements CCDInterface {
 	public boolean getAutoExposure() throws TeleoperationException {
 		return rts.getAutoExposure(this.ccd);
 	}
+	
+	@Override
+	public boolean gainIsModifiable() throws TeleoperationException {
+		return rts.gainIsModifiable(this.ccd);
+	}
+	
+	@Override
+	public boolean gammaIsModifiable() throws TeleoperationException {
+		return rts.gammaIsModifiable(this.ccd);
+	}
 
 	@Override
 	public void setBrightness(long value) throws TeleoperationException {
@@ -88,12 +99,13 @@ public class CCD extends DeviceHandler implements CCDInterface {
 	}
 
 	@Override
-	public void stopContinueMode() throws TeleoperationException {		
+	public void stopContinueMode() throws TeleoperationException {
 		rts.stopContinueMode(this.ccd);
 	}
 
 	@Override
-	public String getImageURL(String id, ImageExtensionFormat format) throws TeleoperationException {
+	public String getImageURL(String id, ImageExtensionFormat format)
+			throws TeleoperationException {
 		return rts.getImageURL(this.ccd, id, format);
 	}
 
@@ -112,7 +124,7 @@ public class CCD extends DeviceHandler implements CCDInterface {
 	@Override
 	public void setGamma(long value) throws TeleoperationException {
 		rts.setGamma(this.ccd, value);
-		
+
 	}
 
 	@Override
@@ -120,7 +132,9 @@ public class CCD extends DeviceHandler implements CCDInterface {
 		return rts.getGamma(this.ccd);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.gloria.rti.client.devices.CCDInterface#setBiningX(long)
 	 */
 	@Override
@@ -128,7 +142,9 @@ public class CCD extends DeviceHandler implements CCDInterface {
 		rts.setBiningX(this.ccd, value);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.gloria.rti.client.devices.CCDInterface#getBiningX()
 	 */
 	@Override
@@ -136,7 +152,9 @@ public class CCD extends DeviceHandler implements CCDInterface {
 		return rts.getBiningX(this.ccd);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.gloria.rti.client.devices.CCDInterface#setBiningY(long)
 	 */
 	@Override
@@ -144,11 +162,19 @@ public class CCD extends DeviceHandler implements CCDInterface {
 		rts.setBiningY(this.ccd, value);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.gloria.rti.client.devices.CCDInterface#getBiningY()
 	 */
 	@Override
 	public long getBiningY() throws TeleoperationException {
 		return rts.getBiningY(this.ccd);
+	}
+
+	@Override
+	public Range getExposureRange(String object)
+			throws TeleoperationException {
+		return rts.getExposureRange(this.ccd, object);
 	}
 }

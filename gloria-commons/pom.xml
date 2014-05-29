@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>gloria-commons</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>gloria-commons</name>
+	<name>GLORIA Commons</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>

@@ -1,5 +1,6 @@
 package eu.gloria.rti.client.devices;
 
+import eu.gloria.gs.services.teleoperation.base.Range;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
 import eu.gloria.gs.services.teleoperation.ccd.CCDState;
 import eu.gloria.gs.services.teleoperation.ccd.ImageExtensionFormat;
@@ -10,9 +11,15 @@ public interface CCDInterface {
 
 	public double getExposureTime() throws TeleoperationException;
 
+	public Range getExposureRange(String object) throws TeleoperationException;
+
 	public void setAutoExposure(boolean mode) throws TeleoperationException;
 
 	public boolean getAutoExposure() throws TeleoperationException;
+	
+	public boolean gainIsModifiable() throws TeleoperationException;
+
+	public boolean gammaIsModifiable() throws TeleoperationException;
 
 	public void setContrast(long value) throws TeleoperationException;
 

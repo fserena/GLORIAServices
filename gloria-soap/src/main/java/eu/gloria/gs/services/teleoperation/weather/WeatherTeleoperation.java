@@ -1,8 +1,11 @@
 package eu.gloria.gs.services.teleoperation.weather;
 
+import eu.gloria.gs.services.log.action.Action;
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
+import eu.gloria.gs.services.teleoperation.generic.GenericTeleoperationException;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetPressureOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetRelativeHumidityOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.GetTemperatureOperation;
@@ -11,6 +14,7 @@ import eu.gloria.gs.services.teleoperation.weather.operations.IsPressureOnAlarmO
 import eu.gloria.gs.services.teleoperation.weather.operations.IsRHOnAlarmOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.IsTemperatureOnAlarmOperation;
 import eu.gloria.gs.services.teleoperation.weather.operations.IsWindOnAlarmOperation;
+import eu.gloria.rti.client.RTSHandler;
 
 public class WeatherTeleoperation extends AbstractTeleoperation implements
 		WeatherTeleoperationInterface {
@@ -128,6 +132,32 @@ public class WeatherTeleoperation extends AbstractTeleoperation implements
 			throw e;
 		} catch (ActionException e) {
 			throw new WeatherTeleoperationException(e.getAction());
+		}
+	}
+	
+	@Override
+	public boolean isOnWeatherAlarm(String rt)
+			throws WeatherTeleoperationException {
+
+		String operationName = "is on weather alarm";
+
+		Action action = new Action();
+		action.put("name", operationName);
+		action.put("rt", rt);
+
+		try {
+			RTSHandler rtHandler = (RTSHandler) this.getServerResolver()
+					.getHandler(rt);
+
+			boolean alarm = rtHandler.isOnWeatherAlarm();
+			action.put("alarm", alarm);
+			
+			this.logInfo(rt, this.getClientUsername(), action);
+			
+			return alarm;
+		} catch (TeleoperationException e) {
+			this.logException(action, e);
+			throw new WeatherTeleoperationException(action);
 		}
 	}
 }

@@ -3,7 +3,9 @@ package eu.gloria.gs.services.teleoperation.focuser;
 import eu.gloria.gs.services.log.action.ActionException;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.Range;
 import eu.gloria.gs.services.teleoperation.focuser.operations.GetPositionOperation;
+import eu.gloria.gs.services.teleoperation.focuser.operations.GetRangeOperation;
 import eu.gloria.gs.services.teleoperation.focuser.operations.MoveAbsoluteOperation;
 import eu.gloria.gs.services.teleoperation.focuser.operations.MoveRelativeOperation;
 
@@ -47,6 +49,20 @@ public class FocuserTeleoperation extends AbstractTeleoperation implements
 			FocuserTeleoperationException {
 		try {
 			this.invokeSetOperation(MoveRelativeOperation.class, rt, focuser, steps);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
+		} catch (ActionException e) {
+			throw new FocuserTeleoperationException(e.getAction());
+		}
+	}
+	
+	@Override
+	public Range getRange(String rt, String focuser)
+			throws DeviceOperationFailedException,
+			FocuserTeleoperationException {
+		try {
+			return (Range) this.invokeGetOperation(GetRangeOperation.class,
+					rt, focuser);
 		} catch (DeviceOperationFailedException e) {
 			throw e;
 		} catch (ActionException e) {

@@ -8,6 +8,7 @@ import eu.gloria.gs.services.teleoperation.base.DeviceHandler;
 import eu.gloria.gs.services.teleoperation.base.DeviceNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
 import eu.gloria.gs.services.teleoperation.base.IncorrectDeviceTypeException;
+import eu.gloria.gs.services.teleoperation.base.Range;
 import eu.gloria.gs.services.teleoperation.base.ServerHandler;
 import eu.gloria.gs.services.teleoperation.base.ServerNotAvailableException;
 import eu.gloria.gs.services.teleoperation.base.TeleoperationException;
@@ -26,6 +27,8 @@ import eu.gloria.rt.entity.device.DeviceCamera;
 import eu.gloria.rt.entity.device.DeviceDome;
 import eu.gloria.rt.entity.device.DeviceMount;
 import eu.gloria.rt.entity.device.DeviceType;
+import eu.gloria.rt.entity.device.ExecutorInfo;
+import eu.gloria.rt.entity.device.ExecutorState;
 import eu.gloria.rt.entity.device.ImageFormat;
 import eu.gloria.rt.entity.device.TrackingRateType;
 import eu.gloria.rti.GloriaRti;
@@ -46,7 +49,7 @@ public class RTSHandler implements ServerHandler {
 
 	private GloriaRti rtsPort;
 	private static String serviceName;
-	private static boolean teleoperationStarted = false;
+	private boolean teleoperationStarted = false;
 	private String host;
 	private String port;
 
@@ -110,7 +113,7 @@ public class RTSHandler implements ServerHandler {
 			}
 
 			rtsPort.focMove(null, focuser, effectiveMove);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(focuser,
 					DeviceType.FOCUS.name(), "absolute move", e.getMessage());
 		}
@@ -124,7 +127,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.domClose(null, dome, 0);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "close", e.getMessage());
 		}
@@ -138,7 +141,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetAutoExposureTime(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get auto exposure", e.getMessage());
 		}
@@ -152,7 +155,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetAutoGain(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get auto gain", e.getMessage());
 		}
@@ -168,7 +171,7 @@ public class RTSHandler implements ServerHandler {
 		List<String> filters;
 		try {
 			filters = rtsPort.fwGetFilterList(null, filterWheel);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(filterWheel,
 					DeviceType.FW.name(), "get filters", e.getMessage());
 		}
@@ -183,7 +186,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetBinX(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get bining x", e.getMessage());
 		}
@@ -197,7 +200,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetBinY(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get bining y", e.getMessage());
 		}
@@ -213,7 +216,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -223,7 +226,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				return rtsPort.scamGetBrightness(null, camera);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "get brigtness", e.getMessage());
 		}
@@ -241,7 +244,7 @@ public class RTSHandler implements ServerHandler {
 					null, ccd, false);
 
 			return deviceCamera.getActivityContinueState();
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(ccd,
 					DeviceType.CCD.name(), "get state", e.getMessage());
 		}
@@ -256,7 +259,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetContinueModeImagePath(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get continue url", e.getMessage());
 		}
@@ -272,7 +275,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -282,7 +285,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				return rtsPort.scamGetContrast(null, camera);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "get contrast", e.getMessage());
 		}
@@ -297,7 +300,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			double dec = rtsPort.mntGetPosAxis2(null, mount);
 			return dec;
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get dec", e.getMessage());
 		}
@@ -354,7 +357,7 @@ public class RTSHandler implements ServerHandler {
 
 			return rtsPort.domGetAzimuth(null, dome);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "get azimuth", e.getMessage());
 		}
@@ -372,8 +375,13 @@ public class RTSHandler implements ServerHandler {
 			DeviceDome domeDevice = (DeviceDome) rtsPort.devGetDevice(null,
 					dome, false);
 
-			return domeDevice.getActivityStateOpening();
-		} catch (RtiError e) {
+			ActivityStateDomeOpening state = domeDevice.getActivityStateOpening();
+			if (state == null) {
+				state = ActivityStateDomeOpening.NOT_DEFINED;
+			}
+			
+			return state;
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "get state", e.getMessage());
 		}
@@ -387,7 +395,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.domGetTracking(null, dome);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "get tracking", e.getMessage());
 		}
@@ -403,7 +411,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -414,9 +422,107 @@ public class RTSHandler implements ServerHandler {
 				return rtsPort.scamGetExposureTime(null, camera);
 			}
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "get exposure time", e.getMessage());
+		}
+	}
+
+	public boolean gainIsModifiable(String camera)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (Exception e) {
+			throw new DeviceNotAvailableException(camera, null, e.getMessage());
+		}
+
+		try {
+			return rtsPort.camHasGain(null, camera);
+
+		} catch (Exception e) {
+			throw new DeviceOperationFailedException(camera, device.getType()
+					.name(), "gain is modifiable", e.getMessage());
+		}
+	}
+
+	public boolean gammaIsModifiable(String camera)
+			throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (Exception e) {
+			throw new DeviceNotAvailableException(camera, null, e.getMessage());
+		}
+
+		try {
+			return rtsPort.camHasGamma(null, camera);
+
+		} catch (Exception e) {
+			throw new DeviceOperationFailedException(camera, device.getType()
+					.name(), "gamma is modifiable", e.getMessage());
+		}
+	}
+
+	public Range getExposureRange(String camera, String object)
+			throws TeleoperationException {
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		Device device = null;
+
+		try {
+			device = rtsPort.devGetDevice(null, camera, false);
+		} catch (Exception e) {
+			throw new DeviceNotAvailableException(camera, null, e.getMessage());
+		}
+
+		try {
+			List<Double> listRange = rtsPort.camGetObjectExposureTime(null,
+					camera, object, "OPEN");
+
+			Range range = new Range();
+			range.setMin(listRange.get(0));
+			range.setMax(listRange.get(1));
+			return range;
+		} catch (Exception e) {
+			throw new DeviceOperationFailedException(camera, device.getType()
+					.name(), "get exposure range", e.getMessage());
+		}
+	}
+
+	public Range getFocuserRange(String focuser) throws TeleoperationException {
+
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+
+			long min = rtsPort.focGetMinStep(null, focuser);
+			long max = rtsPort.focGetMaxStep(null, focuser);
+
+			Range range = new Range();
+			range.setMin(min);
+			range.setMax(max);
+			return range;
+		} catch (Exception e) {
+			throw new DeviceOperationFailedException(focuser,
+					DeviceType.FOCUS.name(), "get focuser range",
+					e.getMessage());
 		}
 	}
 
@@ -431,7 +537,7 @@ public class RTSHandler implements ServerHandler {
 			if (rtsPort.focIsAbsolute(null, focuser)) {
 				return rtsPort.focGetPosition(null, focuser);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(focuser,
 					DeviceType.FOCUS.name(), "get position", e.getMessage());
 		}
@@ -447,7 +553,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetGain(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get gain", e.getMessage());
 		}
@@ -461,7 +567,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camGetGamma(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "get gamma", e.getMessage());
 		}
@@ -478,7 +584,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -491,7 +597,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				return rtsPort.scamGetVideoStreamingURL(null, camera);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			if (e.getMessage().equals("NOT_AVAILABLE")) {
 				ImageNotAvailableException ex = new ImageNotAvailableException(
 						camera, device.getType().name());
@@ -525,18 +631,25 @@ public class RTSHandler implements ServerHandler {
 
 			boolean parked = rtsPort.mntIsParked(null, mount);
 			boolean slewing = rtsPort.mntIsSlewing(null, mount);
-			boolean tracking = rtsPort.mntGetTracking(null, mount);
+			boolean tracking = false;
+			try {
+				tracking = rtsPort.mntGetTracking(null, mount);
+			} catch (RtiError e) {				
+			}
 
 			if (parked)
 				return ActivityStateMount.PARKED;
-			if (tracking)
-				return ActivityStateMount.TRACKING;
 			if (slewing)
 				return ActivityStateMount.MOVING;
+			if (tracking)
+				return ActivityStateMount.TRACKING;
 
 			return state;
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
+			if (e.getMessage().contains("not supported")) {
+				return ActivityStateMount.NOT_DEFINED;
+			}
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get state", e.getMessage());
 		}
@@ -554,7 +667,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.barGetMeasure(null, barometer);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(barometer,
 					DeviceType.BAROMETER.name(), "get pressure", e.getMessage());
 		}
@@ -569,7 +682,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			double ra = rtsPort.mntGetPosAxis1(null, mount);
 			return ra;
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "get ra", e.getMessage());
 		}
@@ -584,7 +697,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.rhsGetMeasure(null, rhSensor);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(rhSensor,
 					DeviceType.RH_SENSOR.name(), "get rh", e.getMessage());
 		}
@@ -601,7 +714,7 @@ public class RTSHandler implements ServerHandler {
 					null, scam, false);
 
 			return deviceCamera.getActivityContinueState();
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(scam,
 					DeviceType.SURVEILLANCE_CAMERA.name(), "get state",
 					e.getMessage());
@@ -617,7 +730,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.tempGetMeasure(null, tempSensor);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(tempSensor,
 					DeviceType.TEMPERATURE_SENSOR.name(), "get temperature",
 					e.getMessage());
@@ -632,7 +745,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.wspGetMeasure(null, wind);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(wind,
 					DeviceType.WIND_SPEED_SENSOR.name(), "get wind speed",
 					e.getMessage());
@@ -653,6 +766,29 @@ public class RTSHandler implements ServerHandler {
 			throw new ServerNotAvailableException(host, port, null);
 		}
 	}
+	
+	public boolean isOnWeatherAlarm() throws ServerNotAvailableException {
+		if (rtsPort == null) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+
+		try {
+			List<Device> devices = rtsPort.devGetDevices(null, false);
+			
+			for (Device device : devices) {
+				AlarmState state = device.getAlarmState();
+				
+				if (AlarmState.WEATHER.equals(state)) {
+					return true;
+				}
+			}
+			
+			return false;
+
+		} catch (Exception e) {
+			throw new ServerNotAvailableException(host, port, null);
+		}
+	}
 
 	public boolean isPressureSensorInAlarm(String barometer)
 			throws TeleoperationException {
@@ -663,12 +799,17 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, barometer, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);
-		} catch (RtiError e) {
+			AlarmState state = sensor.getAlarmState();
+			if (state != null) {
+				return state.equals(AlarmState.WEATHER);
+			}
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(barometer,
 					DeviceType.BAROMETER.name(), "get pressure alarm",
 					e.getMessage());
 		}
+
+		return false;
 	}
 
 	public boolean isRHSensorInAlarm(String rhSensor)
@@ -680,11 +821,16 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, rhSensor, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);
-		} catch (RtiError e) {
+			AlarmState state = sensor.getAlarmState();
+			if (state != null) {
+				return state.equals(AlarmState.WEATHER);
+			}
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(rhSensor,
 					DeviceType.RH_SENSOR.name(), "get rh alarm", e.getMessage());
 		}
+
+		return false;
 	}
 
 	public boolean isTeleoperationStarted() {
@@ -700,12 +846,17 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, tempSensor, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);
-		} catch (RtiError e) {
+			AlarmState state = sensor.getAlarmState();
+			if (state != null) {
+				return state.equals(AlarmState.WEATHER);
+			}
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(tempSensor,
 					DeviceType.TEMPERATURE_SENSOR.name(),
 					"get temperature alarm", e.getMessage());
 		}
+
+		return false;
 	}
 
 	public boolean isWindSensorInAlarm(String wind)
@@ -717,12 +868,18 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			Device sensor = rtsPort.devGetDevice(null, wind, false);
-			return sensor.getAlarmState().equals(AlarmState.WEATHER);
-		} catch (RtiError e) {
+
+			AlarmState state = sensor.getAlarmState();
+			if (state != null) {
+				return state.equals(AlarmState.WEATHER);
+			}
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(wind,
 					DeviceType.RH_SENSOR.name(), "get temperature alarm",
 					e.getMessage());
 		}
+
+		return false;
 	}
 
 	public void moveEast(String mount) throws TeleoperationException {
@@ -733,7 +890,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntMoveEast(null, mount);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "move east", e.getMessage());
 		}
@@ -747,7 +904,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntMoveNorth(null, mount);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "move north", e.getMessage());
 		}
@@ -761,7 +918,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntMoveSouth(null, mount);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "move south", e.getMessage());
 		}
@@ -775,7 +932,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntMoveWest(null, mount);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "move west", e.getMessage());
 		}
@@ -783,20 +940,41 @@ public class RTSHandler implements ServerHandler {
 
 	public void notifyTeleoperation(long seconds)
 			throws GenericTeleoperationException {
+
+		ExecutorInfo executor;
 		try {
-			rtsPort.execStopOp(null);
-			teleoperationStarted = false;
-		} catch (RtiError e) {
-			throw new GenericTeleoperationException("start", "stop previous", e);
+			executor = rtsPort.execGetInfo(null);
+		} catch (Exception e) {
+			throw new GenericTeleoperationException("start",
+					"get executor state", e);
 		}
 
-		try {
-			rtsPort.execStartOp(null, null, "GLORIA", seconds);
-			teleoperationStarted = true;
-		} catch (RtiError e) {
-			GenericTeleoperationException ex = new GenericTeleoperationException(
-					"start", e);
-			ex.getAction().put("while", "after stop");
+		ExecutorState state = executor.getState();
+		
+		if (state.equals(ExecutorState.IDLE) || state.equals(ExecutorState.RUNNING)) {
+			//if (teleoperationStarted) {
+				try {
+					rtsPort.execStopOp(null);
+					teleoperationStarted = false;
+				} catch (Exception e) {
+					throw new GenericTeleoperationException("start",
+							"stop previous", e);
+				}
+		//	}
+
+			try {
+				rtsPort.execStartOp(null, null, "GLORIA", seconds);
+				teleoperationStarted = true;
+			} catch (Exception e) {
+				GenericTeleoperationException ex = new GenericTeleoperationException(
+						"start", e);
+				ex.getAction().put("while", "after stop");
+
+				throw ex;
+			}
+		} else {
+			GenericTeleoperationException ex = new GenericTeleoperationException();
+			ex.getAction().put("state", state.name());
 
 			throw ex;
 		}
@@ -810,7 +988,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.domOpen(null, dome, 0);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "open", e.getMessage());
 		}
@@ -825,7 +1003,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.domPark(null, dome);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "park", e.getMessage());
 		}
@@ -840,7 +1018,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.mntPark(null, mount);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "park", e.getMessage());
 		}
@@ -862,7 +1040,7 @@ public class RTSHandler implements ServerHandler {
 			}
 
 			rtsPort.focMove(null, focuser, effectiveMove);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(focuser,
 					DeviceType.FOCUS.name(), "relative move", e.getMessage());
 		}
@@ -878,7 +1056,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 
 			rtsPort.fwSelectFilterKind(null, filterWheel, filter);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(filterWheel,
 					DeviceType.FW.name(), "select filter", e.getMessage());
 		}
@@ -894,7 +1072,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.camSetAutoExposureTime(null, camera, mode);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set auto exposure", e.getMessage());
 		}
@@ -909,7 +1087,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camSetAutoGain(null, camera, mode);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set auto gain", e.getMessage());
 		}
@@ -924,7 +1102,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camSetBinX(null, camera, (int) value);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set bining x", e.getMessage());
 		}
@@ -939,7 +1117,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camSetBinY(null, camera, (int) value);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set bining y", e.getMessage());
 		}
@@ -956,7 +1134,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -967,7 +1145,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				rtsPort.scamSetBrightness(null, camera, (long) value);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "set brigtness", e.getMessage());
 		}
@@ -984,7 +1162,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -994,7 +1172,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				rtsPort.scamSetContrast(null, camera, value);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "set contrast", e.getMessage());
 		}
@@ -1009,7 +1187,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.domSetTracking(null, dome, mode);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(dome,
 					DeviceType.DOME.name(), "set tracking", e.getMessage());
 		}
@@ -1026,7 +1204,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			device = rtsPort.devGetDevice(null, camera, false);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceNotAvailableException(camera, null, e.getMessage());
 		}
 
@@ -1036,7 +1214,7 @@ public class RTSHandler implements ServerHandler {
 			} else {
 				rtsPort.scamSetExposureTime(null, camera, (long) value);
 			}
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera, device.getType()
 					.name(), "set exposure time", e.getMessage());
 		}
@@ -1051,7 +1229,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camSetGain(null, camera, value);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set gain", e.getMessage());
 		}
@@ -1066,7 +1244,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camSetGamma(null, camera, value);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "set gamma", e.getMessage());
 		}
@@ -1081,7 +1259,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntSetTracking(null, mount, mode);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "set tracking", e.getMessage());
 		}
@@ -1096,7 +1274,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntSetSlewRate(null, mount, rate);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "set slew rate", e.getMessage());
 		}
@@ -1112,7 +1290,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.mntSetTrackingRate(null, mount,
 					TrackingRateType.valueOf(rate.name()));
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "set tracking rate",
 					e.getMessage());
@@ -1129,7 +1307,7 @@ public class RTSHandler implements ServerHandler {
 		try {
 			rtsPort.mntSlewToCoordinates(null, mount, ra, dec);
 
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "slew to coordinates",
 					e.getMessage());
@@ -1145,7 +1323,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.mntSlewObject(null, mount, object);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(mount,
 					DeviceType.MOUNT.name(), "slew to object", e.getMessage());
 		}
@@ -1160,7 +1338,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camStartContinueMode(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "start continue", e.getMessage());
 		}
@@ -1174,7 +1352,7 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			return rtsPort.camStartExposure(null, camera, true);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "start exposure", e.getMessage());
 		}
@@ -1192,18 +1370,20 @@ public class RTSHandler implements ServerHandler {
 
 		try {
 			rtsPort.camStopContinueMode(null, camera);
-		} catch (RtiError e) {
+		} catch (Exception e) {
 			throw new DeviceOperationFailedException(camera,
 					DeviceType.CCD.name(), "stop continue", e.getMessage());
 		}
 	}
 
 	public void stopTeleoperation() throws GenericTeleoperationException {
-		try {
-			rtsPort.execStopOp(null);
-			teleoperationStarted = false;
-		} catch (RtiError e) {
-			throw new GenericTeleoperationException("stop", e);
+		if (teleoperationStarted) {
+			try {
+				rtsPort.execStopOp(null);
+				teleoperationStarted = false;
+			} catch (Exception e) {
+				throw new GenericTeleoperationException("stop", e);
+			}
 		}
 	}
 }

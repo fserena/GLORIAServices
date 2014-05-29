@@ -414,6 +414,9 @@ public class Experiment extends GSLogProducerService implements
 				e.getAction().put("slots", 0);
 				throw e;
 			}
+			
+			action.put("slots", timeSlots.size());
+			this.logInfo(action);
 
 			return timeSlots;
 		} catch (ActionException e) {
@@ -486,6 +489,9 @@ public class Experiment extends GSLogProducerService implements
 		Action action = new Action(Experiment.class,
 				"executeExperimentOperation", reservationId, operation);
 
+		boolean adminMode = this.isAdminMode(action);
+		action.put("admin mode", adminMode);
+		
 		ExperimentContext context;
 		try {
 			context = contextManager.getContext(this.getClientUsername(),

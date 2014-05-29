@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>experiments-engine</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA Experiments</name>
+	<name>Experiments Engine</name>
 	<dependencies>
 		<dependency>
 			<groupId>commons-dbcp</groupId>

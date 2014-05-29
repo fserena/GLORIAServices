@@ -35,13 +35,11 @@ public class SchedulerMonitorExecutor extends ServerThread {
 	public void setBrain(SchedulerBrain brain) {
 		this.brain = brain;
 	}
-	
-	
+
 	@Override
 	public void end() {
 		super.end();
-
-		GSClientProvider.clearCredentials();
+		// GSClientProvider.clearCredentials();
 	}
 
 	@Override

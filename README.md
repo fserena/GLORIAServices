@@ -1,2 +1,2 @@
-GLORIAServices
-==============
+# gloria-soap
+

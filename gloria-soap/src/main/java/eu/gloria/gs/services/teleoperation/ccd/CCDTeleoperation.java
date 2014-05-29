@@ -5,10 +5,14 @@ import eu.gloria.gs.services.repository.image.ImageRepositoryInterface;
 import eu.gloria.gs.services.repository.image.data.ImageTargetData;
 import eu.gloria.gs.services.teleoperation.base.AbstractTeleoperation;
 import eu.gloria.gs.services.teleoperation.base.DeviceOperationFailedException;
+import eu.gloria.gs.services.teleoperation.base.Range;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GainIsModifiableOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GammaIsModifiableOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningXOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBiningYOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetBrightnessOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetContrastOperation;
+import eu.gloria.gs.services.teleoperation.ccd.operations.GetExposureRangeOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetExposureTimeOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetGainOperation;
 import eu.gloria.gs.services.teleoperation.ccd.operations.GetGammaOperation;
@@ -92,6 +96,19 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 		try {
 			return (Double) this.invokeGetOperation(
 					GetExposureTimeOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
+		} catch (ActionException e) {
+			throw new CCDTeleoperationException(e.getAction());
+		}
+	}
+
+	@Override
+	public Range getExposureRange(String rt, String ccd, String object)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		try {
+			return (Range) this.invokeGetOperation(
+					GetExposureRangeOperation.class, rt, ccd, object);
 		} catch (DeviceOperationFailedException e) {
 			throw e;
 		} catch (ActionException e) {
@@ -292,6 +309,32 @@ public class CCDTeleoperation extends AbstractTeleoperation implements
 			throws DeviceOperationFailedException, CCDTeleoperationException {
 		try {
 			this.invokeSetOperation(StopContinueModeOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
+		} catch (ActionException e) {
+			throw new CCDTeleoperationException(e.getAction());
+		}
+	}
+
+	@Override
+	public boolean gainIsModifiable(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		try {
+			return (Boolean) this.invokeGetOperation(
+					GainIsModifiableOperation.class, rt, ccd);
+		} catch (DeviceOperationFailedException e) {
+			throw e;
+		} catch (ActionException e) {
+			throw new CCDTeleoperationException(e.getAction());
+		}
+	}
+
+	@Override
+	public boolean gammaIsModifiable(String rt, String ccd)
+			throws DeviceOperationFailedException, CCDTeleoperationException {
+		try {
+			return (Boolean) this.invokeGetOperation(
+					GammaIsModifiableOperation.class, rt, ccd);
 		} catch (DeviceOperationFailedException e) {
 			throw e;
 		} catch (ActionException e) {
