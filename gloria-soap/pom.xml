@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>gloria-soap</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA SOAP API</name>
+	<name>Soap API</name>
 	<packaging>war</packaging>
 
 	<dependencies>

@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>user-repository</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA User Repository</name>
+	<name>User Repository SPI</name>
 	<packaging>jar</packaging>
 
 	<dependencies>

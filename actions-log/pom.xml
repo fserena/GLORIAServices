@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>actions-log</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA Action Log</name>
+	<name>Actions Log SPI</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.mybatis</groupId>

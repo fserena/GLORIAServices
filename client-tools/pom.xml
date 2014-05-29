@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>client-tools</artifactId>
 	<version>0.0.3-SNAPSHOT</version>
-	<name>client-tools</name>
+	<name>Service Client Tools</name>
 	<properties>
 		<cxf.version>2.7.8</cxf.version>
 	</properties>

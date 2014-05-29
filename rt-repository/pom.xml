@@ -4,7 +4,7 @@
 	<groupId>eu.gloria.gs.services</groupId>
 	<artifactId>rt-repository</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>GLORIA RT Repository</name>
+	<name>RT Repository SPI</name>
 	<dependencies>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
